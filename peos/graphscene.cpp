@@ -1,5 +1,5 @@
 #include "graphscene.h"
-#include <iostream>
+#include <stdio.h>
 using namespace std;
 
 
@@ -38,7 +38,7 @@ GraphScene::GraphScene(int nn, int mm, vector< pair<int,int> > edgs,vector<int> 
     edges->push_back(myEdge ( myPair(2,4),1)  );
     edges->push_back(myEdge ( myPair(1,4),0)  );
 
-    printf("e1 is an edge between nodes numberedd %d and %d\n",edges->at(0).first.first,edges->at(0).first.second);
+    printf("e1 is an edge between nodes numbered %d and %d\n",edges->at(0).first.first,edges->at(0).first.second);
 
 
 
