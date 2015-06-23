@@ -406,7 +406,7 @@
   <action name="actionNew">
    <property name="icon">
     <iconset>
-     <normaloff>icons/new.png</normaloff>icons/new.png</iconset>
+     <normaloff>../icons/new.png</normaloff>../icons/new.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -418,7 +418,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset>
-     <normaloff>icons/Folder Open.png</normaloff>icons/Folder Open.png</iconset>
+     <normaloff>../icons/Folder Open.png</normaloff>../icons/Folder Open.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -435,7 +435,7 @@
   <action name="actionSave">
    <property name="icon">
     <iconset>
-     <normaloff>icons/save.png</normaloff>icons/save.png</iconset>
+     <normaloff>../icons/save.png</normaloff>../icons/save.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -475,7 +475,7 @@
   <action name="actionCut">
    <property name="icon">
     <iconset>
-     <normaloff>icons/Avosoft-Warm-Toolbar-Cut.ico</normaloff>icons/Avosoft-Warm-Toolbar-Cut.ico</iconset>
+     <normaloff>../icons/Avosoft-Warm-Toolbar-Cut.ico</normaloff>../icons/Avosoft-Warm-Toolbar-Cut.ico</iconset>
    </property>
    <property name="text">
     <string>Cut</string>
@@ -484,7 +484,7 @@
   <action name="actionCopy">
    <property name="icon">
     <iconset>
-     <normaloff>icons/Copy.png</normaloff>icons/Copy.png</iconset>
+     <normaloff>../icons/Copy.png</normaloff>../icons/Copy.png</iconset>
    </property>
    <property name="text">
     <string>Copy</string>
@@ -493,7 +493,7 @@
   <action name="actionPaste">
    <property name="icon">
     <iconset>
-     <normaloff>icons/136837629872716929332x32-paste_from_clipboard-4-md.png</normaloff>icons/136837629872716929332x32-paste_from_clipboard-4-md.png</iconset>
+     <normaloff>../icons/136837629872716929332x32-paste_from_clipboard-4-md.png</normaloff>../icons/136837629872716929332x32-paste_from_clipboard-4-md.png</iconset>
    </property>
    <property name="text">
     <string>Paste</string>
@@ -527,7 +527,7 @@
   <action name="actionZoom_In">
    <property name="icon">
     <iconset>
-     <normaloff>icons/Zoom-In-icon.png</normaloff>icons/Zoom-In-icon.png</iconset>
+     <normaloff>../icons/Zoom-In-icon.png</normaloff>../icons/Zoom-In-icon.png</iconset>
    </property>
    <property name="text">
     <string>Zoom In</string>
@@ -536,7 +536,7 @@
   <action name="actionZoom_Out">
    <property name="icon">
     <iconset>
-     <normaloff>icons/Zoom_Out-01.png</normaloff>icons/Zoom_Out-01.png</iconset>
+     <normaloff>../icons/Zoom_Out-01.png</normaloff>../icons/Zoom_Out-01.png</iconset>
    </property>
    <property name="text">
     <string>Zoom Out</string>
@@ -545,7 +545,7 @@
   <action name="actionReset_Zoom">
    <property name="icon">
     <iconset>
-     <normaloff>icons/120px-Gnome-zoom-fit-best.svg.png</normaloff>icons/120px-Gnome-zoom-fit-best.svg.png</iconset>
+     <normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</iconset>
    </property>
    <property name="text">
     <string>Reset Zoom</string>
@@ -606,6 +606,7 @@
     <string>Exit</string>
    </property>
   </action>
+
  </widget>
  <resources/>
  <connections>
