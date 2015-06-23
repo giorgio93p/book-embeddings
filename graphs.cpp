@@ -1,34 +1,25 @@
 #include "graphs.h"
 
-
-bool Edge::operator==(const Edge& e) const{
-	return false;
-}
-
 BookEmbeddedGraph* Graph::bookEmbed(const int npages,const std::vector<int>& vertexPermutation){
-	
+	//TODO
 	return new BookEmbeddedGraph;
 }
 BookEmbeddedGraph* Graph::bookEmbedOptimalPermutation(const int npages){
-	
+	//TODO
 	return new BookEmbeddedGraph;
 }
 BookEmbeddedGraph* Graph::bookEmbedWithLeastPages(){
-	
+	//TODO
 	return new BookEmbeddedGraph;
 }
 
 void BookEmbeddedGraph::setPage(const Edge& e, const int newPage){
-	int p = pageOfEdge[e];
+	int p = this->inf(e);
 	pages[p].erase(e);
 	pages[newPage].insert(e);
-	pageOfEdge[e] = newPage;
+	this->assign(e, newPage);
 	
-	recalculateCrossings();
-}
-
-std::vector<Page>* BookEmbeddedGraph::getPages(){
-	return &pages;
+	//recalculateCrossings();
 }
     
 int BookEmbeddedGraph::getNpages(){
@@ -50,12 +41,12 @@ BookEmbeddedGraph::~BookEmbeddedGraph(){
 }
 
 void BookEmbeddedGraph::calculateCrossings(){
-	
+	//TODO
 }
 
-void BookEmbeddedGraph::recalculateCrossings(){
-	
-}
+//void BookEmbeddedGraph::calculateCrossings(const int pages&){
+	//TODO
+//}
 
 int main(){
 	

@@ -1,33 +1,15 @@
-//#include <LEDA/graph.h>
+//#define LEDA_STD_IO_HEADERS
+#include <LEDA/graph/graph.h>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
-class Node /*: public node*/{
-	
-};
-
-class Edge /*: public edge*/{
-   public:
-	bool operator==(const Edge& e) const;
-};
-
-/**
- * This block of code is needed for hashing Edge objects
- **/
-namespace std{
-	template <>
-    struct hash<Edge>{
-        size_t operator()(const Edge& e) const{
-			return 0;
-            //return (/*first node hash*/ ^ /*second node hash*/ << 1)) >> 1);
-        };
-    };
-}
+typedef leda::node Node;
+typedef leda::edge Edge;
 
 class BookEmbeddedGraph;
 
-class Graph /*: public graph*/ {
+class Graph : public leda::graph {
    public:
     //TODO:
     //orismos methodon epanasxediasmou (px gia dinatotita allagis akmwn / switching koryfwn)
@@ -49,9 +31,8 @@ class Graph /*: public graph*/ {
 
 typedef std::unordered_set<Edge> Page;
 
-class BookEmbeddedGraph : public Graph {
+class BookEmbeddedGraph : public leda::GRAPH<int,int> {
     std::vector<Page> pages;
-    std::unordered_map<Edge,int> pageOfEdge; //this is used as a mapping from edges to pages
     
     std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
     int ncrossings;
@@ -71,7 +52,6 @@ class BookEmbeddedGraph : public Graph {
     // that should be passed on to the front end.
     
     
-    std::vector<Page>* getPages();
     int getNpages();
     int getNcrossings();
     int getNcrossings(const Edge& e);
@@ -80,6 +60,6 @@ class BookEmbeddedGraph : public Graph {
     virtual ~BookEmbeddedGraph();
     
    private:
-    void   calculateCrossings();
-    void recalculateCrossings();
+    void calculateCrossings();
+//    void calculateCrossings(const int pages[]&);
 };
