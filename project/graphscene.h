@@ -7,9 +7,19 @@ using namespace std;
 #include <vector>
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
+#include <Kernel/graph/graph_draw.h>
+#include "../graphs.h"
 
 
 #define LEN 250
+
+class Colors {
+    vector<QColor> pageColors;
+
+  public:
+    Colors();
+    QColor& operator[](int i);
+};
 
 typedef  pair<int,int> IntPair;
 
@@ -31,5 +41,13 @@ private:
 
 
 };
+
+class SimpleGraphScene : public QGraphicsScene{
+    std::vector<QGraphicsEllipseItem*> nodes;
+
+  public:
+    void drawGraph(Graph g);
+};
+
 
 #endif // GRAPHSCENE_H

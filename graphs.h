@@ -1,8 +1,12 @@
-//#define LEDA_STD_IO_HEADERS
+#ifndef GRAPHS_H
+#define GRAPHS_H
+
 #include <LEDA/graph/graph.h>
+//#include <Kernel/graph/graph_alg.h>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 
 typedef leda::node Node;
 typedef leda::edge Edge;
@@ -27,9 +31,14 @@ class Graph : public leda::graph {
     //TODO:
     //prosthiki synartisewn pou kanoun bookembedding gia dedomeno permutation alla agnosti selidopoisi
     //kai to antistrofo
+//   inline leda::edge_array<int>& getBiconnectedComponents(){
+//               leda::edge_array<int>& result();
+//               leda::BICONNECTED_COMPONENTS(this, result);
+//		return result;
+//	}
 };
 
-typedef std::unordered_set<Edge> Page;
+typedef std::set<Edge> Page;
 
 class BookEmbeddedGraph : public leda::GRAPH<int,int> {
     std::vector<Page> pages;
@@ -63,3 +72,5 @@ class BookEmbeddedGraph : public leda::GRAPH<int,int> {
     void calculateCrossings();
 //    void calculateCrossings(const int pages[]&);
 };
+
+#endif
