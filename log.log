@@ -1,0 +1,27 @@
+Entry 6 (3/615):
+
+Implement algorithms to:
+
+compute BC-tree with iterator over biconnected components
+compute SPQR tree decomposition with iterator
+planarity check
+ktree check
+
+G is planar
+
+combinatorial embedding
+canonical ordering + iterator for faces
+peeling ordering to levels 
+Yannakakis' algorithm for 4-page
+Nishizeki-Cluba's algorithm for hamilton cycle in 4-connected planar graph
+
+G is not planar
+
+find K33 subgraphs
+find maximal bipartite subgraph
+find maximal planar subgraph
+create chordal graph and color it 
+baur-braudez heuristic
+he-sykora heuristic
+find edge-seperator
+
