@@ -2,6 +2,15 @@
 #include "ui_mainwindow.h"
 #include "graphscene.h"
 
+#include <ogdf/basic/Graph.h>
+#include <ogdf/basic/graph_generators.h>
+#include <ogdf/layered/DfsAcyclicSubgraph.h>
+#include <ogdf/fileformats/GraphIO.h>
+
+
+
+class Edge;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -18,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     edges2.push_back(IntPair(2,3));
 
     edges2.push_back(IntPair(1,2));
-    edges2.push_back(IntPair(0,5));
+    edges2.push_back(IntPair(0,4));
 
     edges3.push_back(IntPair(2,3));
     edges3.push_back(IntPair(0,2));
@@ -43,6 +52,9 @@ MainWindow::MainWindow(QWidget *parent) :
     graphicsView_2->setScene(scene.at(1));
     graphicsView_3->setScene(scene.at(2));
     graphicsView_4->setScene(scene.at(3));
+
+   connect(actionOpen, SIGNAL(triggered()), this, SLOT(on_actionOpen_triggered()));
+
 
     QGridLayout *layout = new QGridLayout;
 }
@@ -78,3 +90,34 @@ void MainWindow::MoveEdge(Edge e,int pg1,int pg2) {
 
 }
 */
+
+void MainWindow::on_actionOpen_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
+            tr("GraphModellingLanguage files (*.gml);;C++ Files (*.cpp *.h)"));
+
+    if (!fileName.isEmpty()) {
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
+            return;
+        }
+        std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
+        bool readSuccessful = ogdf::GraphIO::readGML(this->mainGraph,fileNameStr);
+        if (readSuccessful){
+            //std::cout << "Read Successful!!!!!\n" << std::endl;
+            std::cout << "Number of nodes in read graph ==" << mainGraph.numberOfNodes() << endl;
+        }
+
+
+        //ogdf::GridLayout mylayout1(mainGraph);
+        //mylayout1.init()
+
+
+        //QTextStream in(&file);
+        //this->textEdit->setText(in.readAll());
+        file.close();
+    }
+}
+
+

@@ -8,6 +8,9 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+
+
+
 TARGET = project
 TEMPLATE = app
 
@@ -26,8 +29,28 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-QMAKE_CXXFLAGS += -std=c++11
+macx {
 
-INCLUDEPATH += $$_PRO_FILE_PWD_/../LEDA/incl/
+QMAKE_CXXFLAGS += -stdlib=libstdc++
 
-LIBS += -L$$_PRO_FILE_PWD_/../LEDA/ -lleda
+}
+
+win32 {
+
+INCLUDEPATH += 
+LIBS += 
+QMAKE_CXXFLAGS +=
+
+}
+
+!win32{
+INCLUDEPATH += $$_PRO_FILE_PWD_/../OGDF/include
+LIBS += -L$$_PRO_FILE_PWD_/../OGDF/_release -lOGDF -lCOIN
+QMAKE_CXXFLAGS +=-pthread
+    
+    
+    }
+
+
+
+

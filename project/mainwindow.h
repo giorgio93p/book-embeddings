@@ -5,8 +5,16 @@
 #include <QGridLayout>
 #include "ui_mainwindow.h"
 #include "graphscene.h"
-#include "../graphs.h"
+//#include "graphs.h"
+#include <ogdf/basic/GraphAttributes.h>
+#include <ogdf/basic/Graph.h>
+#include <ogdf/fileformats/GraphIO.h>
 
+
+#include <QFileDialog>
+#include <QFile>
+#include <QMessageBox>
+#include <QTextStream>
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
@@ -19,8 +27,14 @@ public:
     ~MainWindow();
     //vector<Page> *pages;
 
+public slots:
+
+    void on_actionOpen_triggered();
+
 
 private:
+
+    ogdf::Graph mainGraph;
 
     vector<GraphScene*> scene ;
     //BookEmbeddedGraph* begraph;
