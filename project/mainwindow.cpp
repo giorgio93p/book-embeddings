@@ -2,15 +2,6 @@
 #include "ui_mainwindow.h"
 #include "graphscene.h"
 
-#include <ogdf/basic/Graph.h>
-#include <ogdf/basic/graph_generators.h>
-#include <ogdf/layered/DfsAcyclicSubgraph.h>
-#include <ogdf/fileformats/GraphIO.h>
-
-
-
-class Edge;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -100,7 +91,7 @@ void MainWindow::on_actionOpen_triggered()
             return;
         }
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
-        bool readSuccessful = ogdf::GraphIO::readGML(this->mainGraph,fileNameStr);
+        bool readSuccessful = mainGraph.readGML(fileNameStr);
         if (readSuccessful){
             //std::cout << "Read Successful!!!!!" << std::endl;
             std::cout << "Number of nodes in read graph ==" << mainGraph.numberOfNodes() << endl;

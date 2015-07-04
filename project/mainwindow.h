@@ -5,11 +5,7 @@
 #include <QGridLayout>
 #include "ui_mainwindow.h"
 #include "graphscene.h"
-//#include "graphs.h"
-#include <ogdf/basic/GraphAttributes.h>
-#include <ogdf/basic/Graph.h>
-#include <ogdf/fileformats/GraphIO.h>
-
+#include "graphs.h"
 
 #include <QFileDialog>
 #include <QFile>
@@ -35,7 +31,7 @@ public slots:
 
 private:
 
-    ogdf::Graph mainGraph;
+    Graph mainGraph;
 
     vector<GraphScene*> scene ;
     //BookEmbeddedGraph* begraph;

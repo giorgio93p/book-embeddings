@@ -1,36 +1,32 @@
+#ifndef GRAPHS_H
+#define GRAPHS_H
 
-
-//#include <LEDA/graph.h>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 
-class Node /*: public node*/{
-	
-};
+#include <ogdf/basic/Graph.h>
+#include <ogdf/basic/GraphAttributes.h>
+#include <ogdf/basic/graph_generators.h>
+#include <ogdf/layered/DfsAcyclicSubgraph.h>
+#include <ogdf/fileformats/GraphIO.h>
 
-class Edge /*: public edge*/{
-   public:
-	bool operator==(const Edge& e) const;
-};
-
-/**
- * This block of code is needed for hashing Edge objects
- **/
-namespace std{
-	template <>
-    struct hash<Edge>{
-        size_t operator()(const Edge& e) const{
-			return 0;
-            //return (/*first node hash*/ ^ /*second node hash*/ << 1)) >> 1);
-        };
-    };
-}
+typedef ogdf::node Node;
+typedef ogdf::edge Edge;
 
 class BookEmbeddedGraph;
 
-class Graph /*: public graph*/ {
-   public:
+class Graph  {
+	ogdf::Graph g;
+
+  public:	
+	inline virtual bool readGML(std::string fileName){
+        return ogdf::GraphIO::readGML(g,fileName);
+	}
+	inline int numberOfNodes(){
+        return g.numberOfNodes();
+	}
     //TODO:
     //orismos methodon epanasxediasmou (px gia dinatotita allagis akmwn / switching koryfwn)
     
@@ -47,9 +43,11 @@ class Graph /*: public graph*/ {
     //TODO:
     //prosthiki synartisewn pou kanoun bookembedding gia dedomeno permutation alla agnosti selidopoisi
     //kai to antistrofo
+    
+    virtual ~Graph();
 };
 
-typedef std::unordered_set<Edge> Page;
+typedef std::set<Edge> Page;
 
 class BookEmbeddedGraph : public Graph {
     std::vector<Page> pages;
@@ -59,29 +57,19 @@ class BookEmbeddedGraph : public Graph {
     int ncrossings;
     
    public:
-    void setPage(const Edge& e, const int newPage);
-
-
-    //int drawEmbeddingPages(vector<int> pagenums,Graphic *result); //draw one or more pages in one image (using coloured edges)
-    //int drawEmbeddingAllPages(Graphic *result);                   //draw all pages in one image (using coloured edges)
-    // these 2 create a window/tab/whatever
-    // (which they store as an Object of class "Graphic)
-    // displaying several or all pages of our 
-    // book embedding, using our graphics library(/ies).  
-    // "Graphic" is not a specific class
-    // but something that can  store the result
-    // that should be passed on to the front end.
+    void setPage(const Edge& e, const int newPage);    
     
-    
-    std::vector<Page>* getPages();
-    int getNpages();
-    int getNcrossings();
-    int getNcrossings(const Edge& e);
-    std::unordered_set<Edge> getcrossings(const Edge& e);
+    //std::vector<Page>* getPages() const;
+    inline int getNpages() const {return pages.size();}
+    inline int getNcrossings() const {return ncrossings;}
+    inline int getNcrossings(const Edge& e) {return crossings[e].size();}
+    inline std::unordered_set<Edge> getcrossings(const Edge& e) {return crossings[e];}
     
     virtual ~BookEmbeddedGraph();
     
    private:
     void   calculateCrossings();
-    void recalculateCrossings();
+    //void recalculateCrossings();
 };
+
+#endif

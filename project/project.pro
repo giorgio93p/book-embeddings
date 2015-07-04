@@ -19,13 +19,15 @@ SOURCES += main.cpp\
         mainwindow.cpp\
         graphscene.cpp \
     mypath.cpp \
-    myfirstdialog.cpp
+    myfirstdialog.cpp \
+    graphs.cpp
 
 
 HEADERS  += mainwindow.h \
             graphscene.h \
     mypath.h \
-    myfirstdialog.h
+    myfirstdialog.h \
+    graphs.h
 
 FORMS    += mainwindow.ui
 
