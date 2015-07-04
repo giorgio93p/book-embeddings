@@ -7,8 +7,7 @@ using namespace std;
 #include <vector>
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
-#include <Kernel/graph/graph_draw.h>
-#include "../graphs.h"
+#include "graphs.h"
 
 
 #define LEN 250

@@ -53,9 +53,6 @@ MainWindow::MainWindow(QWidget *parent) :
     graphicsView_3->setScene(scene.at(2));
     graphicsView_4->setScene(scene.at(3));
 
-   connect(actionOpen, SIGNAL(triggered()), this, SLOT(on_actionOpen_triggered()));
-
-
     QGridLayout *layout = new QGridLayout;
 }
 
@@ -105,17 +102,13 @@ void MainWindow::on_actionOpen_triggered()
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
         bool readSuccessful = ogdf::GraphIO::readGML(this->mainGraph,fileNameStr);
         if (readSuccessful){
-            //std::cout << "Read Successful!!!!!\n" << std::endl;
+            //std::cout << "Read Successful!!!!!" << std::endl;
             std::cout << "Number of nodes in read graph ==" << mainGraph.numberOfNodes() << endl;
         }
-
 
         //ogdf::GridLayout mylayout1(mainGraph);
         //mylayout1.init()
 
-
-        //QTextStream in(&file);
-        //this->textEdit->setText(in.readAll());
         file.close();
     }
 }

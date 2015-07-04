@@ -290,7 +290,7 @@
      <x>0</x>
      <y>0</y>
      <width>795</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -606,7 +606,6 @@
     <string>Exit</string>
    </property>
   </action>
-
  </widget>
  <resources/>
  <connections>

@@ -30,6 +30,7 @@ public:
 public slots:
 
     void on_actionOpen_triggered();
+    inline void on_actionOpen_2_triggered() {on_actionOpen_triggered();};
 
 
 private:

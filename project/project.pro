@@ -46,7 +46,7 @@ QMAKE_CXXFLAGS +=
 !win32{
 INCLUDEPATH += $$_PRO_FILE_PWD_/../OGDF/include
 LIBS += -L$$_PRO_FILE_PWD_/../OGDF/_release -lOGDF -lCOIN
-QMAKE_CXXFLAGS +=-pthread
+QMAKE_CXXFLAGS +=-pthread -std=c++11
     
     
     }
