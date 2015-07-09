@@ -11,7 +11,7 @@
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
-    vector<QGraphicsView*> views;
+    std::vector<QGraphicsView*> views;
     BookEmbeddedGraph mainGraph;
 
 public:

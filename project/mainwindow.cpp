@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupUi(this);
     setWindowTitle("P.E.O.S.");
 
-    views = vector<QGraphicsView*>();
+    views = std::vector<QGraphicsView*>();
     views.push_back(graphicsView);
     views.push_back(graphicsView_2);
     views.push_back(graphicsView_3);

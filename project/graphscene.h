@@ -1,7 +1,6 @@
-
 #ifndef GRAPHSCENE_H
 #define GRAPHSCENE_H
-using namespace std;
+
 #include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
 #include <vector>
@@ -12,16 +11,6 @@ using namespace std;
 
 #define LEN 250
 
-class Colors {
-    vector<QColor> pageColors;
-
-  public:
-    Colors();
-    QColor& operator[](int i);
-};
-
-typedef  pair<int,int> IntPair;
-
 class GraphScene : public QGraphicsScene
 {
 public:
@@ -31,8 +20,8 @@ public:
 
 
 private:
-    std::unordered_map<QGraphicsEllipseItem*, Node> nodes;
-    std::unordered_map<QGraphicsItem*, Edge> edges;
+    std::unordered_map<Node, QGraphicsEllipseItem*> nodes;
+    std::unordered_map<Edge, QGraphicsItem*> edges;
     int n;
     int m;
 
