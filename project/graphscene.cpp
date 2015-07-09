@@ -10,42 +10,40 @@ QColor& Colors::operator[](int i){
     return pageColors[i];
 }
 
-GraphScene::GraphScene(int nn, int mm, vector< pair<int,int> > edgs,vector<int> permutation)  :
-    n(nn),m(mm)
-{
-    int i;
-    nodes.resize(nn);
-    edges = new vector<IntPair>(edgs);
-    for (i=0;i<n;i++) {
+GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
+    n = g.numberOfNodes();
+    m = g.pageSize(page);
+    std::unordered_map<Node,QGraphicsEllipseItem*> nodesReverse = std::unordered_map<Node,QGraphicsEllipseItem*>();
+
+    //Paint Nodes
+    int i=0;
+    Node v;
+    forall_nodes(v,g){
         QBrush redBrush(Qt::red);
         QPen blackPen(Qt::black);
         blackPen.setWidth(2);
 
-        //nodes.push_back(this->addEllipse(-LEN+i*(2*LEN/n),0,12,12,blackPen,redBrush));
         QGraphicsEllipseItem* el = this->addEllipse(-LEN+i*(2*LEN/n),0,12,12,blackPen,redBrush);
 
-        //nodes[i]->setMovable();
+        //el->setMovable();
         el->setFlag(QGraphicsItem::ItemIsSelectable, true);
-        nodes[i]=el;
-
+        nodes[el] = v;
+        nodesReverse[v] = el;
+        i++;
     }
 
     printf("%d is the number of edges here\n",m);
 
-    for (i=0; i<mm;i++) {
-
-        //QColor c=Qt::red;
-
+    //Paint Edges
+    for (auto &e : g.edgesIn(page)) {
         QPen blackPen(Qt::black);
         blackPen.setWidth(2);
 
-        qreal interval=(2*LEN/nn); //space between two consequent vertices
+        qreal interval=(2*LEN/n); //space between two consequent vertices
 
-
-        qreal x1 = 6 + ((qreal)edges->at(i).first) * interval-LEN;
-        qreal x2 = 6 + ((qreal)edges->at(i).second) * interval-LEN;
-
-
+        qreal x1 = nodesReverse[e->source()]->boundingRect().center().x();
+        qreal x2 = nodesReverse[e->target()]->boundingRect().center().x();
+        std::cout << x1 << "," << x2 << std::endl;
         double vscalingfactor = 0.7;
         double height = ((x2-x1)/2)*vscalingfactor;
         QPainterPath* edg = new QPainterPath();
@@ -58,9 +56,7 @@ GraphScene::GraphScene(int nn, int mm, vector< pair<int,int> > edgs,vector<int> 
         QGraphicsItem * path = this->addPath(*edg,blackPen);
         path->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-
-
-
+        edges[path] = e;
     }
 
 

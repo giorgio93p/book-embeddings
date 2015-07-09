@@ -7,6 +7,7 @@
 #include <set>
 
 #include <ogdf/basic/Graph.h>
+#include <ogdf/basic/Graph_d.h>
 #include <ogdf/basic/GraphAttributes.h>
 #include <ogdf/basic/graph_generators.h>
 #include <ogdf/layered/DfsAcyclicSubgraph.h>
@@ -19,14 +20,36 @@ class BookEmbeddedGraph;
 
 class Graph  {
 	ogdf::Graph g;
+    ogdf::GraphAttributes attr;
 
-  public:	
-	inline virtual bool readGML(std::string fileName){
-        return ogdf::GraphIO::readGML(g,fileName);
+  public:
+    Graph();
+
+    virtual bool readGML(std::string& fileName){
+        return ogdf::GraphIO::readGML(attr,g,fileName);
 	}
-	inline int numberOfNodes(){
+    virtual bool writeGML(std::string& fileName){
+        return ogdf::GraphIO::writeGML(attr,fileName);
+    }
+    bool empty() const {
+        return g.empty();
+    }
+    int numberOfNodes() const{
         return g.numberOfNodes();
 	}
+    int numberOfEdges() const{
+        return g.numberOfEdges();
+    }
+    Node addNode(){
+        return g.newNode();
+    }
+    Edge addEdge(Node& from, Node& to){
+        return g.newEdge(from, to);
+    }
+    Node firstNode() const{
+        return g.firstNode();
+    }
+
     //TODO:
     //orismos methodon epanasxediasmou (px gia dinatotita allagis akmwn / switching koryfwn)
     
@@ -57,13 +80,29 @@ class BookEmbeddedGraph : public Graph {
     int ncrossings;
     
    public:
+    BookEmbeddedGraph();
+
+    void addPage();
     void setPage(const Edge& e, const int newPage);    
-    
-    //std::vector<Page>* getPages() const;
-    inline int getNpages() const {return pages.size();}
-    inline int getNcrossings() const {return ncrossings;}
-    inline int getNcrossings(const Edge& e) {return crossings[e].size();}
-    inline std::unordered_set<Edge> getcrossings(const Edge& e) {return crossings[e];}
+
+    std::set<Edge> edgesIn(int page) const {
+        return pages[page];
+    }
+    int getNpages() const {
+        return pages.size();
+    }
+    int getNcrossings() const {
+        return ncrossings;
+    }
+    int getNcrossings(const Edge& e) const{
+        return crossings.at(e).size();
+    }
+    std::unordered_set<Edge> getcrossings(const Edge& e) const{
+        return crossings.at(e);
+    }
+    int pageSize(int p) const{
+        return pages[p].size();
+    }
     
     virtual ~BookEmbeddedGraph();
     

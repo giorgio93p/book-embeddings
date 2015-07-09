@@ -25,28 +25,18 @@ typedef  pair<int,int> IntPair;
 class GraphScene : public QGraphicsScene
 {
 public:
-    GraphScene(int nn, int mm, std::vector< std::pair< int,int > > edgs, std::vector<int> permutation);
+    GraphScene(const BookEmbeddedGraph& g, const int page);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
 
 
 private:
-    std::vector<QGraphicsEllipseItem*> nodes;
-    vector< IntPair > *edges;
+    std::unordered_map<QGraphicsEllipseItem*, Node> nodes;
+    std::unordered_map<QGraphicsItem*, Edge> edges;
     int n;
     int m;
 
 
-
-
 };
-
-class SimpleGraphScene : public QGraphicsScene{
-    std::vector<QGraphicsEllipseItem*> nodes;
-
-  public:
-    void drawGraph(Graph g);
-};
-
 
 #endif // GRAPHSCENE_H

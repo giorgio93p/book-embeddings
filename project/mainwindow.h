@@ -1,6 +1,3 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
 #include <QMainWindow>
 #include <QGridLayout>
 #include "ui_mainwindow.h"
@@ -14,11 +11,14 @@
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
+    vector<QGraphicsView*> views;
+    BookEmbeddedGraph mainGraph;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     void openGraph(char* filename);
-    void drawGraph();
+    void drawGraph(Graph& g);
+    void drawBookEmbeddedGraph(BookEmbeddedGraph& g);
 
     ~MainWindow();
     //vector<Page> *pages;
@@ -26,21 +26,7 @@ public:
 public slots:
 
     void on_actionOpen_triggered();
-    inline void on_actionOpen_2_triggered() {on_actionOpen_triggered();};
-
-
-private:
-
-    Graph mainGraph;
-
-    vector<GraphScene*> scene ;
-    //BookEmbeddedGraph* begraph;
-    //Graph* graph;
-
+    void on_actionOpen_2_triggered() {on_actionOpen_triggered();};
+    void on_actionSave_as_triggered();
 };
 
-
-
-
-
-#endif // MAINWINDOW_H
