@@ -15,8 +15,9 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
         QBrush redBrush(Qt::red);
         QPen blackPen(Qt::black);
         blackPen.setWidth(2);
+        qreal interval=(2*LEN/n); //space between two consequent vertices
 
-        QGraphicsEllipseItem* el = this->addEllipse(-LEN+i*(2*LEN/n),0,12,12,blackPen,redBrush);
+        QGraphicsEllipseItem* el = this->addEllipse(-LEN+i*interval,0,12,12,blackPen,redBrush);
 
         //el->setMovable();
         el->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -52,7 +53,6 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
     pen.setWidth(2);
 
     for (auto &e : g.edgesIn(page)) {
-        qreal interval=(2*LEN/n); //space between two consequent vertices
 
         qreal x1 = nodes[e->source()]->boundingRect().center().x();
         qreal x2 = nodes[e->target()]->boundingRect().center().x();
