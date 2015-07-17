@@ -19,11 +19,17 @@ typedef ogdf::edge Edge;
 class BookEmbeddedGraph;
 
 class Graph  {
-	ogdf::Graph g;
+  protected:
+    ogdf::Graph g;
     ogdf::GraphAttributes attr;
 
   public:
     Graph();
+    Graph(const Graph& graph);
+
+    ogdf::Graph toOGDF() const{
+        return g;
+    }
 
     virtual bool readGML(std::string& fileName){
         return ogdf::GraphIO::readGML(attr,g,fileName);
@@ -40,10 +46,8 @@ class Graph  {
     int numberOfEdges() const{
         return g.numberOfEdges();
     }
-    Node addNode(){
-        return g.newNode();
-    }
-    Edge addEdge(Node& from, Node& to){
+    Node addNode();
+    virtual Edge addEdge(Node& from, Node& to){
         return g.newEdge(from, to);
     }
     Node firstNode() const{
@@ -74,16 +78,39 @@ typedef std::set<Edge> Page;
 
 class BookEmbeddedGraph : public Graph {
     std::vector<Page> pages;
-    std::unordered_map<Edge,int> pageOfEdge; //this is used as a mapping from edges to pages
-    
     std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
     int ncrossings;
     
    public:
-    BookEmbeddedGraph();
+    BookEmbeddedGraph(){
+        BookEmbeddedGraph(Graph());
+    }
+    BookEmbeddedGraph(Graph& g);
+
+    Edge addEdge(Node& from, Node& to, int pageNo){
+        Edge e = Graph::addEdge(from, to);
+        addEdgeToPage(e,pageNo);
+        return e;
+    }
+
+    /**
+     * Creates a new edge and puts it in the first page
+     *
+     * @return a reference to the edge created
+     */
+    Edge addEdge(Node& from, Node& to){
+        return addEdge(from,to,0);
+    }
 
     void addPage();
-    void setPage(const Edge& e, const int newPage);    
+    void removePage(int pageNo);
+
+    /**
+     * Does not recalculate crossings
+     */
+    void moveToPage(Edge& e, const int newPage);
+
+    int getPageNo(const Edge& e) const;
 
     std::set<Edge> edgesIn(int page) const {
         return pages[page];
@@ -107,7 +134,8 @@ class BookEmbeddedGraph : public Graph {
     virtual ~BookEmbeddedGraph();
     
    private:
-    void   calculateCrossings();
+    void addEdgeToPage(Edge& e, int pageNo);
+    void calculateCrossings();
     //void recalculateCrossings();
 };
 

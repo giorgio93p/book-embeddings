@@ -1,12 +1,27 @@
 #include "graphs.h"
 
 Graph::Graph(){
-    ogdf::Graph g;
-    attr = ogdf::GraphAttributes(g, ogdf::GraphAttributes::nodeLabel);
+    g = ogdf::Graph();
+    attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeLabel);
     attr.setDirected(false);
+}
 
-    g.newNode();
-    attr.label(g.firstNode()) = "a";
+Graph::Graph(const Graph& graph){
+    g = ogdf::Graph(graph.toOGDF());
+    attr.setDirected(false);
+    attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeLabel);
+    Node n;
+    int i=0;
+    forall_nodes(n,g){
+        attr.label(n) = std::to_string(i);
+        i++;
+    }
+}
+
+Node Graph::addNode(){
+    Node n = g.newNode();
+    attr.label(n) = std::to_string(numberOfNodes()-1);
+    return n;
 }
 
 BookEmbeddedGraph* Graph::bookEmbed(const int npages,const std::vector<int>& vertexPermutation){
@@ -25,30 +40,53 @@ BookEmbeddedGraph* Graph::bookEmbedWithLeastPages(){
 Graph::~Graph(){
 }
 
-BookEmbeddedGraph::BookEmbeddedGraph(){
+BookEmbeddedGraph::BookEmbeddedGraph(Graph& graph) : Graph(graph){
+    attr = ogdf::GraphAttributes(g, ogdf::GraphAttributes::nodeLabel);
+
     pages = std::vector<Page>();
-    pageOfEdge = std::unordered_map<Edge,int>();
+    addPage();
+    Edge e;
+    forall_edges(e,g) addEdgeToPage(e,0);
 
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
     ncrossings = 0;
 }
 
 void BookEmbeddedGraph::addPage(){
-    pages.push_back(Page());
+    Page newPage = std::set<Edge, std::function<bool (const Edge&, const Edge&)>(
+                [this](const Edge& e1, const Edge& e2) {
+                    return std::stoi(this->attr.label(e1->source())) != std::stoi(this->attr.label(e2->source()))
+                        ? stoi(this->attr.label(e1->source())) < std::stoi(this->attr.label(e2->source()))
+                        : stoi(this->attr.label(e1->target())) > std::stoi(this->attr.label(e2->target()));
+                 })
+    );
+    pages.push_back(newPage);
 }
 
-void BookEmbeddedGraph::setPage(const Edge& e, const int newPage){
-    try{
-        int p = pageOfEdge.at(e);
-        pages[p].erase(e);
-    } catch (std::out_of_range& e) {}
-	pages[newPage].insert(e);
-	pageOfEdge[e] = newPage;
-	
-    //recalculateCrossings();
+void BookEmbeddedGraph::removePage(int pageNo){
+    for(int i=pageNo; i<getNpages()-1; i++){
+        pages[i] = pages[i+1];
+        for(auto e : pages[i]) attr.label(e) = std::to_string(i);
+    }
+    pages.pop_back();
+}
+
+void BookEmbeddedGraph::moveToPage(Edge& e, const int newPage){
+    int p = getPageNo(e);
+    pages[p].erase(e);
+    addEdgeToPage(e,newPage);
+}
+
+int BookEmbeddedGraph::getPageNo(const Edge &e) const{
+    return std::stoi(attr.label(e));
 }
 
 BookEmbeddedGraph::~BookEmbeddedGraph(){
+}
+
+void BookEmbeddedGraph::addEdgeToPage(Edge& e, const int pageNo){
+    attr.label(e) = std::to_string(pageNo);
+    pages[pageNo].insert(e);
 }
 
 void BookEmbeddedGraph::calculateCrossings(){
