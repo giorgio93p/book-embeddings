@@ -9,13 +9,6 @@ QGraphicsPathItem(parent);
 
  }
 
-
-
-
-
-
-
-
 QRectF boundingRect() const {
     return selectionPolygon.boundingRect();
 }

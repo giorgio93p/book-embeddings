@@ -63,8 +63,9 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
         edg->moveTo(x2,0);
         edg->arcTo(x1,-height,(x2-x1),2*height,0,180);
 
-        QGraphicsItem * path = this->addPath(*edg,pen);
-        path->setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+        QGraphicsItem * path = new embedding_edge(height, x1, x2, edg, pen);
+        path->setFlags(QGraphicsItem::ItemIsSelectable);
 
         edges[e] = path;
     }
@@ -72,10 +73,6 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
 
 void GraphScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
-
     this->addText("καλημέρα !!!");
-
-    //this->repaint();
-
 }
 

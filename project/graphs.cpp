@@ -1,7 +1,6 @@
 #include "graphs.h"
 
 Graph::Graph(){
-    g = ogdf::Graph();
     attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeLabel);
     attr.setDirected(false);
 }
@@ -43,23 +42,24 @@ Graph::~Graph(){
 BookEmbeddedGraph::BookEmbeddedGraph(Graph& graph) : Graph(graph){
     attr = ogdf::GraphAttributes(g, ogdf::GraphAttributes::nodeLabel);
 
-    pages = std::vector<Page>();
+    //pages = std::vector<Page>();
     addPage();
     Edge e;
     forall_edges(e,g) addEdgeToPage(e,0);
 
-    crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
+    //crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
     ncrossings = 0;
 }
 
 void BookEmbeddedGraph::addPage(){
-    Page newPage = std::set<Edge, std::function<bool (const Edge&, const Edge&)>(
+    Page newPage = std::set<Edge, std::function <bool (const Edge&, const Edge&)>(
                 [this](const Edge& e1, const Edge& e2) {
                     return std::stoi(this->attr.label(e1->source())) != std::stoi(this->attr.label(e2->source()))
                         ? stoi(this->attr.label(e1->source())) < std::stoi(this->attr.label(e2->source()))
                         : stoi(this->attr.label(e1->target())) > std::stoi(this->attr.label(e2->target()));
                  })
     );
+
     pages.push_back(newPage);
 }
 
@@ -68,6 +68,7 @@ void BookEmbeddedGraph::removePage(int pageNo){
         pages[i] = pages[i+1];
         for(auto e : pages[i]) attr.label(e) = std::to_string(i);
     }
+
     pages.pop_back();
 }
 
@@ -89,8 +90,50 @@ void BookEmbeddedGraph::addEdgeToPage(Edge& e, const int pageNo){
     pages[pageNo].insert(e);
 }
 
+void BookEmbeddedGraph::generateBuckets(){
+    for (Page p : pages) {
+        Buckets pageStart;
+        Buckets pageEnd;
+
+        pageStart.reserve(numberOfNodes());
+        pageEnd.reserve(numberOfNodes());
+
+        for (Edge e : p) {
+            pageStart[e->source()->index()].insert(e);
+            pageEnd[e->target()->index()].insert(e);
+        }
+
+        startBuckets.push_back(pageStart);
+        endBuckets.push_back(pageEnd);
+    }
+
+    bucketsNeedToBeGenerated = false;
+
+}
+
 void BookEmbeddedGraph::calculateCrossings(){
-	//TODO
+    if (bucketsNeedToBeGenerated)
+        generateBuckets();
+
+    for (Buckets bs : startBuckets){//bs are a single page's buckets
+        for (Bucket b : bs){
+            for (Edge e : b) {
+                int startNode = e->source()->index();
+                int endNode = e->target()->index();
+
+                for (int i = startNode; i <= endNode; i++){
+                    if (bs[i].size() > 0) {
+                        for (Edge candidate : bs[i]){
+                            if ((candidate->target()->index() > endNode) || (candidate->target()->index() < startNode)){
+                                crossings[e].insert(candidate);
+                                ncrossings++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 //void BookEmbeddedGraph::calculateCrossings(const int pages&){

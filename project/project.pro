@@ -17,14 +17,16 @@ SOURCES += main.cpp\
         graphscene.cpp \
     mypath.cpp \
     myfirstdialog.cpp \
-    graphs.cpp
+    graphs.cpp \
+    embedding_edge.cpp
 
 
 HEADERS  += mainwindow.h \
             graphscene.h \
     mypath.h \
     myfirstdialog.h \
-    graphs.h
+    graphs.h \
+    embedding_edge.h
 
 FORMS    += mainwindow.ui
 
