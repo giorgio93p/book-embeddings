@@ -24,29 +24,14 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
         nodes[v] = el;
         i++;
     }
-
     //Paint Edges
     //std::printf("%d is the number of edges here\n",m);
     std::unordered_map<Edge, QGraphicsItem*> edges = std::unordered_map<Edge, QGraphicsItem*>();
     m = g.pageSize(page);
-    QColor color;
-    switch(page){
-        case 0: color = Qt::red; break;
-        case 1: color =  Qt::green; break;
-        case 2: color =  Qt::blue; break;
-        case 3: color =  Qt::cyan; break;
-        case 4: color =  Qt::magenta; break;
-        case 5: color =  Qt::yellow; break;
-        case 6: color =  Qt::gray; break;
-        case 7: color =  Qt::darkRed; break;
-        case 8: color =  Qt::darkGreen; break;
-        case 9: color =  Qt::darkBlue; break;
-        case 10: color =  Qt::darkCyan; break;
-        case 11: color =  Qt::darkMagenta; break;
-        case 12: color =  Qt::darkYellow; break;
-        case 13: color =  Qt::lightGray; break;
-        default: color = Qt::black;
-    }
+    QColor colors[] = {Qt::red,Qt::green,Qt::blue,Qt::cyan,Qt::magenta,Qt::yellow,Qt::gray,
+                      Qt::darkRed,Qt::darkGreen,Qt::darkBlue,Qt::darkCyan,Qt::darkMagenta,Qt::darkYellow,
+                       Qt::lightGray};
+    QColor color = page<14 ? colors[page] : Qt::black;
     //std::cout << "Page number: " << page << std::endl;
     //std::cout << "Color: " << (color.name().toUtf8().toStdString()) << std::endl;
     QPen pen(color);
