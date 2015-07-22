@@ -25,7 +25,7 @@ class Graph  {
 
   public:
     Graph();
-    Graph(const Graph& graph);
+    Graph(const Graph* graph);
 
     ogdf::Graph toOGDF() const{
         return g;
@@ -46,7 +46,7 @@ class Graph  {
     int numberOfEdges() const{
         return g.numberOfEdges();
     }
-    Node addNode();
+    virtual Node addNode();
     virtual Edge addEdge(Node& from, Node& to){
         return g.newEdge(from, to);
     }
@@ -79,14 +79,14 @@ typedef std::set<Edge> Page;
 class BookEmbeddedGraph : public Graph {
     std::vector<Page> pages;
     std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
+    std::vector<Node> permutation;
     int ncrossings;
     
    public:
-    BookEmbeddedGraph(){
-        BookEmbeddedGraph(Graph());
-    }
-    BookEmbeddedGraph(Graph& g);
+    BookEmbeddedGraph(Graph *g);
+    BookEmbeddedGraph();
 
+    Node addNode() override;
     Edge addEdge(Node& from, Node& to, int pageNo){
         Edge e = Graph::addEdge(from, to);
         addEdgeToPage(e,pageNo);
@@ -98,7 +98,7 @@ class BookEmbeddedGraph : public Graph {
      *
      * @return a reference to the edge created
      */
-    Edge addEdge(Node& from, Node& to){
+    Edge addEdge(Node& from, Node& to) override{
         return addEdge(from,to,0);
     }
 
@@ -111,6 +111,9 @@ class BookEmbeddedGraph : public Graph {
     void moveToPage(Edge& e, const int newPage);
 
     int getPageNo(const Edge& e) const;
+    int getPosition(const Node& v) const;
+    void swap(Node& v1, Node& v2);
+    void moveTo(Node& v, const int position);
 
     std::set<Edge> edgesIn(int page) const {
         return pages[page];
@@ -130,6 +133,8 @@ class BookEmbeddedGraph : public Graph {
     int pageSize(int p) const{
         return pages[p].size();
     }
+
+    bool readGML(std::string& fileName) override;
     
     virtual ~BookEmbeddedGraph();
     

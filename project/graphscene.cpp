@@ -47,8 +47,8 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
         case 13: color =  Qt::lightGray; break;
         default: color = Qt::black;
     }
-    std::cout << "Page number: " << page << std::endl;
-    std::cout << "Color: " << (color.name().toUtf8().toStdString()) << std::endl;
+    //std::cout << "Page number: " << page << std::endl;
+    //std::cout << "Color: " << (color.name().toUtf8().toStdString()) << std::endl;
     QPen pen(color);
     pen.setWidth(2);
 
