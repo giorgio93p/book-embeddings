@@ -17,6 +17,7 @@
 typedef ogdf::node Node;
 typedef ogdf::edge Edge;
 typedef std::set<Edge> Page;
+//typedef std::set<Edge, bool (*)(const Edge&, const Edge&)>  Page;
 typedef std::set<Edge>      Bucket;
 typedef std::vector<Bucket> Buckets;
 
@@ -29,7 +30,7 @@ class Graph  {
 
     public:
         Graph();
-        Graph(const Graph& graph);
+        Graph(Graph* graph);
 
         ogdf::Graph toOGDF() const{
             return g;
@@ -50,12 +51,19 @@ class Graph  {
         int numberOfEdges() const{
             return g.numberOfEdges();
         }
+
         Node addNode();
+
         virtual Edge addEdge(Node& from, Node& to){
             return g.newEdge(from, to);
         }
+
         Node firstNode() const{
             return g.firstNode();
+        }
+
+        ogdf::GraphAttributes getGraphAttributes() {
+            return attr;
         }
 
         //TODO:
@@ -78,41 +86,35 @@ class Graph  {
         virtual ~Graph();
 };
 
-
 class BookEmbeddedGraph : public Graph {
 
     public:
-        BookEmbeddedGraph(){
-            BookEmbeddedGraph(Graph());
-        }
-        BookEmbeddedGraph(Graph& g);
+        BookEmbeddedGraph(Graph* g);
 
-        Edge addEdge(Node& from, Node& to, int pageNo){
-            Edge e = Graph::addEdge(from, to);
-            addEdgeToPage(e,pageNo);
-            return e;
-        }
+        BookEmbeddedGraph();
 
-        /**
-         * Creates a new edge and puts it in the first page
-         *
-         * @return a reference to the edge created
-         */
-        Edge addEdge(Node& from, Node& to){
+        Edge addEdge(Node& from, Node& to, int pageNo);
+
+        Edge addEdge(Node& from, Node& to) override{
             return addEdge(from,to,0);
         }
+
+        Node addNode();
 
         void addPage();
         void removePage(int pageNo);
 
-        /**
+        /*
          * Does not recalculate crossings
-         */
+        */
         void moveToPage(Edge& e, const int newPage);
 
         int getPageNo(const Edge& e) const;
+        int getPosition(const Node& v) const;
+        void swap(Node& v1, Node& v2);
+        void moveTo(Node& v, const int position);
 
-        std::set<Edge> edgesIn(int page) const {
+        Page edgesIn(int page) const {
             return pages[page];
         }
         int getNpages() const {
@@ -131,12 +133,15 @@ class BookEmbeddedGraph : public Graph {
             return pages[p].size();
         }
 
+        bool readGML(std::string& fileName) override;
         virtual ~BookEmbeddedGraph();
 
     private:
         std::vector<int> nodeOrderOnSpine;
         std::vector<Page> pages;
         std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
+        std::vector<Node> permutation;
+
         int ncrossings;
 
         bool bucketsNeedToBeGenerated;
@@ -148,5 +153,7 @@ class BookEmbeddedGraph : public Graph {
         void calculateCrossings();
         //void recalculateCrossings();
 };
+
+bool edgeCmp (const Edge&, const Edge&);
 
 #endif

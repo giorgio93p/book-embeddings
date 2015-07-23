@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::drawGraph(Graph& g){}
 
 void MainWindow::drawBookEmbeddedGraph(BookEmbeddedGraph& g){
+    mainGraph = &g;
     std::cout << "Number of pages: " << g.getNpages() << std::endl;
     std::cout << "Number of views: " << views.size() << std::endl;
     for(int p=0; p<std::min((long)g.getNpages(),(long)views.size()); p++){
@@ -52,13 +53,13 @@ void MainWindow::on_actionOpen_triggered()
         }
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
         file.close();
-        bool readSuccessful = mainGraph.readGML(fileNameStr);
+        bool readSuccessful = mainGraph->readGML(fileNameStr);
         if (readSuccessful){
             //std::cout << "Read Successful!!!!!" << std::endl;
-            std::cout << "Number of nodes in read graph ==" << mainGraph.numberOfNodes() << endl;
+            std::cout << "Number of nodes in read graph ==" << mainGraph->numberOfNodes() << endl;
         }
 
-        this->drawBookEmbeddedGraph(mainGraph);
+        this->drawBookEmbeddedGraph(*mainGraph);
     }
 }
 
@@ -69,12 +70,8 @@ void MainWindow::on_actionSave_as_triggered()
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
-        if (file.exists()) {
-            QMessageBox::critical(this, tr("Error"), tr("File would be overwritten"));
-            return;
-        }
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
-        mainGraph.writeGML(fileNameStr);
+        mainGraph->writeGML(fileNameStr);
     }
 }
 

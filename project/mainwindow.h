@@ -12,7 +12,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
     std::vector<QGraphicsView*> views;
-    BookEmbeddedGraph mainGraph;
+    BookEmbeddedGraph* mainGraph;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

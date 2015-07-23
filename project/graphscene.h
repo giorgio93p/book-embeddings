@@ -7,6 +7,7 @@
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
 #include "graphs.h"
+#include "embedding_edge.h"
 
 
 #define LEN 250
