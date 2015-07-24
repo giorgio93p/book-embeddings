@@ -18,7 +18,27 @@ Node Graph::addNode(){
     return g.newNode();
 }
 
+bool Graph::graphIsPlanar() const{
+    ogdf::BoothLueker blPlanarityCheck;
+    return blPlanarityCheck.isPlanar(toOGDF());
+}
+
 Graph::~Graph(){
+}
+
+BookEmbeddedGraph* Graph::bookEmbed(const int npages,const std::vector<int>& vertexPermutation){
+	//TODO
+	return new BookEmbeddedGraph;
+}
+
+BookEmbeddedGraph* Graph::bookEmbedOptimalPermutation(const int npages){
+	//TODO
+	return new BookEmbeddedGraph;
+}
+
+BookEmbeddedGraph* Graph::bookEmbedWithLeastPages(){
+	//TODO
+	return new BookEmbeddedGraph;
 }
 
 /******************************************** BookEmbeddedGraph Implementation ********************************************/
@@ -194,20 +214,58 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
 //TODO
 //}
 
-BookEmbeddedGraph* Graph::bookEmbed(const int npages,const std::vector<int>& vertexPermutation){
-	//TODO
-	return new BookEmbeddedGraph;
+// BookEmbeddedGraph end
+
+/******************************************** BCTree Implementation ********************************************/
+
+BCTree::BCTree(Graph &g) : originalGraph(g.toOGDF()), ogBCT(originalGraph){}
+
+Node BCTree::firstNode(bool biconnected){
+    if (!biconnected)
+        return ogBCT.bcTree().firstNode();
+
+    return ogBCT.auxiliaryGraph().firstNode();
 }
 
-BookEmbeddedGraph* Graph::bookEmbedOptimalPermutation(const int npages){
-	//TODO
-	return new BookEmbeddedGraph;
+Node BCTree::lastNode(bool biconnected){
+    if (!biconnected)
+        return ogBCT.bcTree().lastNode();
+
+    return ogBCT.auxiliaryGraph().lastNode();
+
 }
 
-BookEmbeddedGraph* Graph::bookEmbedWithLeastPages(){
-	//TODO
-	return new BookEmbeddedGraph;
+int BCTree::numberOfNodes(bool biconnected) {
+    if (!biconnected)
+        return ogBCT.bcTree().numberOfNodes();
+
+    return ogBCT.auxiliaryGraph().numberOfNodes();
+
 }
+
+int BCTree::numberOfBComps () {
+    return ogBCT.numberOfBComps();
+}
+
+int BCTree::numberOfCComps () {
+    return ogBCT.numberOfCComps();
+}
+
+onode_type BCTree::typeOfVertexInOriginalGraph(Node n) {
+    if (ogBCT.typeOfGNode(n) == ogdf::BCTree::Normal)
+        return ONODETYPE_NORMAL;
+
+    return ONODETYPE_CUT;
+}
+
+bnode_type BCTree::typeOfVertexInBCTree(Node n) {
+    if (ogBCT.typeOfBNode(n) == ogdf::BCTree::BComp)
+        return BNODETYPE_BCOMP;
+
+    return BNODETYPE_CCOMP;
+}
+
+// BCTree end
 
 bool edgeCmp (const Edge &e1, const Edge &e2) {
     int sourceLabel1 = e1->source()->index();

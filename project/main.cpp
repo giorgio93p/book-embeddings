@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     e = mainGraph.addEdge(nodes[3],nodes[4],2);
     mainGraph.addPage();
     e = mainGraph.addEdge(nodes[2],nodes[4],3);
+
     QApplication a(argc, argv);
     MainWindow w;
     w.drawBookEmbeddedGraph(mainGraph);

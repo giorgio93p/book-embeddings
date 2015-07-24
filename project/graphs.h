@@ -13,6 +13,8 @@
 #include <ogdf/basic/graph_generators.h>
 #include <ogdf/layered/DfsAcyclicSubgraph.h>
 #include <ogdf/fileformats/GraphIO.h>
+#include <ogdf/planarity/BoothLueker.h>
+#include <ogdf/decomposition/BCTree.h>
 
 typedef ogdf::node Node;
 typedef ogdf::edge Edge;
@@ -65,6 +67,8 @@ class Graph  {
         ogdf::GraphAttributes getGraphAttributes() {
             return attr;
         }
+
+        bool graphIsPlanar() const;
 
         //TODO:
         //orismos methodon epanasxediasmou (px gia dinatotita allagis akmwn / switching koryfwn)
@@ -155,5 +159,41 @@ class BookEmbeddedGraph : public Graph {
 };
 
 bool edgeCmp (const Edge&, const Edge&);
+
+//BCTree iteration macros
+//TODO: populate as needed
+#define forall_nodes_bc(v,T,b) for ((v) = (T).firstNode(b); (v); (v) = (v)->succ())
+#define forall_edges_bc(e,T,b) for ((e) = (T).firstEdge(b); (e); (e) = (e)->succ())
+
+enum onode_type {
+    ONODETYPE_NORMAL, 
+    ONODETYPE_CUT
+};
+
+enum bnode_type {
+    BNODETYPE_BCOMP,
+    BNODETYPE_CCOMP
+};
+
+class BCTree {
+    private:
+        //NOTE : originalGraph should not even be here, but we can't call
+        //BCTree's constructor with a temp argument, so we need to use
+        //that (see constructor definition)
+        
+        ogdf::Graph originalGraph;
+        ogdf::BCTree ogBCT;
+    public:
+        BCTree(Graph &);
+
+        Node firstNode(bool);
+        Node lastNode(bool);
+
+        int numberOfNodes(bool);
+        int numberOfBComps ();
+        int numberOfCComps ();
+        onode_type typeOfVertexInOriginalGraph(Node);
+        bnode_type typeOfVertexInBCTree(Node);
+};
 
 #endif
