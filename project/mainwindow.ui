@@ -6,290 +6,238 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>795</width>
-    <height>790</height>
+    <width>836</width>
+    <height>898</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QScrollArea" name="scrollArea">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>0</y>
-      <width>461</width>
-      <height>751</height>
-     </rect>
-    </property>
-    <property name="widgetResizable">
-     <bool>true</bool>
-    </property>
-    <widget class="QWidget" name="scrollAreaWidgetContents">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>459</width>
-       <height>749</height>
-      </rect>
-     </property>
-     <widget class="QGraphicsView" name="graphicsView">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>441</width>
-        <height>191</height>
-       </rect>
-      </property>
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QGraphicsView" name="GraphView">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget_2">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="title">
+          <string>Tab 1</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QGraphicsView" name="graphicsView_7">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_6">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="title">
+          <string>Tab 2</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QGraphicsView" name="graphicsView_8">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="title">
+          <string>Tab 1</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Crossings:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="total_crossings_indicator_">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Number of pages:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="number_of_pages_indicator">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Number of nodes:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="number_of_nodes_indicator">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Number of edges:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="number_of_edges_indicator">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="accessibleName">
+          <string/>
+         </property>
+         <attribute name="title">
+          <string>Tab 2</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Graph Properties:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>#Faces:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>4</horstretch>
-        <verstretch>4</verstretch>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-     </widget>
-     <widget class="QGraphicsView" name="graphicsView_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>220</y>
-        <width>441</width>
-        <height>161</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QGraphicsView" name="graphicsView_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>410</y>
-        <width>441</width>
-        <height>151</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QGraphicsView" name="graphicsView_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>570</y>
-        <width>441</width>
-        <height>141</height>
-       </rect>
-      </property>
-      <property name="mouseTracking">
+      <property name="widgetResizable">
        <bool>true</bool>
       </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>580</y>
-      <width>301</width>
-      <height>131</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Tab 1</string>
-     </attribute>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>10</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Crossings:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>40</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Number of pages:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>70</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#changes:</string>
-      </property>
-     </widget>
-     <widget class="QTextBrowser" name="textBrowser">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>10</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QTextBrowser" name="textBrowser_2">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>40</y>
-        <width>51</width>
-        <height>16</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Tab 2</string>
-     </attribute>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>251</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Graph Properties:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#Faces:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#nodes:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>70</y>
-        <width>47</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#edges:</string>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>301</width>
-      <height>561</height>
-     </rect>
-    </property>
-    <widget class="QGraphicsView" name="GraphView">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>10</y>
-       <width>311</width>
-       <height>231</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTabWidget" name="tabWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>260</y>
-       <width>301</width>
-       <height>291</height>
-      </rect>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab_3">
-      <attribute name="title">
-       <string>Tab 1</string>
-      </attribute>
-      <widget class="QGraphicsView" name="graphicsView_5">
+      <widget class="QWidget" name="embedding_drawing">
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>10</y>
-         <width>291</width>
-         <height>241</height>
+         <y>0</y>
+         <width>530</width>
+         <height>791</height>
         </rect>
        </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="tab_4">
-      <attribute name="title">
-       <string>Tab 2</string>
-      </attribute>
-      <widget class="QGraphicsView" name="graphicsView_6">
-       <property name="geometry">
-        <rect>
-         <x>-5</x>
-         <y>11</y>
-         <width>281</width>
-         <height>231</height>
-        </rect>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout"/>
       </widget>
      </widget>
-    </widget>
-   </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>795</width>
+     <width>836</width>
      <height>25</height>
     </rect>
    </property>
@@ -402,6 +350,8 @@
    <addaction name="actionZoom_Out"/>
    <addaction name="actionReset_Zoom"/>
    <addaction name="separator"/>
+   <addaction name="separator"/>
+   <addaction name="actionAddPage"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -441,7 +391,7 @@
     <string>Save</string>
    </property>
    <property name="toolTip">
-    <string> Save the changes</string>
+    <string>Save the changes</string>
    </property>
    <property name="statusTip">
     <string>toolTip</string>
@@ -606,6 +556,15 @@
     <string>Exit</string>
    </property>
   </action>
+  <action name="actionAddPage">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/Add.png</normaloff>../icons/Add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Page</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -626,18 +585,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionExit</sender>
+   <sender>actionOpen_2</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
+   <receiver>actionOpen</receiver>
+   <slot>trigger()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>397</x>
-     <y>394</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>

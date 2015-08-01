@@ -115,6 +115,7 @@ class BookEmbeddedGraph : public Graph {
 
         int getPageNo(const Edge& e) const;
         int getPosition(const Node& v) const;
+        Node nodeAt(int position) const;
         void swap(Node& v1, Node& v2);
         void moveTo(Node& v, const int position);
 
@@ -138,10 +139,10 @@ class BookEmbeddedGraph : public Graph {
         }
 
         bool readGML(std::string& fileName) override;
-        virtual ~BookEmbeddedGraph();
+        virtual ~BookEmbeddedGraph() = default;
 
     private:
-        std::vector<int> nodeOrderOnSpine;
+        //std::vector<int> nodeOrderOnSpine;
         std::vector<Page> pages;
         std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
         std::vector<Node> permutation;
@@ -159,6 +160,9 @@ class BookEmbeddedGraph : public Graph {
 };
 
 bool edgeCmp (const Edge&, const Edge&);
+
+//BookEmbeddedGraph iteration macros
+#define forall_nodes_embedded(v,g) int ijklm=0; for((v) = (g).nodeAt(0); ijklm < (g).numberOfNodes(); (v) = ijklm < (g).numberOfNodes()-1 ? (g).nodeAt(++ijklm) : (g).nodeAt(ijklm++))
 
 //BCTree iteration macros
 //TODO: populate as needed

@@ -1,17 +1,15 @@
 #include "graphscene.h"
 #include <iostream>
-using namespace std;
-
-
 
 GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
     n = g.numberOfNodes();
-    std::unordered_map<Node,QGraphicsEllipseItem*> nodes = std::unordered_map<Node,QGraphicsEllipseItem*>();
+    nodes = std::unordered_map<Node,QGraphicsEllipseItem*>();
 
     //Paint Nodes
     int i=0;
     Node v;
-    forall_nodes(v,g){
+    forall_nodes_embedded(v,g){
+        //std::cout << g.getPosition(v) << std::endl;
         QBrush redBrush(Qt::red);
         QPen blackPen(Qt::black);
         blackPen.setWidth(2);
@@ -26,7 +24,7 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
     }
     //Paint Edges
     //std::printf("%d is the number of edges here\n",m);
-    std::unordered_map<Edge, QGraphicsItem*> edges = std::unordered_map<Edge, QGraphicsItem*>();
+    edges = std::unordered_map<Edge, QGraphicsItem*>();
     m = g.pageSize(page);
     QColor colors[] = {Qt::red,Qt::green,Qt::blue,Qt::cyan,Qt::magenta,Qt::yellow,Qt::gray,
                       Qt::darkRed,Qt::darkGreen,Qt::darkBlue,Qt::darkCyan,Qt::darkMagenta,Qt::darkYellow,
@@ -37,10 +35,10 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
     QPen pen(color);
     pen.setWidth(2);
 
-    for (auto &e : g.edgesIn(page)) {
+    for (Edge e : g.edgesIn(page)) {
 
-        qreal x1 = nodes[e->source()]->boundingRect().center().x();
-        qreal x2 = nodes[e->target()]->boundingRect().center().x();
+        qreal x1 = std::min(nodes[e->source()]->boundingRect().center().x(),nodes[e->target()]->boundingRect().center().x());
+        qreal x2 = std::max(nodes[e->source()]->boundingRect().center().x(),nodes[e->target()]->boundingRect().center().x());
 
         double vscalingfactor = 0.7;
         double height = ((x2-x1)/2)*vscalingfactor;
@@ -59,6 +57,6 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const int page){
 
 void GraphScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
-    this->addText("καλημέρα !!!");
+    //this->addText("καλημέρα !!!");
 }
 

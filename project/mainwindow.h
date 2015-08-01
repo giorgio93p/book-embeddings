@@ -11,22 +11,31 @@
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
-    std::vector<QGraphicsView*> views;
+    std::vector<QGraphicsView*> pageViews;
     BookEmbeddedGraph* mainGraph;
+    std::string currentFile;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void openGraph(char* filename);
+    bool openBookEmbeddedGraph(std::string filename);
     void drawGraph(Graph& g);
-    void drawBookEmbeddedGraph(BookEmbeddedGraph& g);
-
-    ~MainWindow();
+    ~MainWindow() = default;
     //vector<Page> *pages;
 
-public slots:
+private:
+    void drawBookEmbeddedGraph();
+    void add_page_drawing(int p);
 
+public slots:
+    void on_actionAddPage_triggered();
     void on_actionOpen_triggered();
-    void on_actionOpen_2_triggered() {on_actionOpen_triggered();};
+    void on_actionSave_triggered();
     void on_actionSave_as_triggered();
+
+signals:
+    void number_of_nodes_changed(int i);
+    void number_of_edges_changed(int i);
+    void number_of_pages_changed(int i);
+    void crossings_changed(int i);
 };
 

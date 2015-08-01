@@ -53,23 +53,21 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
         i++;
     }
 
-    //pages = std::vector<Page>();
+    pages = std::vector<Page>();
     addPage();
     Edge e;
     forall_edges(e,g) addEdgeToPage(e,0);
 
     permutation = std::vector<Node>(numberOfNodes());
 
+    bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
-    //TODO: calculatecrossings
-    ncrossings = 0;
+    //ncrossings = 0;
+    calculateCrossings();
     std::cout << "BookEmbeddedGraph created" << std::endl;
 }
 
 BookEmbeddedGraph::BookEmbeddedGraph() : BookEmbeddedGraph(new Graph()) {}
-
-BookEmbeddedGraph::~BookEmbeddedGraph(){
-}
 
 Node BookEmbeddedGraph::addNode(){
     Node n = Graph::addNode();
@@ -141,6 +139,10 @@ void BookEmbeddedGraph::moveTo(Node &v, const int position){
     //recalculate crossings?
 }
 
+Node BookEmbeddedGraph::nodeAt(int position) const{
+    return permutation[position];
+}
+
 
 void BookEmbeddedGraph::addEdgeToPage(Edge& e, const int pageNo){
     attr.label(e) = std::to_string(pageNo);
@@ -196,17 +198,20 @@ void BookEmbeddedGraph::calculateCrossings(){
 bool BookEmbeddedGraph::readGML(std::string &fileName){
     if(! ogdf::GraphIO::readGML(attr,g,fileName)) return false;
 
+    permutation.clear();
+    permutation.reserve(numberOfNodes());
     Node v;
     forall_nodes(v,g){
         permutation[getPosition(v)] = v;
     }
 
+    pages.clear();
     Edge e;
     forall_edges(e,g){
         while(getPageNo(e) >= getNpages()) addPage();
         pages[getPageNo(e)].insert(e);
-        //TODO: calculatecrossings
     }
+    //TODO: calculatecrossings
     return true;
 }
 
