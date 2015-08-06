@@ -1,15 +1,13 @@
 #include "embedding_edge.h"
 
+/**
+ * n1 <= n2
+ */
 embedding_edge::embedding_edge(double h, qreal n1, qreal n2, QPainterPath *path, QPen p) {
     height = h;
 
-    if (n1 < n2) {
-        left = n1;
-        right = n2;
-    }else{
-        left = n2;
-        right = n1;
-    }
+    left = n1;
+    right = n2;
 
     painterPath = path;
     pen = p;

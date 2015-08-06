@@ -18,7 +18,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QGraphicsView" name="GraphView">
+       <widget class="QGraphicsView" name="graphView">
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -97,21 +97,21 @@
          </attribute>
          <layout class="QFormLayout" name="formLayout">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_13">
+           <widget class="QLabel" name="total_crossings_label">
             <property name="text">
              <string>Crossings:</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="total_crossings_indicator_">
+           <widget class="QLabel" name="total_crossings_indicator">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="number_of_pages_label">
             <property name="text">
              <string>Number of pages:</string>
             </property>
@@ -125,7 +125,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_6">
+           <widget class="QLabel" name="number_of_nodes_label">
             <property name="text">
              <string>Number of nodes:</string>
             </property>
@@ -139,7 +139,7 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_7">
+           <widget class="QLabel" name="number_of_edges_label">
             <property name="text">
              <string>Number of edges:</string>
             </property>
@@ -168,29 +168,16 @@
           <string>Tab 2</string>
          </attribute>
          <layout class="QFormLayout" name="formLayout_2">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="planarity_indicator">
             <property name="text">
-             <string>Graph Properties:</string>
+             <string>Is Planar?</string>
             </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
-            <property name="text">
-             <string>#Faces:</string>
+            <property name="tristate">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

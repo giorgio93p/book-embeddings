@@ -18,7 +18,6 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     bool openBookEmbeddedGraph(std::string filename);
-    void drawGraph(Graph& g);
     ~MainWindow() = default;
     //vector<Page> *pages;
 
@@ -37,5 +36,6 @@ signals:
     void number_of_edges_changed(int i);
     void number_of_pages_changed(int i);
     void crossings_changed(int i);
+    void planarity_changed(bool b);
 };
 

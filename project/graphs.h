@@ -68,6 +68,12 @@ class Graph  {
             return attr;
         }
 
+        void buildLayout(double xmin, double ymin, double xmax, double ymax);
+        double getXcoord(const Node &v) const;
+        double getYcoord(const Node &v) const;
+        double getBoxWidth(const Node &v) const;
+        double getBoxHeight(const Node &v) const;
+
         bool graphIsPlanar() const;
 
         //TODO:
@@ -102,6 +108,7 @@ class BookEmbeddedGraph : public Graph {
         Edge addEdge(Node& from, Node& to) override{
             return addEdge(from,to,0);
         }
+        Edge firstEdge() const;
 
         Node addNode();
 

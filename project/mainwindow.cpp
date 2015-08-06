@@ -10,15 +10,14 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    //QGraphicsView * p;
-
     setupUi(this);
     setWindowTitle(WINDOW_TITLE);
 
     connect(this, SIGNAL(number_of_nodes_changed(int)), number_of_edges_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(number_of_edges_changed(int)), number_of_nodes_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(number_of_pages_changed(int)), number_of_pages_indicator, SLOT(setNum(int)));
-    connect(this, SIGNAL(crossings_changed(int)), total_crossings_indicator_, SLOT(setNum(int)));
+    connect(this, SIGNAL(crossings_changed(int)), total_crossings_indicator, SLOT(setNum(int)));
+    connect(this, SIGNAL(planarity_changed(bool)), planarity_indicator, SLOT(setChecked(bool)));
 
     //embedding_drawing->setScaledContents(true);
 
@@ -27,13 +26,17 @@ MainWindow::MainWindow(QWidget *parent) :
     actionAddPage->setEnabled(false);
 
     pageViews = std::vector<QGraphicsView*>();
-
-    //QGridLayout *layout = new QGridLayout;
 }
 
-void MainWindow::drawGraph(Graph& g){}
-
 void MainWindow::drawBookEmbeddedGraph(){
+    //Draw graph
+    delete graphView->scene();
+    mainGraph->buildLayout(0.0,0.0,graphView->width(),graphView->height());
+    GraphScene* gs = new GraphScene(*mainGraph);
+    graphView->setScene(gs);
+    graphView->fitInView(gs->sceneRect());
+
+    //Draw pages
     for(int p=pageViews.size()-1; p>=0; p--){
         embedding_drawing->layout()->removeWidget(pageViews[p]);
         delete pageViews[p]->scene();
@@ -43,12 +46,14 @@ void MainWindow::drawBookEmbeddedGraph(){
     for(int p=0; p<mainGraph->getNpages(); p++){
         add_page_drawing(p);
     }
-    std::cout << "Number of pages: " << mainGraph->getNpages() << std::endl;
-    std::cout << "Number of views: " << pageViews.size() << std::endl;
-    emit number_of_nodes_changed(mainGraph->numberOfNodes());
-    emit number_of_edges_changed(mainGraph->numberOfEdges());
-    emit number_of_pages_changed(mainGraph->getNpages());
-    emit crossings_changed(mainGraph->getNcrossings());
+}
+
+void MainWindow::add_page_drawing(int page){
+    QGraphicsView* view = new QGraphicsView(embedding_drawing);
+    embedding_drawing->layout()->addWidget(view);
+    pageViews.push_back(view);
+    view->setScene(new EmbeddedGraphScene(*mainGraph,page));
+    view->show();
 }
 
 bool MainWindow::openBookEmbeddedGraph(std::string filename){
@@ -61,19 +66,16 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         //std::cout << "Number of nodes in read graph ==" << mainGraph->numberOfNodes() << endl;
         //std::cout << "Number of edges in read graph ==" << mainGraph->numberOfEdges() << endl;
         this->drawBookEmbeddedGraph();
+        emit number_of_nodes_changed(mainGraph->numberOfNodes());
+        emit number_of_edges_changed(mainGraph->numberOfEdges());
+        emit number_of_pages_changed(mainGraph->getNpages());
+        emit crossings_changed(mainGraph->getNcrossings());
+        emit planarity_changed(mainGraph->graphIsPlanar());
         return true;
     } else {
         //delete temp;
         return false;
     }
-}
-
-void MainWindow::add_page_drawing(int page){
-    QGraphicsView* view = new QGraphicsView(embedding_drawing);
-    embedding_drawing->layout()->addWidget(view);
-    pageViews.push_back(view);
-    view->setScene(new GraphScene(*mainGraph,page));
-    view->show();
 }
 
 void MainWindow::on_actionAddPage_triggered(){
@@ -114,6 +116,7 @@ void MainWindow::on_actionSave_as_triggered()
         QFile file(fileName);
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
         mainGraph->writeGML(fileNameStr);
+        actionSave->setEnabled(true);
     }
 }
 

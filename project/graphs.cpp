@@ -1,14 +1,15 @@
 #include "graphs.h"
+#include <ogdf/energybased/FMMMLayout.h>
 
 Graph::Graph(){
-    attr = ogdf::GraphAttributes(g,0);
+    attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
     attr.setDirected(false);
 }
 
 Graph::Graph(Graph* graph){
     g = ogdf::Graph(graph->toOGDF());
     attr.setDirected(false);
-    attr = ogdf::GraphAttributes(g, 0);
+    attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
     
     //NOTE:You might not always want to delete the original graph
     //delete graph;
@@ -16,6 +17,19 @@ Graph::Graph(Graph* graph){
 
 Node Graph::addNode(){
     return g.newNode();
+}
+
+void Graph::buildLayout(double xmin, double ymin, double xmax, double ymax){
+    ogdf::FMMMLayout drawer = ogdf::FMMMLayout();
+    drawer.call(attr);
+}
+
+double Graph::getXcoord(const Node& v) const{
+    return attr.x(v);
+}
+
+double Graph::getYcoord(const Node& v) const{
+    return attr.y(v);
 }
 
 bool Graph::graphIsPlanar() const{
@@ -80,6 +94,10 @@ Edge BookEmbeddedGraph::addEdge(Node& from, Node& to, int pageNo){
     Edge e = Graph::addEdge(from, to);
     addEdgeToPage(e,pageNo);
     return e;
+}
+
+Edge BookEmbeddedGraph::firstEdge() const{
+    return g.firstEdge();
 }
 
 void BookEmbeddedGraph::addPage(){
