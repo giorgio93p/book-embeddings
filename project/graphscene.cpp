@@ -8,7 +8,7 @@ QColor getPageColor(int page){
     return pageColors[page % pageColors_length];
 }
 
-EmbeddedGraphScene::EmbeddedGraphScene(const BookEmbeddedGraph& g, const int page, int width, int height){
+EmbeddedGraphScene::EmbeddedGraphScene(const BookEmbeddedGraph& g, const int page, const double width, const double height){
     //Paint Nodes
     nodes = std::unordered_map<Node,QGraphicsEllipseItem*>();
     QBrush redBrush(Qt::red);
@@ -63,7 +63,7 @@ void EmbeddedGraphScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
     //this->addText("καλημέρα !!!");
 }
 
-GraphScene::GraphScene(const BookEmbeddedGraph& g, int width, int height){
+GraphScene::GraphScene(const BookEmbeddedGraph& g, const double width, const double height){
     //Paint Nodes
     nodes = std::unordered_map<Node,QGraphicsEllipseItem*>();
     QBrush redBrush(Qt::black);

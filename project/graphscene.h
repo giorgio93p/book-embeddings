@@ -12,7 +12,7 @@
 class EmbeddedGraphScene : public QGraphicsScene
 {
 public:
-    EmbeddedGraphScene(const BookEmbeddedGraph& g, const int page, int width=250, int height=50);
+    EmbeddedGraphScene(const BookEmbeddedGraph& g, const int page, const double width=250.0, const double height=50.0);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
 private:
@@ -23,7 +23,7 @@ private:
 class GraphScene : public QGraphicsScene
 {
 public:
-    GraphScene(const BookEmbeddedGraph &g, int width=250, int height=50);
+    GraphScene(const BookEmbeddedGraph &g, const double width=250.0, const double height=50.0);
     //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
 private:
