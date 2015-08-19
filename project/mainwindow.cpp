@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "graphscene.h"
+#include "pagescene.h"
 
 #define WINDOW_TITLE tr("P.E.O.S.")
 
@@ -30,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::drawBookEmbeddedGraph(){
     //Draw graph
-    delete graphView->scene();
+    delete graphView->scene(); //delete scene that shows the whole graph
     mainGraph->buildLayout(0.0,0.0,graphView->width(),graphView->height());
     GraphScene* gs = new GraphScene(*mainGraph);
     graphView->setScene(gs);
@@ -50,9 +51,20 @@ void MainWindow::drawBookEmbeddedGraph(){
 
 void MainWindow::add_page_drawing(int page){
     QGraphicsView* view = new QGraphicsView(embedding_drawing);
+
+    /* embedding_drawing: a widget that we have created with QTDesigner.
+     * It is used as the parent widget for all page views.
+     * Itself it is contained in a ScrollArea Widget
+     * which we have named, not surprisignly, scrollArea.
+     * All this was made in QTDesigner.
+     * kosm
+     */
+
+
     embedding_drawing->layout()->addWidget(view);
     pageViews.push_back(view);
-    view->setScene(new EmbeddedGraphScene(*mainGraph,page));
+    view->setScene(new PageScene(*mainGraph,page));
+
     view->show();
 }
 

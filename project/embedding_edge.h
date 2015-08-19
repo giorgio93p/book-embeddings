@@ -5,13 +5,20 @@
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QtDebug>
+#include "graphs.h"
+#include <QObject>
 
-class embedding_edge : public QGraphicsItem {
+class embedding_edge : public QObject, public QGraphicsItem
+{
+
+    Q_OBJECT
+
     double height;
     qreal left;
     qreal right;
     QPainterPath *painterPath;
     QPen pen;
+    Edge* edge;
 
     public:
         embedding_edge(double, qreal, qreal, QPainterPath *, QPen);
@@ -21,6 +28,11 @@ class embedding_edge : public QGraphicsItem {
         QPainterPath shape() const;
         void mousePressEvent(QGraphicsSceneMouseEvent *e);
         QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+
+    signals:
+
+        int was_clicked(embedding_edge*);
+
 };
 
 #endif

@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     mypath.cpp \
     myfirstdialog.cpp \
     graphs.cpp \
-    embedding_edge.cpp
+    embedding_edge.cpp \
+    pagescene.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -26,7 +27,9 @@ HEADERS  += mainwindow.h \
     mypath.h \
     myfirstdialog.h \
     graphs.h \
-    embedding_edge.h
+    embedding_edge.h \
+    pagescene.h \
+    colors.h
 
 FORMS    += mainwindow.ui
 

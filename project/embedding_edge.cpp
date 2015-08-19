@@ -44,6 +44,8 @@ QPainterPath embedding_edge::shape() const{
 void embedding_edge::mousePressEvent(QGraphicsSceneMouseEvent *e){
     qDebug() << "An edge was clicked";
     QGraphicsItem::mousePressEvent(e);
+
+    emit was_clicked(this);
 }
 
 QVariant embedding_edge::itemChange(GraphicsItemChange change, const QVariant & value) {

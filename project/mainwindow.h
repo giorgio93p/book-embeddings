@@ -15,11 +15,14 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
     BookEmbeddedGraph* mainGraph;
     std::string currentFile;
 
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     bool openBookEmbeddedGraph(std::string filename);
     ~MainWindow() = default;
-    //vector<Page> *pages;
+    //vector<Page> *pages;(
+    BookEmbeddedGraph* getMainGraph() const { return mainGraph;}
+
 
 private:
     void drawBookEmbeddedGraph();

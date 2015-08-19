@@ -18,6 +18,10 @@ public:
     //void done(int r) Q_DECL_OVERRIDE;
 public slots:
 
+signals:
+
+    void ras();
+
 
 
 
