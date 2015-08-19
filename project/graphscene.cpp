@@ -1,10 +1,7 @@
 #include "graphscene.h"
 #include <iostream>
 
-
-
-
- GraphScene::GraphScene(const BookEmbeddedGraph& g, int width, int height){
+GraphScene::GraphScene(const BookEmbeddedGraph& g, const double width, const double height){
     //Paint Nodes
     nodes = std::unordered_map<Node,QGraphicsEllipseItem*>();
     QBrush redBrush(Qt::black);

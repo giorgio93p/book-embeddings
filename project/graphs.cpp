@@ -1,4 +1,5 @@
 #include "graphs.h"
+#include <ogdf/energybased/SpringEmbedderFR.h>
 #include <ogdf/energybased/FMMMLayout.h>
 
 Graph::Graph(){
@@ -19,9 +20,13 @@ Node Graph::addNode(){
     return g.newNode();
 }
 
-void Graph::buildLayout(double xmin, double ymin, double xmax, double ymax){
+void Graph::buildLayout(const double xmin, const double ymin, const double xmax, const double ymax){
     ogdf::FMMMLayout drawer = ogdf::FMMMLayout();
     drawer.call(attr);
+    ogdf::SpringEmbedderFR drawer2 = ogdf::SpringEmbedderFR();
+    drawer2.scaling(ogdf::SpringEmbedderFR::scUserBoundingBox);
+    drawer2.userBoundingBox(xmin, ymin, xmax, ymax);
+    drawer2.call(attr);
 }
 
 double Graph::getXcoord(const Node& v) const{

@@ -68,7 +68,7 @@ class Graph  {
             return attr;
         }
 
-        void buildLayout(double xmin, double ymin, double xmax, double ymax);
+        void buildLayout(const double xmin, const double ymin, const double xmax, const double ymax);
         double getXcoord(const Node &v) const;
         double getYcoord(const Node &v) const;
         double getBoxWidth(const Node &v) const;

@@ -12,10 +12,6 @@ static    QColor getPageColor(int page){
     return pageColors[page % pageColors_length];
 }
 
-/*
-static    QColor getPageColor2(int page){
-    return pageColors[page % pageColors_length];
-}
-*/
+
 #endif // COLORS
 

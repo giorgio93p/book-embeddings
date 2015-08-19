@@ -15,8 +15,6 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp\
         graphscene.cpp \
-    mypath.cpp \
-    myfirstdialog.cpp \
     graphs.cpp \
     embedding_edge.cpp \
     pagescene.cpp
@@ -24,8 +22,6 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
             graphscene.h \
-    mypath.h \
-    myfirstdialog.h \
     graphs.h \
     embedding_edge.h \
     pagescene.h \
