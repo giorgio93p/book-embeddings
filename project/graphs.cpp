@@ -125,7 +125,8 @@ void BookEmbeddedGraph::moveToPage(Edge& e, const int newPage){
     int p = getPageNo(e);
     pages[p].erase(e);
     addEdgeToPage(e,newPage);
-    //recalculate crossings of old and new page?
+    std::vector<int> temp = {p,newPage};
+    calculateCrossings(temp);
 }
 
 int BookEmbeddedGraph::getPageNo(const Edge &e) const{
@@ -193,7 +194,7 @@ void BookEmbeddedGraph::generateBuckets(){
 
 }
 
-void BookEmbeddedGraph::calculateCrossings(){
+void BookEmbeddedGraph::calculateCrossings(const std::vector<int> pagesChanged){
     if (bucketsNeedToBeGenerated)
         generateBuckets();
 

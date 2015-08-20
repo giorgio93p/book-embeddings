@@ -162,8 +162,11 @@ class BookEmbeddedGraph : public Graph {
 
         void addEdgeToPage(Edge& e, int pageNo);
         void generateBuckets();
-        void calculateCrossings();
-        //void recalculateCrossings();
+
+        /**
+         * @param pagesChanged The pages that need to be recalculated. If the vector is empty, all pages need calculation.
+         */
+        void calculateCrossings(const std::vector<int> pagesChanged = std::vector<int>());
 };
 
 bool edgeCmp (const Edge&, const Edge&);

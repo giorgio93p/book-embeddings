@@ -1,9 +1,13 @@
 #include "embedding_edge.h"
+#include <QMenu>
+#include <QAction>
+#include <QInputDialog>
+#include <QActionEvent>
 
 /**
  * n1 <= n2
  */
-embedding_edge::embedding_edge(double h, qreal n1, qreal n2, QPainterPath *path, QPen p) {
+embedding_edge::embedding_edge(double h, qreal n1, qreal n2, QPainterPath *path, QPen p, const Edge& e, QMainWindow *w) {
     height = h;
 
     left = n1;
@@ -11,6 +15,10 @@ embedding_edge::embedding_edge(double h, qreal n1, qreal n2, QPainterPath *path,
 
     painterPath = path;
     pen = p;
+
+    edge = e;
+    window = w;
+    //std::cout << "Drawing edge " << (*e)->source() << "," << (*e)->target() << std::endl;
 }
 
 QRectF embedding_edge::boundingRect() const {
@@ -41,18 +49,27 @@ QPainterPath embedding_edge::shape() const{
     return path;
 }
 
-void embedding_edge::mousePressEvent(QGraphicsSceneMouseEvent *e){
-    qDebug() << "An edge was clicked";
-    QGraphicsItem::mousePressEvent(e);
-
-    emit was_clicked(this);
-}
-
 QVariant embedding_edge::itemChange(GraphicsItemChange change, const QVariant & value) {
     if (change == QGraphicsItem::ItemSelectedChange) {
-        qDebug() << "Selected embedding edge change";
+        if(value.toBool()) emit was_selected(edge);
+        else emit was_deselected(edge);
     }
 
     return QGraphicsItem::itemChange(change, value);
 }
 
+void embedding_edge::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
+    //emit was_selected(edge);
+    QMenu menu;
+    //QAction *removeAction = menu.addAction("Remove");
+    QAction *moveAction = menu.addAction(tr("Move to Page"));
+    connect(moveAction, SIGNAL(triggered()), this, SLOT(moveDialog()));
+    QAction *selectedAction = menu.exec(event->screenPos());
+}
+
+void embedding_edge::moveDialog(){
+    bool ok;
+    int newPage = QInputDialog::getInt(window, tr("Move edge to page"),
+                                         tr("New page:"),0,0,2147483647,1,&ok);
+    if (ok) emit move_to_page(edge, newPage);
+}

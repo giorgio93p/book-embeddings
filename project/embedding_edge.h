@@ -2,11 +2,12 @@
 #define EMBE_H
 
 #include <QPainter>
+#include <QMainWindow>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QtDebug>
-#include "graphs.h"
 #include <QObject>
+#include "graphs.h"
 
 class embedding_edge : public QObject, public QGraphicsItem
 {
@@ -18,21 +19,24 @@ class embedding_edge : public QObject, public QGraphicsItem
     qreal right;
     QPainterPath *painterPath;
     QPen pen;
-    Edge* edge;
+    Edge edge;
+    QMainWindow *window;
 
     public:
-        embedding_edge(double, qreal, qreal, QPainterPath *, QPen);
+        embedding_edge(double, qreal, qreal, QPainterPath *, QPen, const Edge &e, QMainWindow *w);
 
         QRectF boundingRect() const;
         void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
         QPainterPath shape() const;
-        void mousePressEvent(QGraphicsSceneMouseEvent *e);
         QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+        void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+public slots:
+        void moveDialog();
+signals:
+        void was_selected(Edge&);
+        void was_deselected(Edge&);
 
-    signals:
-
-        int was_clicked(embedding_edge*);
-
+        void move_to_page(Edge&, int);
 };
 
 #endif

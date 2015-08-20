@@ -27,7 +27,6 @@ GraphScene::GraphScene(const BookEmbeddedGraph& g, const double width, const dou
     forall_edges(e,g) {
         //std::cout << "Page number: " << page << std::endl;
         //std::cout << "Color: " << (color.name().toUtf8().toStdString()) << std::endl;
-        cout << "agadgasgs" << endl;
 
         pen.setColor(getPageColor(g.getPageNo(e)));
         qreal x1 = nodes[e->source()]->boundingRect().center().x();

@@ -1,6 +1,3 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "graphscene.h"
@@ -17,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(number_of_nodes_changed(int)), number_of_edges_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(number_of_edges_changed(int)), number_of_nodes_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(number_of_pages_changed(int)), number_of_pages_indicator, SLOT(setNum(int)));
-    connect(this, SIGNAL(crossings_changed(int)), total_crossings_indicator, SLOT(setNum(int)));
+    connect(this, SIGNAL(crossings_changed(std::vector<int>)), this, SLOT(on_crossings_changed(std::vector<int>)));
     connect(this, SIGNAL(planarity_changed(bool)), planarity_indicator, SLOT(setChecked(bool)));
 
     //embedding_drawing->setScaledContents(true);
@@ -32,10 +29,10 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::drawBookEmbeddedGraph(){
     //Draw graph
     delete graphView->scene(); //delete scene that shows the whole graph
-    mainGraph->buildLayout(0.0,0.0,graphView->width(),graphView->height());
+    mainGraph->buildLayout(-graphView->width(),-graphView->height(),graphView->width(),graphView->height());
     GraphScene* gs = new GraphScene(*mainGraph);
     graphView->setScene(gs);
-    graphView->fitInView(gs->sceneRect());
+    //graphView->fitInView(gs->sceneRect());
 
     //Draw pages
     for(int p=pageViews.size()-1; p>=0; p--){
@@ -63,7 +60,7 @@ void MainWindow::add_page_drawing(int page){
 
     embedding_drawing->layout()->addWidget(view);
     pageViews.push_back(view);
-    view->setScene(new PageScene(*mainGraph,page));
+    view->setScene(new PageScene(*mainGraph,page,this));
 
     view->show();
 }
@@ -81,7 +78,7 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         emit number_of_nodes_changed(mainGraph->numberOfNodes());
         emit number_of_edges_changed(mainGraph->numberOfEdges());
         emit number_of_pages_changed(mainGraph->getNpages());
-        emit crossings_changed(mainGraph->getNcrossings());
+        emit crossings_changed(std::vector<int>());
         emit planarity_changed(mainGraph->graphIsPlanar());
         return true;
     } else {
@@ -132,8 +129,58 @@ void MainWindow::on_actionSave_as_triggered()
     }
 }
 
+void MainWindow::on_edge_selected(Edge& e){
+    node_stats->setEnabled(false);
+    edge_stats->setEnabled(true);
+    std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") selected" << endl;
+    //edge_crossings_indicator->setNum(mainGraph->getNcrossings(e));
+    edge_source_indicator->setNum(e->source()->index());
+    edge_target_indicator->setNum(e->target()->index());
+    edge_page_indicator->setNum(mainGraph->getPageNo(e));
+    stats->setCurrentWidget(edge_stats);
+}
+
+void MainWindow::on_edge_deselected(Edge& e){
+    edge_stats->setEnabled(false);
+    //edge_crossings_indicator->clear();
+    edge_source_indicator->clear();
+    edge_target_indicator->clear();
+    edge_page_indicator->clear();
+    std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
+}
+
+void MainWindow::on_node_selected(Node& v){
+    edge_stats->setEnabled(false);
+    node_stats->setEnabled(true);
+    std::cout << "Node " << v->index() << " selected" << endl;
+    node_outdeg_indicator->setNum(v->outdeg());
+    node_indeg_indicator->setNum(v->indeg());
+    node_index_indicator->setNum(v->index());
+    stats->setCurrentWidget(node_stats);
+}
+
+void MainWindow::on_node_deselected(Node& v){
+    node_stats->setEnabled(false);
+    node_outdeg_indicator->clear();
+    node_indeg_indicator->clear();
+    node_index_indicator->clear();
+    std::cout << "Node " << v->index() << " deselected" << endl;
+}
+
+void MainWindow::on_edge_move_to_page(Edge &e , int p){
+    if(p < 0 || p >= mainGraph->getNpages()) return;
+    int currPage = mainGraph->getPageNo(e);
+    mainGraph->moveToPage(e,p);
+    ((PageScene*)(pageViews[currPage]->scene()))->removeEdge(e);
+    ((PageScene*)(pageViews[p]->scene()))->addEdge(e);
+    std::vector<int> temp = {p, currPage};
+    emit crossings_changed(temp);
+}
+
+void MainWindow::on_crossings_changed(std::vector<int> pagesChanged){
+    total_crossings_indicator->setNum(mainGraph->getNcrossings());
+}
+
 void MainWindow::on_actionSave_triggered(){
     if(mainGraph->writeGML(currentFile)) std::cout << "Graph saved to " << currentFile << endl;
 }
-
-#endif

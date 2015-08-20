@@ -44,7 +44,7 @@
          </attribute>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
-           <widget class="QGraphicsView" name="graphicsView_7">
+           <widget class="QGraphicsView" name="bc_tree_view">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -81,11 +81,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QTabWidget" name="tabWidget">
+       <widget class="QTabWidget" name="stats">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="graph_stats">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -93,68 +93,81 @@
           </sizepolicy>
          </property>
          <attribute name="title">
-          <string>Tab 1</string>
+          <string>Graph</string>
          </attribute>
          <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="total_crossings_label">
             <property name="text">
              <string>Crossings:</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QLabel" name="total_crossings_indicator">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="number_of_pages_label">
             <property name="text">
              <string>Number of pages:</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QLabel" name="number_of_pages_indicator">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="number_of_nodes_label">
             <property name="text">
              <string>Number of nodes:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QLabel" name="number_of_nodes_indicator">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="number_of_edges_label">
             <property name="text">
              <string>Number of edges:</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QLabel" name="number_of_edges_indicator">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="planarity_indicator">
+            <property name="text">
+             <string>Is Planar?</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="tristate">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_2">
+        <widget class="QWidget" name="node_stats">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -165,19 +178,111 @@
           <string/>
          </property>
          <attribute name="title">
-          <string>Tab 2</string>
+          <string>Node</string>
          </attribute>
          <layout class="QFormLayout" name="formLayout_2">
-          <item row="1" column="1">
-           <widget class="QCheckBox" name="planarity_indicator">
+          <item row="3" column="0">
+           <widget class="QLabel" name="node_index_label">
             <property name="text">
-             <string>Is Planar?</string>
+             <string>Index:</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="node_index_indicator">
+            <property name="text">
+             <string/>
             </property>
-            <property name="tristate">
-             <bool>false</bool>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="node_indeg_label">
+            <property name="text">
+             <string>In-degree:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="node_indeg_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="node_outdeg_label">
+            <property name="text">
+             <string>Out-degree:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="node_outdeg_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="edge_stats">
+         <attribute name="title">
+          <string>Edge</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="2" column="0">
+           <widget class="QLabel" name="edge_source_label">
+            <property name="text">
+             <string>Source:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="edge_source_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="edge_target_label">
+            <property name="text">
+             <string>Target:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="edge_target_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="edge_crossings_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="edge_crossings_label">
+            <property name="text">
+             <string>Crossings:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="edge_page_label">
+            <property name="text">
+             <string>Page:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="edge_page_indicator">
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -204,7 +309,7 @@
          <x>0</x>
          <y>0</y>
          <width>530</width>
-         <height>789</height>
+         <height>791</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -225,7 +330,7 @@
      <x>0</x>
      <y>0</y>
      <width>836</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
