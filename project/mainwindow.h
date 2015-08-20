@@ -14,6 +14,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
     std::vector<QGraphicsView*> pageViews;
     BookEmbeddedGraph* mainGraph;
     std::string currentFile;
+    BCTree *bctree;
 
 
 public:
@@ -24,7 +25,9 @@ public:
     BookEmbeddedGraph* getMainGraph() const { return mainGraph;}
 
 
+
 private:
+    void drawBCTree();
     void drawBookEmbeddedGraph();
     void add_page_drawing(int p);
 

@@ -17,7 +17,8 @@ SOURCES += main.cpp\
         graphscene.cpp \
     graphs.cpp \
     embedding_edge.cpp \
-    pagescene.cpp
+    pagescene.cpp \
+    bctscene.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -25,7 +26,8 @@ HEADERS  += mainwindow.h \
     graphs.h \
     embedding_edge.h \
     pagescene.h \
-    colors.h
+    colors.h \
+    bctscene.h
 
 FORMS    += mainwindow.ui
 

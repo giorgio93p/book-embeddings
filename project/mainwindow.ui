@@ -44,7 +44,7 @@
          </attribute>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
-           <widget class="QGraphicsView" name="graphicsView_7">
+           <widget class="QGraphicsView" name="bCTView">
             <property name="minimumSize">
              <size>
               <width>0</width>

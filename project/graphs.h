@@ -1,3 +1,5 @@
+
+
 #ifndef GRAPHS_H
 #define GRAPHS_H
 
@@ -32,11 +34,14 @@ class Graph  {
 
     public:
         Graph();
-        Graph(Graph* graph);
+        Graph(ogdf::Graph graph);
+        Graph(Graph*);
+
 
         ogdf::Graph toOGDF() const{
             return g;
         }
+
 
         virtual bool readGML(std::string& fileName){
             return ogdf::GraphIO::readGML(attr,g,fileName);
@@ -60,12 +65,20 @@ class Graph  {
             return g.newEdge(from, to);
         }
 
-        Node firstNode() const{
+        virtual Node firstNode() const{
             return g.firstNode();
+        }
+
+        virtual Edge firstEdge() const {
+            return g.firstEdge();
         }
 
         ogdf::GraphAttributes getGraphAttributes() {
             return attr;
+        }
+
+        ogdf::Graph getGraph() {
+            return g;
         }
 
         void buildLayout(const double xmin, const double ymin, const double xmax, const double ymax);
@@ -196,6 +209,10 @@ class BCTree {
         ogdf::BCTree ogBCT;
     public:
         BCTree(Graph &);
+
+        ogdf::Graph getBCTree() const {
+            return ogBCT.bcTree();
+        }
 
         Node firstNode(bool);
         Node lastNode(bool);

@@ -14,6 +14,13 @@ Graph::Graph(Graph* graph){
     
     //NOTE:You might not always want to delete the original graph
     //delete graph;
+
+
+}
+
+Graph::Graph(ogdf::Graph graph){
+    g=graph;
+    attr = ogdf::GraphAttributes(g);//no value given
 }
 
 Node Graph::addNode(){
@@ -21,17 +28,36 @@ Node Graph::addNode(){
 }
 
 void Graph::buildLayout(const double xmin, const double ymin, const double xmax, const double ymax){
+    cout << "entering buildLayout" << endl;
+
+
+
     ogdf::FMMMLayout drawer = ogdf::FMMMLayout();
+
+
+        drawer.useHighLevelOptions(true);
+        drawer.unitEdgeLength(15.0);
+        drawer.newInitialPlacement(true);
+        drawer.qualityVersusSpeed(ogdf::FMMMLayout::qvsGorgeousAndEfficient);
+
+    cout << "before call of drawer" << endl;
+
     drawer.call(attr);
+
+    cout << "after  call of drawer" << endl;
+
+
     ogdf::SpringEmbedderFR drawer2 = ogdf::SpringEmbedderFR();
     drawer2.scaling(ogdf::SpringEmbedderFR::scUserBoundingBox);
-    drawer2.userBoundingBox(xmin, ymin, xmax, ymax);
+    drawer2.userBoundingBox(0.0, 0.0, xmax, ymax);
     drawer2.call(attr);
+
 }
 
 double Graph::getXcoord(const Node& v) const{
     return attr.x(v);
 }
+
 
 double Graph::getYcoord(const Node& v) const{
     return attr.y(v);
@@ -262,6 +288,7 @@ Node BCTree::lastNode(bool biconnected){
     return ogBCT.auxiliaryGraph().lastNode();
 
 }
+
 
 int BCTree::numberOfNodes(bool biconnected) {
     if (!biconnected)

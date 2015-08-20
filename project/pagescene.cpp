@@ -2,6 +2,11 @@
 #include <iostream>
 #include <QGraphicsView>
 
+/*
+ * This class used to be called "BookEmbeddedScene", but for obvious reasons it was renamed.
+ * It is used as a scene that shows a single page.
+ */
+
 
 PageScene::PageScene(const BookEmbeddedGraph& g, const int page, int width, int height){
     //Paint Nodes
@@ -29,7 +34,6 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int page, int width, int 
     edges = new std::unordered_map<Edge, embedding_edge*>();
 
     QColor color = getPageColor(page);
-    cout << "agadgasgs" << endl;
 
     //std::cout << "Page number: " << page << std::endl;
     //std::cout << "Color: " << (color.name().toUtf8().toStdString()) << std::endl;

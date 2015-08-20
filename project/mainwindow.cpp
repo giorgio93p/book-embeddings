@@ -5,8 +5,10 @@
 #include "ui_mainwindow.h"
 #include "graphscene.h"
 #include "pagescene.h"
+#include "bctscene.h"
 
 #define WINDOW_TITLE tr("P.E.O.S.")
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -68,6 +70,44 @@ void MainWindow::add_page_drawing(int page){
     view->show();
 }
 
+void MainWindow::drawBCTree() {
+
+
+    //this draws the Biconnected Compenents Tree of the input graph on Tab1, right below the mainGraph.
+    //it is drawn in a QGraphicsView object which was made in Desinger, named bCTView.
+
+
+    bctree = new BCTree(*mainGraph);  //make a new object of clss BCTree
+    cout << bctree->numberOfNodes(true) << endl; //testing if class works
+    ogdf::Graph graf = bctree->getBCTree();     //get the bct in ogdf::graph representation
+
+    //ogdf::GraphIO::writeGML(graf, "/home/kosmas/sierpinski_04-layout.gml");
+
+
+
+    Graph* bCGraph = new Graph(graf);    //create a new Graph object that represents the bct.
+                                        //check the Graph constructor that takes an ogdf::Graph
+                                        //as a parameter
+
+
+
+    delete bCTView->scene();             //deleting previous scene if any
+
+
+    bCGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
+                                                                     //segfaults :(.
+                                                                     //we use it to make some
+                                                                    // settings in the attr member of graphs
+
+    QGraphicsScene *gs =new BCTScene(*bCGraph,250,50);              //BCTScene: new class, custom made to
+                                                                    //show bctrees.
+
+    bCTView->setScene(gs);                                           //final
+    bCTView->fitInView((gs)->sceneRect());                           //things
+
+
+}
+
 bool MainWindow::openBookEmbeddedGraph(std::string filename){
     BookEmbeddedGraph* temp = new BookEmbeddedGraph();
     if (temp->readGML(filename)){
@@ -77,6 +117,11 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         //std::cout << "Read Successful!!!!!" << std::endl;
         //std::cout << "Number of nodes in read graph ==" << mainGraph->numberOfNodes() << endl;
         //std::cout << "Number of edges in read graph ==" << mainGraph->numberOfEdges() << endl;
+        this->drawBCTree(); //drawBCTree
+                            //added by kosms
+                            //made to draw the Biconnected Components Tree.
+                            //which is shown at the scene named bCTScene
+
         this->drawBookEmbeddedGraph();
         emit number_of_nodes_changed(mainGraph->numberOfNodes());
         emit number_of_edges_changed(mainGraph->numberOfEdges());

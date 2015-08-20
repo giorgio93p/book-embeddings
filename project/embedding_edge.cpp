@@ -3,6 +3,7 @@
 /**
  * n1 <= n2
  */
+
 embedding_edge::embedding_edge(double h, qreal n1, qreal n2, QPainterPath *path, QPen p) {
     height = h;
 
