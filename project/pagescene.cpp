@@ -50,7 +50,7 @@ void PageScene::addEdge(const Edge& e){
     edg->moveTo(x2,0);
     edg->arcTo(x1,-h,(x2-x1),2*h,0,180);
 
-    embedding_edge * path = new embedding_edge(h, x1, x2, edg, pen, e, window);
+    embedding_edge * path = new embedding_edge(edg, pen, e);
     this->addItem(path);
     path->setFlags(QGraphicsItem::ItemIsSelectable);
 
@@ -58,7 +58,7 @@ void PageScene::addEdge(const Edge& e){
 
     connect(path,SIGNAL(was_selected(Edge&)),window,SLOT(on_edge_selected(Edge&)));
     connect(path,SIGNAL(was_deselected(Edge&)),window,SLOT(on_edge_deselected(Edge&)));
-    connect(path,SIGNAL(move_to_page(Edge&,int)),window,SLOT(on_edge_move_to_page(Edge&,int)));
+    connect(path,SIGNAL(move(Edge&)),window,SLOT(move_edge(Edge&)));
 }
 
 void PageScene::removeEdge(const Edge &e){

@@ -13,17 +13,12 @@ class embedding_edge : public QObject, public QGraphicsItem
 {
 
     Q_OBJECT
-
-    double height;
-    qreal left;
-    qreal right;
     QPainterPath *painterPath;
     QPen pen;
     Edge edge;
-    QMainWindow *window;
 
     public:
-        embedding_edge(double, qreal, qreal, QPainterPath *, QPen, const Edge &e, QMainWindow *w);
+        embedding_edge(QPainterPath *, QPen, const Edge &e);
 
         QRectF boundingRect() const;
         void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
@@ -31,12 +26,12 @@ class embedding_edge : public QObject, public QGraphicsItem
         QVariant itemChange(GraphicsItemChange change, const QVariant & value);
         void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 public slots:
-        void moveDialog();
+        void on_move_request(){emit move(edge);}
 signals:
         void was_selected(Edge&);
         void was_deselected(Edge&);
 
-        void move_to_page(Edge&, int);
+        void move(Edge&);
 };
 
 #endif

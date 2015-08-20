@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "graphscene.h"
 #include "pagescene.h"
+#include <QInputDialog>
 
 #define WINDOW_TITLE tr("P.E.O.S.")
 
@@ -167,13 +168,18 @@ void MainWindow::on_node_deselected(Node& v){
     std::cout << "Node " << v->index() << " deselected" << endl;
 }
 
-void MainWindow::on_edge_move_to_page(Edge &e , int p){
-    if(p < 0 || p >= mainGraph->getNpages()) return;
+void MainWindow::move_edge(Edge &e){
+    bool ok;
+    int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
+                                         tr("New page:"),0,0,mainGraph->getNpages()-1,1,&ok);
+    if (!ok) return;
     int currPage = mainGraph->getPageNo(e);
-    mainGraph->moveToPage(e,p);
+    mainGraph->moveToPage(e,newPage);
     ((PageScene*)(pageViews[currPage]->scene()))->removeEdge(e);
-    ((PageScene*)(pageViews[p]->scene()))->addEdge(e);
-    std::vector<int> temp = {p, currPage};
+    ((PageScene*)(pageViews[newPage]->scene()))->addEdge(e);
+    ((GraphScene*)(graphView->scene()))->removeEdge(e);
+    ((GraphScene*)(graphView->scene()))->addEdge(e,newPage);
+    std::vector<int> temp = {newPage, currPage};
     emit crossings_changed(temp);
 }
 

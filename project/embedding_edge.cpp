@@ -1,28 +1,21 @@
 #include "embedding_edge.h"
 #include <QMenu>
 #include <QAction>
-#include <QInputDialog>
 #include <QActionEvent>
 
-/**
- * n1 <= n2
- */
-embedding_edge::embedding_edge(double h, qreal n1, qreal n2, QPainterPath *path, QPen p, const Edge& e, QMainWindow *w) {
-    height = h;
-
-    left = n1;
-    right = n2;
-
+embedding_edge::embedding_edge(QPainterPath *path, QPen p, const Edge& e) {
     painterPath = path;
     pen = p;
 
     edge = e;
-    window = w;
     //std::cout << "Drawing edge " << (*e)->source() << "," << (*e)->target() << std::endl;
 }
 
 QRectF embedding_edge::boundingRect() const {
-    qreal width = right - left;
+    qreal left = painterPath->boundingRect().left();
+    qreal right = painterPath->boundingRect().right();
+    qreal height = painterPath->boundingRect().height();
+    qreal width = painterPath->boundingRect().width();
 
     QRectF bounding =  QRectF(left + 0.45 * width, -height, 0.1 * width, 0.6 * height);/*QRectF(left, -height, width, height);*/
     return bounding;
@@ -34,7 +27,10 @@ void embedding_edge::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 }
 
 QPainterPath embedding_edge::shape() const{
-    qreal width = right - left;
+    qreal left = painterPath->boundingRect().left();
+    qreal right = painterPath->boundingRect().right();
+    qreal height = painterPath->boundingRect().height();
+    qreal width = painterPath->boundingRect().width();
 
     //NOTE:this is the _original_ bounding rect... should we change it?
     QRectF rect= QRectF(left, -height, width, height);
@@ -63,13 +59,6 @@ void embedding_edge::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
     QMenu menu;
     //QAction *removeAction = menu.addAction("Remove");
     QAction *moveAction = menu.addAction(tr("Move to Page"));
-    connect(moveAction, SIGNAL(triggered()), this, SLOT(moveDialog()));
+    connect(moveAction, SIGNAL(triggered()), this, SLOT(on_move_request()));
     QAction *selectedAction = menu.exec(event->screenPos());
-}
-
-void embedding_edge::moveDialog(){
-    bool ok;
-    int newPage = QInputDialog::getInt(window, tr("Move edge to page"),
-                                         tr("New page:"),0,0,2147483647,1,&ok);
-    if (ok) emit move_to_page(edge, newPage);
 }
