@@ -43,6 +43,7 @@ public slots:
     void on_node_deselected(Node &);
 
     void move_edge(Edge&);
+    void on_remove_page(int);
     void on_crossings_changed(std::vector<int>);
 
 signals:

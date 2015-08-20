@@ -3,6 +3,11 @@
 #include "graphscene.h"
 #include "pagescene.h"
 #include <QInputDialog>
+#include <QVBoxLayout>
+#include <QGridLayout>
+#include <QLabel>
+#include <QAction>
+#include <QPushButton>
 
 #define WINDOW_TITLE tr("P.E.O.S.")
 
@@ -48,22 +53,51 @@ void MainWindow::drawBookEmbeddedGraph(){
 }
 
 void MainWindow::add_page_drawing(int page){
-    QGraphicsView* view = new QGraphicsView(embedding_drawing);
 
     /* embedding_drawing: a widget that we have created with QTDesigner.
-     * It is used as the parent widget for all page views.
+     * It is used as ancestor widget for all page views.
      * Itself it is contained in a ScrollArea Widget
      * which we have named, not surprisignly, scrollArea.
      * All this was made in QTDesigner.
-     * kosm
+     *
+     * Below, we create the view for the page and, along with it,
+     * two QLabels (page_number and crossings_of_page)
+     * and one QPushButton (delete)
+     * which we align
+     *
      */
-
-
-    embedding_drawing->layout()->addWidget(view);
+    int rowNumber = ((QGridLayout*)embedding_drawing->layout())->rowCount();
+    QGraphicsView* view = new QGraphicsView();
     pageViews.push_back(view);
-    view->setScene(new PageScene(*mainGraph,page,this));
+    PageScene* scene = new PageScene(*mainGraph,page,this);
+    view->setScene(scene);
+    connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));
+    ((QGridLayout*)embedding_drawing->layout())->addWidget(view,rowNumber,0);
 
-    view->show();
+    QWidget* vert = new QWidget(embedding_drawing);
+    vert->setLayout(new QVBoxLayout());
+    embedding_drawing->layout()->addWidget(vert);
+    connect(view,SIGNAL(destroyed(QObject*)),vert,SLOT(deleteLater()));
+    ((QGridLayout*)embedding_drawing->layout())->addWidget(vert,rowNumber,1);
+
+    QLabel* page_number = new QLabel();
+    page_number->setNum(page);
+    page_number->setToolTip(tr("Page number"));
+    vert->layout()->addWidget(page_number);
+    connect(scene,SIGNAL(page_number_changed(int)),page_number,SLOT(setNum(int)));
+
+    QLabel* crossings_of_page = new QLabel();
+    crossings_of_page->setNum(mainGraph->getNcrossings(page));
+    crossings_of_page->setToolTip(tr("Crossings"));
+    vert->layout()->addWidget(crossings_of_page);
+    connect(scene,SIGNAL(crossings_changed(int)),crossings_of_page,SLOT(setNum(int)));
+
+    QPushButton* del = new QPushButton("Delete");
+    del->setToolTip(tr("Delete page"));
+    //if(mainGraph->pageSize(page)>0) del->setEnabled(false);
+    connect(del,SIGNAL(pressed()),scene,SLOT(on_remove_page_request()));
+    vert->layout()->addWidget(del);
+
 }
 
 bool MainWindow::openBookEmbeddedGraph(std::string filename){
@@ -81,6 +115,7 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         emit number_of_pages_changed(mainGraph->getNpages());
         emit crossings_changed(std::vector<int>());
         emit planarity_changed(mainGraph->graphIsPlanar());
+        stats->setCurrentWidget(graph_stats);
         return true;
     } else {
         //delete temp;
@@ -181,6 +216,19 @@ void MainWindow::move_edge(Edge &e){
     ((GraphScene*)(graphView->scene()))->addEdge(e,newPage);
     std::vector<int> temp = {newPage, currPage};
     emit crossings_changed(temp);
+}
+
+void MainWindow::on_remove_page(int page){
+    if(mainGraph->pageSize(page) == 0){
+        mainGraph->removePage(page);
+        QGraphicsView* temp = pageViews[page];
+        pageViews.erase(pageViews.begin()+page);
+        delete temp;
+        emit number_of_pages_changed(mainGraph->getNpages());
+        for(int i=page; i<mainGraph->getNpages(); i++){
+            ((PageScene*)(pageViews[i]->scene()))->setPageNumber(i);
+        }
+    }
 }
 
 void MainWindow::on_crossings_changed(std::vector<int> pagesChanged){

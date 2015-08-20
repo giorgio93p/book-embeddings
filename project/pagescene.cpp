@@ -3,8 +3,9 @@
 #include <QGraphicsView>
 
 
-PageScene::PageScene(const BookEmbeddedGraph& g, const int page, MainWindow* w, int width, int height){
+PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, int width, int height){
     window = w;
+    page = p;
 
     //Paint Nodes
     nodes = new std::unordered_map<Node,QGraphicsEllipseItem*>();
@@ -66,3 +67,7 @@ void PageScene::removeEdge(const Edge &e){
     delete edges->at(e);
 }
 
+void PageScene::setPageNumber(int p){
+    page = p;
+    emit page_number_changed(page);
+}

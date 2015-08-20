@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>836</width>
-    <height>898</height>
+    <width>920</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,7 +83,7 @@
       <item>
        <widget class="QTabWidget" name="stats">
         <property name="currentIndex">
-         <number>2</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="graph_stats">
          <property name="sizePolicy">
@@ -308,8 +308,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>530</width>
-         <height>791</height>
+         <width>614</width>
+         <height>613</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -318,7 +318,7 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout"/>
+       <layout class="QGridLayout" name="gridLayout"/>
       </widget>
      </widget>
     </item>
@@ -329,7 +329,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>836</width>
+     <width>920</width>
      <height>25</height>
     </rect>
    </property>
