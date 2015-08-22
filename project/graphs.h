@@ -148,8 +148,15 @@ class BookEmbeddedGraph : public Graph {
         int getNcrossings() const {
             return ncrossings;
         }
+        int getNcrossings(const int page) const{
+            int result = 0;
+            for(Edge e : pages[page]){
+                result += getNcrossings(e);
+            }
+            return result;
+        }
         int getNcrossings(const Edge& e) const{
-            return crossings.at(e).size();
+            return 0;//crossings.at(e).size();
         }
         std::unordered_set<Edge> getcrossings(const Edge& e) const{
             return crossings.at(e);
@@ -175,8 +182,11 @@ class BookEmbeddedGraph : public Graph {
 
         void addEdgeToPage(Edge& e, int pageNo);
         void generateBuckets();
-        void calculateCrossings();
-        //void recalculateCrossings();
+
+        /**
+         * @param pagesChanged The pages that need to be recalculated. If the vector is empty, all pages need calculation.
+         */
+        void calculateCrossings(const std::vector<int> pagesChanged = std::vector<int>());
 };
 
 bool edgeCmp (const Edge&, const Edge&);

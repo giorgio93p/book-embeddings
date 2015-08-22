@@ -11,7 +11,6 @@
 #include "colors.h"
 
 /*
- *
  * scene to display a bctree. Its constructor creates
  * all the nodes and edges in the form of QGraphicsItems.
  */
