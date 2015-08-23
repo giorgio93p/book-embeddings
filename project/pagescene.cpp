@@ -1,4 +1,5 @@
 #include "pagescene.h"
+#include "mainwindow.h"
 #include <iostream>
 #include <QGraphicsView>
 
@@ -7,15 +8,14 @@
  * It is used as a scene that shows a single page.
  */
 
-
-PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, int width, int height){
+PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, int width, int height) : m_width(width){
+    //Paint Nodes
 
     colour = col;
-    window = w;
+    mainWindow = w;
     page = p;
 
-    //Paint Nodes
-    nodes = new std::unordered_map<Node,QGraphicsEllipseItem*>();
+    nodes = new std::unordered_map<Node,PageNode*>();
     QBrush redBrush(Qt::red);
     QPen blackPen(Qt::black);
     blackPen.setWidth(2);
@@ -25,15 +25,19 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     Node v;
     forall_nodes_embedded(v,g){
         //std::cout << g.getPosition(v) << std::endl;
+        QString indexStr = QString::number(v->index());
+        QGraphicsSimpleTextItem* labelItem = this->addSimpleText(indexStr);
+        PageNode* el = new PageNode(this, i, g.numberOfNodes(), interval);
+        el->setBrush(redBrush);
+        el->setPen(blackPen);
+        el->setRect(-width+i*interval,0,12,12);
+        addItem(el);
+        //QGraphicsEllipseItem* el = this->addEllipse(-width+i*interval,0,12,12,blackPen,redBrush);
 
-        QGraphicsEllipseItem* el = this->addEllipse(-width+i*interval,0,12,12,blackPen,redBrush);
-
-        //el->setMovable();
-        el->setFlag(QGraphicsItem::ItemIsSelectable, true);
+        labelItem->setPos(-width+i*interval,15);
         (*nodes)[v] = el;
+        //nodes[v] = el;
         i++;
-        //connect(el,SIGNAL(was_selected(Node&)),w,SLOT(on_node_selected(Node&)));
-        //connect(el,SIGNAL(was_deselected(Node&)),w,SLOT(on_node_deselected(Node&)));
     }
 
     //Paint Edges
@@ -48,8 +52,6 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
         this->addEdge(e);
     }
 }
-
-
 
 void PageScene::addEdge(const Edge& e){
     qreal x1 = std::min((*nodes)[e->source()]->boundingRect().center().x(),(*nodes)[e->target()]->boundingRect().center().x());
@@ -67,9 +69,9 @@ void PageScene::addEdge(const Edge& e){
 
     (*edges)[e]= path;
 
-    connect(path,SIGNAL(was_selected(Edge&)),window,SLOT(on_edge_selected(Edge&)));
-    connect(path,SIGNAL(was_deselected(Edge&)),window,SLOT(on_edge_deselected(Edge&)));
-    connect(path,SIGNAL(move(Edge&)),window,SLOT(move_edge(Edge&)));
+    connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
+    connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
+    connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
 }
 
 void PageScene::removeEdge(const Edge &e){
@@ -80,4 +82,12 @@ void PageScene::removeEdge(const Edge &e){
 void PageScene::setPageNumber(int p){
     page = p;
     emit page_number_changed(page);
+}
+
+int PageScene::width() {
+    return m_width;
+}
+
+MainWindow* PageScene::window(){
+    return mainWindow;
 }

@@ -444,6 +444,8 @@
    <addaction name="separator"/>
    <addaction name="separator"/>
    <addaction name="actionAddPage"/>
+   <addaction name="separator"/>
+   <addaction name="actionRedraw"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -655,6 +657,20 @@
    </property>
    <property name="text">
     <string>Add Page</string>
+   </property>
+  </action>
+  <action name="actionRedraw">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Redraw</string>
+   </property>
+   <property name="toolTip">
+    <string>Redraw</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

@@ -11,12 +11,14 @@
 #include "embedding_edge.h"
 //#include "node_graphics_item.h"
 #include "colors.h"
-#include "mainwindow.h"
+#include "page_node.h"
+#include <unordered_map>
+
+class MainWindow;
 
 class PageScene : public QGraphicsScene
 {
     Q_OBJECT
-    MainWindow* window;
     QColor colour;
 
     QPen pen;
@@ -24,6 +26,8 @@ class PageScene : public QGraphicsScene
 
 public:
     PageScene(const BookEmbeddedGraph& g, const int p, MainWindow *w, QColor col, int width=250, int height=50);
+    int width();
+    MainWindow* window();
 
     void addEdge(const Edge &e);
     void removeEdge(const Edge &e);
@@ -33,8 +37,13 @@ public:
     }
 
 private:
-    std::unordered_map<Node, QGraphicsEllipseItem*> *nodes;
+    std::unordered_map<Node, PageNode*> *nodes;
     std::unordered_map<Edge, embedding_edge*> *edges;
+    QRectF movementPath;
+    MainWindow* mainWindow;
+
+    int m_width;
+
 public slots:
     void on_remove_page_request(){emit remove_page(page);}
 signals:

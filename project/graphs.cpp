@@ -91,6 +91,8 @@ BookEmbeddedGraph* Graph::bookEmbedWithLeastPages(){
 BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
     attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
 
+    //vertexOrder = NULL;
+
     Node n;
     int i=0;
     forall_nodes(n,g){
@@ -263,6 +265,39 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
     }
     //TODO: calculatecrossings
     return true;
+}
+
+void BookEmbeddedGraph::updatePermutation(int originalIndex, int finalPos) {
+    //int originalIndex = movedNode->getIndex();
+    Node originalNode = permutation[originalIndex];
+
+    if (originalIndex < finalPos) { //moved to the right
+        for (int i = originalIndex; i < finalPos; i++){
+            //attr.label(permutation[i + 1]) = attr.label(permutation[i]);
+            permutation[i] = permutation[i + 1];
+            attr.label(permutation[i]) = std::to_string(i);
+
+        }
+
+        permutation[finalPos] = originalNode;
+        attr.label(permutation[finalPos]) = std::to_string(finalPos);
+
+        //return true;
+    }else if (originalIndex > finalPos){ //moved to the left
+        for (int i = originalIndex; i > finalPos; i--){
+            //attr.label(permutation[i + 1]) = attr.label(permutation[i]);
+            permutation[i] = permutation[i - 1];
+            attr.label(permutation[i]) = std::to_string(i);
+
+        }
+
+        permutation[finalPos] = originalNode;
+        attr.label(permutation[finalPos]) = std::to_string(finalPos);
+
+        //return true;
+    }
+
+    //return false; didn't move, don't need to redraw
 }
 
 //void BookEmbeddedGraph::calculateCrossings(const int pages&){
