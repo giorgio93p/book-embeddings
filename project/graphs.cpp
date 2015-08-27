@@ -100,7 +100,9 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
 
     pages = std::vector<Page>();
     addPage();
+
     Edge e;
+
     forall_edges(e,g) addEdgeToPage(e,0);
 
     permutation = std::vector<Node>(numberOfNodes());
@@ -108,11 +110,44 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
     bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
     //ncrossings = 0;
-    calculateCrossings();
+    //calculateCrossings(); //commented out because it wasnt working.
     std::cout << "BookEmbeddedGraph created" << std::endl;
 }
 
 BookEmbeddedGraph::BookEmbeddedGraph() : BookEmbeddedGraph(new Graph()) {}
+
+BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph graph){
+
+
+
+    g=graph;
+    pages = std::vector<Page>();
+    attr = ogdf::GraphAttributes(g);//no value given
+    attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
+    addPage();
+
+    Node v;
+    int i=0;
+    forall_nodes(v,g){
+        attr.label(v) = std::to_string(i);
+        i++;
+    }
+
+    Edge e;
+    forall_edges(e,g) addEdgeToPage(e,0);
+    permutation = std::vector<Node>(numberOfNodes());
+
+    bucketsNeedToBeGenerated = true;
+    crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
+    //ncrossings = 0;
+    //calculateCrossings();
+    std::cout << "BookEmbeddedGraph created" << std::endl;
+
+
+}
+
+
+
 
 Node BookEmbeddedGraph::addNode(){
     Node n = Graph::addNode();
@@ -160,6 +195,8 @@ int BookEmbeddedGraph::getPageNo(const Edge &e) const{
 }
 
 int BookEmbeddedGraph::getPosition(const Node &v) const{
+
+
     return std::stoi(attr.label(v));
 }
 
@@ -203,6 +240,7 @@ void BookEmbeddedGraph::generateBuckets(){
     for (Page p : pages) {
         Buckets pageStart;
         Buckets pageEnd;
+
 
         pageStart.reserve(numberOfNodes());
         pageEnd.reserve(numberOfNodes());
@@ -273,7 +311,10 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
 
 /******************************************** BCTree Implementation ********************************************/
 
-BCTree::BCTree(Graph &g) : originalGraph(g.toOGDF()), ogBCT(originalGraph){}
+BCTree::BCTree(Graph &g) : originalGraph(g.toOGDF()), ogBCT(originalGraph,true){
+
+
+}
 
 Node BCTree::firstNode(bool biconnected){
     if (!biconnected)
@@ -289,6 +330,7 @@ Node BCTree::lastNode(bool biconnected){
     return ogBCT.auxiliaryGraph().lastNode();
 
 }
+
 
 
 int BCTree::numberOfNodes(bool biconnected) {

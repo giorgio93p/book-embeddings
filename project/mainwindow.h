@@ -11,6 +11,8 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
+#include <ogdf/internal/planarity/ConnectedSubgraph.h>
+#include "biconnectedcomponent.h"
 
 #include "colourcloset.h"
 
@@ -24,14 +26,18 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
     BookEmbeddedGraph* mainGraph;
     std::string currentFile;
     BCTree *bctree;
+    std::vector<BiconnectedComponent*> biconnectedComponents;
+
 
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     bool openBookEmbeddedGraph(std::string filename);
+
     ~MainWindow() = default;
     //vector<Page> *pages;(
     BookEmbeddedGraph* getMainGraph() const { return mainGraph;}
+
 
 
 
@@ -39,6 +45,7 @@ private:
     void drawBCTree();
     void drawBookEmbeddedGraph();
     void add_page_drawing(int p);
+    void findConnectedComponentsOfMainGraph();
 
 public slots:
     void on_actionAddPage_triggered();

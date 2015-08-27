@@ -31,6 +31,9 @@ public:
     QColor getColour() {
         return colour;
     }
+    void repaintEdge(const Edge e) {
+        (*edges)[e]->update();
+    }
 
 private:
     std::unordered_map<Node, QGraphicsEllipseItem*> *nodes;

@@ -115,6 +115,7 @@ class BookEmbeddedGraph : public Graph {
         BookEmbeddedGraph(Graph* g);
 
         BookEmbeddedGraph();
+        BookEmbeddedGraph(ogdf::Graph );
 
         Edge addEdge(Node& from, Node& to, int pageNo);
 
@@ -221,7 +222,7 @@ class BCTree {
         BCTree(Graph &);
 
         ogdf::Graph getBCTree() const {
-            return ogBCT.bcTree();
+            return ogBCT.auxiliaryGraph();
         }
 
         Node firstNode(bool);

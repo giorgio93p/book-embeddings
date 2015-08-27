@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     embedding_edge.cpp \
     pagescene.cpp \
     bctscene.cpp \
-    colourcloset.cpp
+    colourcloset.cpp \
+    biconnectedcomponent.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     pagescene.h \
     colors.h \
     bctscene.h \
-    colourcloset.h
+    colourcloset.h \
+    biconnectedcomponent.h
 
 FORMS    += mainwindow.ui
 

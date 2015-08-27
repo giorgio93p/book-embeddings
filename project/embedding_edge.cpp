@@ -33,7 +33,12 @@ QRectF embedding_edge::boundingRect() const {
 }
 
 void embedding_edge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget){
-    painter->setPen(pen);
+    /*if (this->isSelected()) {
+        QPen aPen(Qt::darkGray);
+        aPen.setWidth(12);
+        painter->setPen(aPen);
+    }
+    else*/ painter->setPen(pen);
     painter->drawPath(*painterPath);
 }
 
