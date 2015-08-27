@@ -18,7 +18,6 @@
 
 #define WINDOW_TITLE tr("P.E.O.S.")
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -58,9 +57,12 @@ void MainWindow::drawBookEmbeddedGraph(){
         delete pageViews[p];
         pageViews.pop_back();
     }
+
     for(int p=0; p<mainGraph->getNpages(); p++){
         add_page_drawing(p);
     }
+
+    actionRedraw->setEnabled(false);
 }
 
 void MainWindow::add_page_drawing(int page){
@@ -290,8 +292,10 @@ void MainWindow::drawBCTree() {
 
 
 
-    findConnectedComponentsOfMainGraph();
-
+    findConnectedComponentsOfMainGraph(); //this splits the graph into
+                                          //the biconnected components
+                                          //and stores them in the
+                                          //vector biconnectedComponents
 
     //ogdf::GraphIO::writeGML(graf, "/home/kosmas/sierpinski_04-layout.gml");
 
@@ -349,9 +353,10 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         //std::cout << "Number of edges in read graph ==" << mainGraph->numberOfEdges() << endl;
         this->drawBCTree(); //drawBCTree
                             //added by kosms
-                            //made to draw the Biconnected Components Tree.
-                            //which is shown at the scene named bCTScene
-
+                            //made to draw the Biconnected Components Tree
+                            // and to split the maingraph into
+                            // its biconnected components and storing
+                            // them into the vector called biconnectedComponenets
         this->drawBookEmbeddedGraph();
         emit number_of_nodes_changed(mainGraph->numberOfNodes());
         emit number_of_edges_changed(mainGraph->numberOfEdges());
@@ -379,10 +384,12 @@ void MainWindow::on_actionOpen_triggered()
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
+
         if (!file.open(QIODevice::ReadOnly)) {
             QMessageBox::critical(this, tr("Error"), tr("Could not open file"));
             return;
         }
+
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
         file.close();
         if(openBookEmbeddedGraph(fileNameStr)){
@@ -511,4 +518,23 @@ void MainWindow::on_crossings_changed(std::vector<int> pagesChanged){
 
 void MainWindow::on_actionSave_triggered(){
     if(mainGraph->writeGML(currentFile)) std::cout << "Graph saved to " << currentFile << endl;
+}
+
+void MainWindow::enableRedraw(){
+    actionRedraw->setEnabled(true);
+}
+
+void MainWindow::on_actionRedraw_triggered(){
+    for(int p=pageViews.size()-1; p>=0; p--){
+        embedding_drawing->layout()->removeWidget(pageViews[p]);
+        delete pageViews[p]->scene();
+        delete pageViews[p];
+        pageViews.pop_back();
+    }
+
+    for(int p=0; p<mainGraph->getNpages(); p++){
+        add_page_drawing(p);
+    }
+
+    actionRedraw->setEnabled(false);
 }

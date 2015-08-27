@@ -112,7 +112,7 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
     bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
     //ncrossings = 0;
-    calculateCrossings(); //commented out because it wasnt working.
+    //calculateCrossings(); //commented out because it wasnt working (segfault)
     std::cout << "BookEmbeddedGraph created" << std::endl;
 }
 
@@ -190,7 +190,7 @@ void BookEmbeddedGraph::moveToPage(Edge& e, const int newPage){
     pages[p].erase(e);
     addEdgeToPage(e,newPage);
     std::vector<int> temp = {p,newPage};
-    calculateCrossings(temp);
+    //calculateCrossings(temp); commented out by kosmas (it segfaults)
 }
 
 int BookEmbeddedGraph::getPageNo(const Edge &e) const{

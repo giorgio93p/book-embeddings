@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     pagescene.cpp \
     bctscene.cpp \
     colourcloset.cpp \
-    biconnectedcomponent.cpp
+    biconnectedcomponent.cpp\
+    page_node.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     colors.h \
     bctscene.h \
     colourcloset.h \
-    biconnectedcomponent.h
+    biconnectedcomponent.h\
+    page_node.h
 
 FORMS    += mainwindow.ui
 

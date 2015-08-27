@@ -1,5 +1,3 @@
-
-
 #ifndef GRAPHS_H
 #define GRAPHS_H
 
@@ -7,6 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <set>
+#include <string>
 #include <functional>
 
 #include <ogdf/basic/Graph.h>
@@ -17,6 +16,8 @@
 #include <ogdf/fileformats/GraphIO.h>
 #include <ogdf/planarity/BoothLueker.h>
 #include <ogdf/decomposition/BCTree.h>
+
+//#include "page_node.h"
 
 typedef ogdf::node Node;
 typedef ogdf::edge Edge;
@@ -165,9 +166,16 @@ class BookEmbeddedGraph : public Graph {
         int pageSize(int p) const{
             return pages[p].size();
         }
+        /*
+        void setVertexOrder(int *order){
+            free(vertexOrder);
+            vertexOrder = order;
+        }*/
 
         bool readGML(std::string& fileName) override;
         virtual ~BookEmbeddedGraph() = default;
+
+        void updatePermutation(int, int);
 
     private:
         //std::vector<int> nodeOrderOnSpine;

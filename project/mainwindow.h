@@ -37,7 +37,7 @@ public:
     ~MainWindow() = default;
     //vector<Page> *pages;(
     BookEmbeddedGraph* getMainGraph() const { return mainGraph;}
-
+    void enableRedraw();
 
 
 
@@ -52,6 +52,8 @@ public slots:
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
     void on_actionSave_as_triggered();
+    void on_actionRedraw_triggered();
+
 
     void on_edge_selected(Edge &);
     void on_edge_deselected(Edge &);
