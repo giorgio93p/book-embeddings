@@ -9,6 +9,9 @@
 #include <QObject>
 #include "graphs.h"
 
+
+
+
 class embedding_edge : public QObject, public QGraphicsItem
 {
 

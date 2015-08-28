@@ -8,12 +8,12 @@
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
 #include "graphs.h"
-#include "embedding_edge.h"
 //#include "node_graphics_item.h"
 #include "colors.h"
 #include "page_node.h"
 #include <unordered_map>
 
+class embedding_edge;
 class MainWindow;
 
 class PageScene : public QGraphicsScene
@@ -35,9 +35,7 @@ public:
     QColor getColour() {
         return colour;
     }
-    void repaintEdge(const Edge e) {
-        (*edges)[e]->update();
-    }
+    void repaintEdge(const Edge e);
 
 private:
     std::unordered_map<Node, PageNode*> *nodes;

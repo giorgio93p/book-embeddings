@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setupUi(this);
     setWindowTitle(WINDOW_TITLE);
 
-    connect(this, SIGNAL(number_of_nodes_changed(int)), number_of_edges_indicator, SLOT(setNum(int)));
-    connect(this, SIGNAL(number_of_edges_changed(int)), number_of_nodes_indicator, SLOT(setNum(int)));
+    connect(this, SIGNAL(number_of_nodes_changed(int)), number_of_nodes_indicator, SLOT(setNum(int)));
+    connect(this, SIGNAL(number_of_edges_changed(int)), number_of_edges_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(number_of_pages_changed(int)), number_of_pages_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(crossings_changed(std::vector<int>)), this, SLOT(on_crossings_changed(std::vector<int>)));
     connect(this, SIGNAL(planarity_changed(bool)), planarity_indicator, SLOT(setChecked(bool)));
@@ -348,6 +348,8 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         currentFile = filename;
         //delete mainGraph;
         mainGraph = temp;
+
+        cout << endl << endl << mainGraph->getNcrossings() << endl;
         //std::cout << "Read Successful!!!!!" << std::endl;
         //std::cout << "Number of nodes in read graph ==" << mainGraph->numberOfNodes() << endl;
         //std::cout << "Number of edges in read graph ==" << mainGraph->numberOfEdges() << endl;
@@ -425,7 +427,16 @@ void MainWindow::on_edge_selected(Edge& e){
     edge_page_indicator->setNum(mainGraph->getPageNo(e));
     stats->setCurrentWidget(edge_stats);
 
+
+
     /*
+     *
+     * by kosmas: this chunk of code was meant to deselect everything else in the window. It failed miserably.
+     * it uses the setSelectionArea() method of the qgraphicsscene class. What this method does is
+     * that it selects an everything in a specified rectangle and deselects everything else outside of it.
+     * so i thought that giving a rectangle with a ridiculously small area would solve the problem.
+     * it didnt, and then i decided to focus on something else.
+     *
     int pageNo = mainGraph->getPageNo(e);
 
     for (std::vector<QGraphicsView*>::iterator it = pageViews.begin() ; it != pageViews.end(); ++it) {
@@ -493,6 +504,9 @@ void MainWindow::move_edge(Edge &e){
     PageScene * p = (PageScene*)pageViews[newPage]->scene();
     ((GraphScene*)(graphView->scene()))->addEdge(e,p->getColour());
     std::vector<int> temp = {newPage, currPage};
+
+
+
     emit crossings_changed(temp);
 }
 
@@ -531,6 +545,8 @@ void MainWindow::on_actionRedraw_triggered(){
         delete pageViews[p];
         pageViews.pop_back();
     }
+    colourCloset.returnAll();//kosm: this is necessary in order
+                             //for our colouring mechanism to work.
 
     for(int p=0; p<mainGraph->getNpages(); p++){
         add_page_drawing(p);

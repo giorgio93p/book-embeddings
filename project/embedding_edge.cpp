@@ -2,6 +2,8 @@
 #include <QMenu>
 #include <QAction>
 #include <QActionEvent>
+#include "pagescene.h"
+
 
 
 embedding_edge::embedding_edge(/*double h, qreal n1, qreal n2,*/ QPainterPath *path, QPen p, const Edge &e) {
@@ -21,6 +23,8 @@ embedding_edge::embedding_edge(/*double h, qreal n1, qreal n2,*/ QPainterPath *p
     edge = e;
     //std::cout << "Drawing edge " << (*e)->source() << "," << (*e)->target() << std::endl;
 }
+
+
 
 QRectF embedding_edge::boundingRect() const {
     qreal left = painterPath->boundingRect().left();
@@ -63,8 +67,13 @@ QPainterPath embedding_edge::shape() const{
 
 QVariant embedding_edge::itemChange(GraphicsItemChange change, const QVariant & value) {
     if (change == QGraphicsItem::ItemSelectedChange) {
-        if(value.toBool()) emit was_selected(edge);
-        else emit was_deselected(edge);
+        if(value.toBool()) {
+            emit was_selected(edge);
+        }
+        else
+        {
+            emit was_deselected(edge);
+        }
     }
 
     return QGraphicsItem::itemChange(change, value);

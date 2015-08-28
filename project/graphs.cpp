@@ -111,8 +111,8 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
 
     bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
-    //ncrossings = 0;
-    calculateCrossings(); //commented out because it wasnt working.
+    ncrossings = 0;
+    calculateCrossings(); //commented out because it wasnt working (segfault)
     std::cout << "BookEmbeddedGraph created" << std::endl;
 }
 
@@ -142,8 +142,8 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph graph){
 
     bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
-    //ncrossings = 0;
-    //calculateCrossings();
+    ncrossings = 0;
+    calculateCrossings();
     std::cout << "BookEmbeddedGraph created" << std::endl;
 
 
@@ -181,7 +181,6 @@ void BookEmbeddedGraph::removePage(int pageNo){
         pages[i] = pages[i+1];
         for(auto e : pages[i]) attr.label(e) = std::to_string(i);
     }
-
     pages.pop_back();
 }
 
@@ -190,7 +189,10 @@ void BookEmbeddedGraph::moveToPage(Edge& e, const int newPage){
     pages[p].erase(e);
     addEdgeToPage(e,newPage);
     std::vector<int> temp = {p,newPage};
-    calculateCrossings(temp);
+
+    ncrossings=0;
+    bucketsNeedToBeGenerated=true;
+    calculateCrossings(/*temp*/); //TODO: Fix if prog works.
 }
 
 int BookEmbeddedGraph::getPageNo(const Edge &e) const{
@@ -240,17 +242,38 @@ void BookEmbeddedGraph::addEdgeToPage(Edge& e, const int pageNo){
 }
 
 void BookEmbeddedGraph::generateBuckets(){
+
+
+    startBuckets.clear();
+    endBuckets.clear();
+
+    startBuckets.reserve(getNpages()); // ta  startBuckets kai endBuckets
+    endBuckets.reserve(getNpages());   // exoun ena vector<Bucket> (typedef "Buckets")
+                                       // gia kathe selida. Afto to vector me ti seira
+                                       // tou exei ena bucket gia kathe koryfi
+                                       // to opoio einai ena set apo edges
+                                       // pou periexei tis akmes
+                                       // pou ksekinane apo ekeini tin koryfh (startBuckets)
+                                       // i ftanoun se ekeini tin koryfh    (endBuckets)
+
     for (Page p : pages) {
-        Buckets pageStart;
-        Buckets pageEnd;
+        Bucket b1,b2;
+        Buckets pageStart(numberOfNodes(),b1 );
+        Buckets pageEnd(numberOfNodes(),b2);
 
 
-        pageStart.reserve(numberOfNodes());
-        pageEnd.reserve(numberOfNodes());
+        //pageStart.reserve(numberOfNodes());
+        //pageEnd.reserve(numberOfNodes());
+
+
+
+
 
         for (Edge e : p) {
-            pageStart[e->source()->index()].insert(e);
-            pageEnd[e->target()->index()].insert(e);
+            int i=e->source()->index();
+            int j=e->target()->index();
+            pageStart[i].insert(e);
+            pageEnd[j].insert(e);
         }
 
         startBuckets.push_back(pageStart);
@@ -265,25 +288,33 @@ void BookEmbeddedGraph::calculateCrossings(const std::vector<int> pagesChanged){
     if (bucketsNeedToBeGenerated)
         generateBuckets();
 
-    for (Buckets bs : startBuckets){//bs are a single page's buckets
-        for (Bucket b : bs){
-            for (Edge e : b) {
-                int startNode = e->source()->index();
+    //if this was called with no pages given:
+    ncrossings=0; //this is new (kosmas)
+    for (Buckets bs : startBuckets){//bs are a single page's buckets (diladi foreach page)
+        for (Bucket b : bs){        // for each node
+            for (Edge e : b) {      // for each edge starting from the node
+                int startNode = e->source()->index();  //
                 int endNode = e->target()->index();
 
-                for (int i = startNode; i <= endNode; i++){
-                    if (bs[i].size() > 0) {
-                        for (Edge candidate : bs[i]){
-                            if ((candidate->target()->index() > endNode) || (candidate->target()->index() < startNode)){
+                int leftNode = (startNode < endNode )? startNode : endNode;
+                int rightNode = (startNode < endNode )? endNode : startNode;
+;
+
+                for (int i = leftNode+1; i < rightNode; i++){  //for each node v between the startnode and end node
+                    //if (bs[i].size() > 0) {
+                        for (Edge candidate : bs[i]){        //for every edge ("candidate") starting from v
+                            if ((candidate->target()->index() > rightNode) || (candidate->target()->index() < leftNode)){
                                 crossings[e].insert(candidate);
                                 ncrossings++;
                             }
                         }
-                    }
+                    //}
                 }
             }
         }
     }
+
+    cout << "calculated number of crossings: " << ncrossings << endl;
 }
 
 bool BookEmbeddedGraph::readGML(std::string &fileName){
@@ -302,7 +333,10 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
         while(getPageNo(e) >= getNpages()) addPage();
         pages[getPageNo(e)].insert(e);
     }
-    //TODO: calculatecrossings
+
+    bucketsNeedToBeGenerated=true;
+    ncrossings=0;
+    calculateCrossings();
     return true;
 }
 
@@ -401,11 +435,19 @@ bnode_type BCTree::typeOfVertexInBCTree(Node n) {
 
 // BCTree end
 
-bool edgeCmp (const Edge &e1, const Edge &e2) {
+bool edgeCmp (const Edge &e1, const Edge &e2) { //kosmas: does this work when we have switched to another permutation??
     int sourceLabel1 = e1->source()->index();
     int sourceLabel2 = e2->source()->index();
     int targetLabel1 = e1->target()->index();
     int targetLabel2 = e2->target()->index();
 
     return ((sourceLabel1 != sourceLabel2) ? (sourceLabel1 < sourceLabel2) : (targetLabel1 > targetLabel2));
+}
+
+bool edgeCmp2 (const Edge e1, const Edge e2){
+
+
+
+    //int sourcePos = std::stoi(attr.label(v));
+    return true;
 }

@@ -2,11 +2,14 @@
 #include "mainwindow.h"
 #include <iostream>
 #include <QGraphicsView>
+#include "embedding_edge.h"
+
 
 /*
  * This class used to be called "BookEmbeddedScene", but for obvious reasons it was renamed.
  * It is used as a scene that shows a single page.
  */
+
 
 PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, int width, int height) : m_width(width){
     //Paint Nodes
@@ -51,6 +54,10 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     for (Edge e : g.edgesIn(page)) {
         this->addEdge(e);
     }
+}
+
+void PageScene::repaintEdge(const Edge e) {
+    (*edges)[e]->update();
 }
 
 void PageScene::addEdge(const Edge& e){
