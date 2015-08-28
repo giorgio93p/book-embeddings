@@ -1,4 +1,6 @@
 #include "graphscene.h"
+#include "colors.h"
+
 #include <iostream>
 
 GraphScene::GraphScene(const BookEmbeddedGraph& g, const double width, const double height){
@@ -42,9 +44,9 @@ void GraphScene::addEdgeInitial(const Edge &e, const int page){
     (*edges)[e] = path;
 }
 
-void GraphScene::addEdge(const Edge &e, const QColor col){
+void GraphScene::addEdge(const Edge &e, const QColor col, const int width){
     QPen pen = QPen();
-    pen.setWidth(2);
+    pen.setWidth(width);
     pen.setColor(col);
     qreal x1 = (*nodes)[e->source()]->boundingRect().center().x();
     qreal y1 = (*nodes)[e->source()]->boundingRect().center().y();
@@ -60,3 +62,14 @@ void GraphScene::removeEdge(const Edge &e){
     this->removeItem(edges->at(e));
     delete edges->at(e);
 }
+
+
+void GraphScene::changeEdgeColourAndWidth(const Edge e,const QColor col,const int width) {
+
+    this->removeEdge(e);
+    this->addEdge(e,col,width);
+}
+
+
+
+

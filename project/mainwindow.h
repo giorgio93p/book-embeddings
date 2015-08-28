@@ -46,6 +46,7 @@ private:
     void drawBookEmbeddedGraph();
     void add_page_drawing(int p);
     void findConnectedComponentsOfMainGraph();
+    void deselectEverythingInAllPagesBut(int page = -1);
 
 public slots:
     void on_actionAddPage_triggered();
@@ -65,6 +66,7 @@ public slots:
     void on_crossings_changed(std::vector<int>);
 
 signals:
+
     void number_of_nodes_changed(int i);
     void number_of_edges_changed(int i);
     void number_of_pages_changed(int i);

@@ -9,7 +9,6 @@
 #include <QMouseEvent>
 #include "graphs.h"
 #include "embedding_edge.h"
-#include "colors.h"
 
 class GraphScene : public QGraphicsScene
 {
@@ -18,9 +17,11 @@ public:
     //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
     void addEdgeInitial(const Edge &e, const int page);
-    void addEdge(const Edge &e, const QColor);
+    void addEdge(const Edge &e, const QColor, const int width = 2);
 
     void removeEdge(const Edge &e);
+    void changeEdgeColourAndWidth(const Edge e,const QColor col, const int width = 2);
+
 
 private:
     std::unordered_map<Node, QGraphicsEllipseItem*> *nodes;

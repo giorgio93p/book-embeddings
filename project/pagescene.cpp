@@ -98,3 +98,20 @@ int PageScene::width() {
 MainWindow* PageScene::window(){
     return mainWindow;
 }
+
+
+
+
+void PageScene::deselectAll() {
+
+    for ( auto it = edges->begin(); it != edges->end(); ++it ) {
+        QGraphicsItem* curr = (QGraphicsItem*)it->second;
+        curr->setSelected(false);
+    }
+
+    for ( auto it = nodes->begin(); it != nodes->end(); ++it ) {
+        QGraphicsItem* curr = (QGraphicsItem*)it->second;
+        curr->setSelected(false);
+    }
+
+}

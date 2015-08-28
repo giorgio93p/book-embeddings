@@ -18,5 +18,7 @@ static    QColor getPageColor(int page){
 }
 
 
+#define MY_COLOR QColor(230,0,230)
+
 #endif // COLORS
 

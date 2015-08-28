@@ -4,6 +4,7 @@
 #include "graphscene.h"
 #include "pagescene.h"
 #include "bctscene.h"
+#include "colors.h"
 #include <QInputDialog>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -418,6 +419,10 @@ void MainWindow::on_actionSave_as_triggered()
 }
 
 void MainWindow::on_edge_selected(Edge& e){
+
+    deselectEverythingInAllPagesBut(mainGraph->getPageNo(e));
+
+
     node_stats->setEnabled(false);
     edge_stats->setEnabled(true);
     std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") selected" << endl;
@@ -427,35 +432,33 @@ void MainWindow::on_edge_selected(Edge& e){
     edge_page_indicator->setNum(mainGraph->getPageNo(e));
     stats->setCurrentWidget(edge_stats);
 
+    int pgno =mainGraph->getPageNo(e);
+    PageScene* pg = (PageScene*)pageViews[pgno]->scene();
+    //pg->changeEdgeColour(e,Qt::black); //TODO: implement this shit
+                                         //this method must change the colour of an edge
+                                         //we can use it to show which edge is currently selected.
+
+    GraphScene* gs = (GraphScene*)graphView->scene();
+    gs->changeEdgeColourAndWidth(e,MY_COLOR,5);
+}
+
+void MainWindow::deselectEverythingInAllPagesBut(int pageNo) {
 
 
-    /*
-     *
-     * by kosmas: this chunk of code was meant to deselect everything else in the window. It failed miserably.
-     * it uses the setSelectionArea() method of the qgraphicsscene class. What this method does is
-     * that it selects an everything in a specified rectangle and deselects everything else outside of it.
-     * so i thought that giving a rectangle with a ridiculously small area would solve the problem.
-     * it didnt, and then i decided to focus on something else.
-     *
-    int pageNo = mainGraph->getPageNo(e);
+    for (int i=0; i<pageViews.size(); i++) {
 
-    for (std::vector<QGraphicsView*>::iterator it = pageViews.begin() ; it != pageViews.end(); ++it) {
+        if (i==pageNo) continue; //if the page under examination
+                                //is the page of the selected edge
+                                //then we won't touch
 
-        QGraphicsView* page = *it;
-
-        if (page == pageViews[pageNo]) continue;
-
-        QPainterPath path;
-        path.addRect(0.0,0.0,0.0,0.0);
-        QGraphicsScene* pageScene = page->scene();
-        pageScene->setSelectionArea(path,QTransform());
+        PageScene* ps = (PageScene*) pageViews[i]->scene();
+        ps->deselectAll();
 
 
     }
-
-    */
-
 }
+
+
 
 void MainWindow::on_edge_deselected(Edge& e){
     edge_stats->setEnabled(false);
@@ -463,11 +466,21 @@ void MainWindow::on_edge_deselected(Edge& e){
     edge_source_indicator->clear();
     edge_target_indicator->clear();
     edge_page_indicator->clear();
+
     //kosmas added the following 3 lines:
     //int pageNo = mainGraph->getPageNo(e);
     //PageScene* pageScene = (PageScene*) pageViews[pageNo]->scene();
     //pageScene->repaintEdge(e);
 
+
+    int pageNo = mainGraph->getPageNo(e);
+    PageScene* ps = (PageScene*)pageViews[pageNo]->scene();
+
+    //ps->changeEdgeColour(e); //TODO: implement this shit:
+                             //changeEdgeColour(Edge e) must redraw edge e with the page colour
+
+    GraphScene* gs = (GraphScene*)graphView->scene();
+    gs->changeEdgeColourAndWidth(e,ps->getColour(),2);
 
     std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
 }

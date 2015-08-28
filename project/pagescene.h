@@ -29,6 +29,8 @@ public:
     int width();
     MainWindow* window();
 
+    void deselectAll();
+
     void addEdge(const Edge &e);
     void removeEdge(const Edge &e);
     void setPageNumber(int p);
