@@ -222,33 +222,43 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph& graph, bool weareusingreferenc
 {
 
 
+    cout << "entered BookEmbeddedGraph constructor (with references)" << endl;
+    //use_g2=true;
+    //g2=graph;
+    //attr = ogdf::GraphAttributes(g2,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
+    //already taken care of by the graph constructor
 
-    use_g2=true;
-    g2=graph;
-
+    const ogdf::Graph& g = (use_g2) ? g2 : g1;
 
     pages = std::vector<Page>();
-    attr = ogdf::GraphAttributes(g2,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
     attr.setDirected(false);
     attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
     addPage();
 
     Node v;
     int i=0;
-    forall_nodes(v,g2){
+    forall_nodes(v,g){
         attr.label(v) = std::to_string(i);
         i++;
+        //cout << "DEBUG: graph newBC has nodes";
     }
 
+    cout << endl;
+
     Edge e;
-    forall_edges(e,g2) addEdgeToPage(e,0);
+    forall_edges(e,g) addEdgeToPage(e,0);
     permutation = std::vector<Node>(numberOfNodes());
 
     bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
     ncrossings = 0;
     calculateCrossings();
-    std::cout << "BookEmbeddedGraph created" << std::endl;
+
+    forall_nodes(v,g){
+
+        cout << "DEBUG: graph newBC has nodes";
+    }
+    std::cout << "exiting BookEmbeddedGraph Constructor (with references)" << std::endl;
 
 
 }

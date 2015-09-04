@@ -5,7 +5,7 @@
 #include "biconnectedcomponent.h"
 #include "mainwindow.h"
 
-AGScene::AGScene(AuxiliaryGraph& g,MainWindow* mainwindow,const double width, const double height){
+AGScene::AGScene(AuxiliaryGraph* g,MainWindow* mainwindow,const double width, const double height){
 
     nodes = std::unordered_map<Node,AGNode*>();
     QBrush blackBrush(Qt::black);
@@ -13,18 +13,23 @@ AGScene::AGScene(AuxiliaryGraph& g,MainWindow* mainwindow,const double width, co
     blackPen.setWidth(2);
 
     Node v;
-    forall_nodes(v,g.toOGDF()){
+
+    const ogdf::Graph& gr = g->toOGDF();
+
+
+    forall_nodes(v,gr){
 
 
 
-        BiconnectedComponent* b = g.getBCOf(v);
+        if (g->isCutNode(v) ) continue;
+        BiconnectedComponent* b = g->getBCOf(v);
         AGNode* n = new AGNode(v,b);
-        double x=g.getXcoord(v);
-        double y=g.getYcoord(v);
+        double x=g->getXcoord(v);
+        double y=g->getYcoord(v);
         n->setBrush(blackBrush);
         n->setPen(blackPen);
         n->setRect(x,y,12,12);
-        n->setFlag(QGraphicsItem::ItemIsSelectable, false);
+        n->setFlag(QGraphicsItem::ItemIsSelectable, true);
         this->addItem(n);
         nodes[v] = n;
         connect(n,SIGNAL(was_selected(BiconnectedComponent*)),mainwindow,SLOT(loadBC(BiconnectedComponent*)));
@@ -42,7 +47,7 @@ AGScene::AGScene(AuxiliaryGraph& g,MainWindow* mainwindow,const double width, co
     pen.setWidth(2);
 
     Edge e;
-    forall_edges(e,g) {
+    forall_edges(e,gr) {
 
         qreal x1 = nodes[e->source()]->boundingRect().center().x();
         qreal y1 = nodes[e->source()]->boundingRect().center().y();

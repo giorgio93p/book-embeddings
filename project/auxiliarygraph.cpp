@@ -13,7 +13,11 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     attr(g,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics)
 
 
+
+
 {
+
+    subGraphs = std::vector<ogdf::Graph>();
 
     //attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
     attr.setDirected(false);
@@ -23,7 +27,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
     Node v;
 
-
+    /*
     cout << "debug \n";
     forall_nodes (v,(g)) {
 
@@ -34,7 +38,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
     }
     cout << "debug end\n";
-
+    */
     // The auxilliary graph is all the biconnectedcomponents
     //of the graphs, without the edges between them.
     //This way, we can get every B.C. by extracting each connectedSubgraph
@@ -54,20 +58,25 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     //our bc's
     agN_to_bc = std::unordered_map<Node,BiconnectedComponent*>();
 
-
+    is_cut_node = std::unordered_map<Node,bool>();
 
     //now we shall "crack" g (the auxiliarygraph)
     forall_nodes(v,g) {
 
         if (explored[v]==0) { //check if the vertex belongs to an already extracted subgraph
 
-            ogdf::Graph newBC;
+            ogdf::Graph nuBC;
+            subGraphs.push_back(nuBC);
+            ogdf::Graph& newBC = subGraphs.back(); //back returns reference to last item push back
+
             //ogdf::NodeArray< Node > nodeMapping(); <-- attention! this doesnt work!
-            ogdf::NodeArray< Node > sgN_to_agN;// a mapping from of nodes in SG to nodes in ag
+            ogdf::NodeArray< Node > sgN_to_agN; // a mapping from of nodes in SG to nodes in ag
             ogdf::EdgeArray< Edge > sgE_to_agE;// similarly for edges
             ogdf::NodeArray<Node> nG_to_nSG;
             ogdf::EdgeArray<Edge> eG_to_eSG;
 
+            //the above are to be used in the static function of connectedsubgraph class 'call'.
+            //which btw is overloaded as fuck
 
 
 
@@ -76,8 +85,11 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
             if (newBC.numberOfNodes() <2){   //in case the newly extracted bc is a cut vertex
                 explored[v]=1;               //we won't add it to the vertex of bc's
+                is_cut_node[v]=true;
                 continue;
             }
+
+
 
             //else : we are facing a proper biconnected component
             //ie it contains more than one vertex
@@ -90,6 +102,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
 
             //for(Node n=newBC.firstNode();n;n=n->succ())
+
             forall_nodes(n,newBC) {
 
                 Node agNode = sgN_to_agN[n];
@@ -98,11 +111,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
             }
 
 
-            n = newBC.firstNode();
-            while (n) {
-                cout<<"got a node!\n";
-                n=n->succ();
-            }
+
             forall_nodes(n,newBC) {
 
                 cout << "got a node!\n";
@@ -118,15 +127,9 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
             }
 
-            ogdf::Graph& nuBC=newBC; //creating a reference to newBC
 
 
-            BiconnectedComponent *bc = new BiconnectedComponent(nuBC,mg,nMapping,eMapping);
-            //one last thing.
-            //does the nMapping work for copies of the newBC graph variable?
-            //as you can see, we're not passing it by reference.
-            // We are passing it by value, and we are storing it to the bc object's
-            // field g. We will try to access the mainGraph nodes from bc through this constructor.
+            BiconnectedComponent *bc = new BiconnectedComponent(newBC,mg,nMapping,eMapping);
 
             //now we must
             // 1.map each node of the new bc to the correct bc.
@@ -137,8 +140,12 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
 
                 Node correspondingNode = sgN_to_agN[n];
-                //agN_to_bc[correspondingNode]=bc;
+                agN_to_bc[correspondingNode]=bc;
+                is_cut_node[correspondingNode]=false;
+
+
                 std::unordered_map<Node,int>::const_iterator got = explored.find(correspondingNode);
+
                 if ( got == explored.end() )
                     std::cout << "not found" << endl;
                 else {
@@ -155,9 +162,6 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
             bCs.push_back(bc);
 
-
-
-
         }
     }
 
@@ -167,9 +171,15 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 }
 
 
-BiconnectedComponent* AuxiliaryGraph::getBCOf(Node v) {
-    return agN_to_bc[(v)];
-    //return agN_to_bc.at(v); //etsi prpei na einai kanonika.
+BiconnectedComponent* AuxiliaryGraph::getBCOf(const Node& v) const {
+
+    auto got = agN_to_bc.find(v);
+
+    if ( got == agN_to_bc.end() )
+        std::cout << "could find corresponding bc node belongs to! exiting." << endl;
+
+
+    return agN_to_bc.at(v);
 }
 
 

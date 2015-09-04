@@ -28,8 +28,10 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
 
     forall_nodes(v,g) {
 
-        cout<<"mpika re pousti";
-        Node corresponding = nodeMapping.at(v); //getting the corresponding node. if this fails, then nodes in g are other than the
+
+        cout<<"DEBUG: graph has nodes";
+        Node corresponding = nodeMapping.at(v); //getting the corresponding node. if this fails,
+                                                // then nodes in g are other than the
 
         int num = wholeGraph->getNumberOf(corresponding);
         n_to_i[v]=num;
@@ -37,11 +39,13 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
 
 
     }
+    cout<<endl;
 
 
     Edge e;
     forall_edges(e,g){
 
+        cout << "DEBUG: graph has edges\n" ;
         Edge corresponding;
         corresponding= edgeMapping.at(e);
         int num = wholeGraph->getNumberOf(corresponding);

@@ -21,7 +21,7 @@ class MainWindow;
 class AGScene : public QGraphicsScene
 {
 public:
-    AGScene( AuxiliaryGraph& g,MainWindow* mainwindow,const double width=250.0, const double height=50.0);
+    AGScene( AuxiliaryGraph* g,MainWindow* mainwindow,const double width=250.0, const double height=50.0);
     //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
 private:

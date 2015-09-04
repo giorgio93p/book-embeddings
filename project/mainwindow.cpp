@@ -287,7 +287,9 @@ void MainWindow::drawBCTree() {
                                                                      //we use it to make some
                                                                     // settings in the attr member of graphs
 
-    QGraphicsScene *gs =new AGScene(*auxiliaryGraph,this,bCTView->width(),bCTView->height());
+
+
+    QGraphicsScene *gs =new AGScene(auxiliaryGraph,this,bCTView->width(),bCTView->height());
                                                                     //AGScene: new class, custom made to
                                                                     //show bctrees.
 
@@ -539,7 +541,7 @@ void MainWindow::loadBC(BiconnectedComponent* currbc) {
     cout << "loading another biconnected component!!" << endl;
     currBC = currbc;
     wholeGraphMode = false;
-    cout << currBC->getNpages();
+    cout << currBC->numberOfNodes();
 
     //redrawPages();
 
