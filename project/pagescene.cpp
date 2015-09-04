@@ -11,7 +11,7 @@
  */
 
 
-PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, int width, int height) : m_width(width){
+PageScene::PageScene(BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, int width, int height) : m_width(width){
     //Paint Nodes
 
     colour = col;

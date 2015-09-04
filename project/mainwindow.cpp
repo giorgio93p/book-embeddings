@@ -3,7 +3,7 @@
 #include "ui_mainwindow.h"
 #include "graphscene.h"
 #include "pagescene.h"
-#include "bctscene.h"
+#include "agscene.h"
 #include "colors.h"
 #include <QInputDialog>
 #include <QVBoxLayout>
@@ -15,6 +15,7 @@
 #include <QRect>
 #include <QTransform>
 #include <ogdf/basic/GraphList.h>
+#include "auxiliarygraph.h"
 
 
 #define WINDOW_TITLE tr("P.E.O.S.")
@@ -114,10 +115,17 @@ void MainWindow::add_page_drawing(int page){
 
 }
 
-void MainWindow::findConnectedComponentsOfMainGraph() {
+void MainWindow::findBiconnectedComponentsOfMainGraph() {
 
 
 
+
+
+
+
+
+
+/*
     ogdf::Graph g = mainGraph->toOGDF(); //one question here. Are g's nodes and edges the same
                                          //as mainGraph's? If they are, then all we have to do
                                         // is to create an nodearray with pairs of nodes.
@@ -150,27 +158,8 @@ void MainWindow::findConnectedComponentsOfMainGraph() {
 
 
 
-    Edge e;
-    ogdf::Graph G = graf;
 
-    for((e)=(G).firstEdge(); (e); (e)=(e)->succ()){}
-/*
-    for (e=graf.firstEdge();(e);e->succ()){
-         cout << "infinite loop!!" << endl;
-    }
-*/
-    //e=graf.firstEdge();
-    //e=e->succ();
-    //bct_to_main_graph_edges[e]=bctree.original(e);
-
-    forall_edges(e,graf) {
-    }
-
-    forall_edges(e,graf) {
-        bct_to_main_graph_edges[e] = bctree.original(e); //same as above with edges
-    }
-
-    Node v;
+    //Node v;
     forall_nodes(v,graf) {
 
         bct_to_main_graph_nodes[v]= bctree.original(v); //original returns the corresponding
@@ -178,12 +167,17 @@ void MainWindow::findConnectedComponentsOfMainGraph() {
                                                         //(from which the bct was derived)
     }
 
-    //v = bct_to_main_graph_nodes[graf.firstNode()];
-    //int pos = mainGraph->getPosition(v); //DEBUG
-    //cout << "this should be a valid position baby: " << pos << endl;            //DEBUG
+    Edge e;
+
+    forall_edges(e,graf) {
+        bct_to_main_graph_edges[e] = bctree.original(e); //same as above with edges
+    }
+
+
+
 
     //now we shall start extracting each biconnected component from "graf" (graf is a variable).
-    //we remind that "graf" is the so-called auxilliary graph of the bctree
+    //we remind that "graf" is the so-called auxiliary graph of the bctree
     //of mainGraph. The auxilliary graph is all the biconnectedcomponents
     //of the graphs, without the edges between them.
     //This way, we can get every B.C. by extracting each connectedSubgraph
@@ -224,8 +218,8 @@ void MainWindow::findConnectedComponentsOfMainGraph() {
             //ie it contains more than one vertex
 
             //create the mappings
-            ogdf::NodeArray<Node> nMapping(nuGraf);
-            ogdf::EdgeArray<Edge> eMapping(nuGraf);
+            std::unordered_map<Node,Node> nMapping();
+            std::unordered_map<Edge,Edge> eMapping();
 
             Node vv;
 
@@ -275,51 +269,26 @@ void MainWindow::findConnectedComponentsOfMainGraph() {
     }
 
     cout << "we have a number of binconnected components here: " << biconnectedComponents.size() << endl;
-
+*/
 }
 
 
 
 void MainWindow::drawBCTree() {
 
-
-    //this draws the Biconnected Compenents Tree of the input graph on Tab1, right below the mainGraph.
-    //it is drawn in a QGraphicsView object which was made in Desinger, named bCTView.
-
-    bctree = new BCTree(*mainGraph);  //make a new object of clss BCTree
-    cout << bctree->numberOfNodes(true) << endl; //testing if class works
-    ogdf::Graph graf = bctree->getBCTree();     //get the bct in ogdf::graph representation
-
-
-
-
-    findConnectedComponentsOfMainGraph(); //this splits the graph into
-                                          //the biconnected components
-                                          //and stores them in the
-                                          //vector biconnectedComponents
-
-    //ogdf::GraphIO::writeGML(graf, "/home/kosmas/sierpinski_04-layout.gml");
-
-
-
-
-    Graph* bCGraph = new Graph(graf);    //create a new Graph object that represents the bct.
-                                        //check the Graph constructor that takes an ogdf::Graph
-                                        //as a parameter
-
-
+    auxiliaryGraph = new AuxiliaryGraph(mainGraph);
 
 
     delete bCTView->scene();             //deleting previous scene if any
 
 
-    bCGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
+    auxiliaryGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
                                                                      //segfaults :(.
                                                                      //we use it to make some
                                                                     // settings in the attr member of graphs
 
-    QGraphicsScene *gs =new BCTScene(*bCGraph,bCTView->width(),bCTView->height());
-                                                                    //BCTScene: new class, custom made to
+    QGraphicsScene *gs =new AGScene(*auxiliaryGraph,this,bCTView->width(),bCTView->height());
+                                                                    //AGScene: new class, custom made to
                                                                     //show bctrees.
 
     bCTView->setScene(gs);                                           //final
@@ -327,17 +296,17 @@ void MainWindow::drawBCTree() {
 
     //now we will display the first biconnected component of the graph in the 2nd tab.
 
-    BiconnectedComponent* bc = biconnectedComponents[0];
-    delete bCView->scene();
-    bc->buildLayout(0.0,0.0,bCView->width(),bCView->height());
+    //BiconnectedComponent* bc = biconnectedComponents[0];
+    //delete bCView->scene();
+    //bc->buildLayout(0.0,0.0,bCView->width(),bCView->height());
 
 
-    gs =new BCTScene(*bc,250,50);              //BCTScene: new class, custom made to
+    //gs =new BCTScene(*bc,250,50);              //BCTScene: new class, custom made to
                                                                     //show bctrees. (it can also be used
                                                                     // to display graphs in general)
 
-    bCView->setScene(gs);                                           //final
-    bCView->fitInView((gs)->sceneRect());                           //things
+    //bCView->setScene(gs);                                           //final
+    //bCView->fitInView((gs)->sceneRect());                           //things
 
 
 
@@ -467,10 +436,6 @@ void MainWindow::on_edge_deselected(Edge& e){
     edge_target_indicator->clear();
     edge_page_indicator->clear();
 
-    //kosmas added the following 3 lines:
-    //int pageNo = mainGraph->getPageNo(e);
-    //PageScene* pageScene = (PageScene*) pageViews[pageNo]->scene();
-    //pageScene->repaintEdge(e);
 
 
     int pageNo = mainGraph->getPageNo(e);
@@ -565,5 +530,44 @@ void MainWindow::on_actionRedraw_triggered(){
         add_page_drawing(p);
     }
 
+    actionRedraw->setEnabled(false);
+}
+
+
+void MainWindow::loadBC(BiconnectedComponent* currbc) {
+
+    cout << "loading another biconnected component!!" << endl;
+    currBC = currbc;
+    wholeGraphMode = false;
+    cout << currBC->getNpages();
+
+    //redrawPages();
+
+
+
+
+
+}
+
+void MainWindow::redrawPages() {
+
+
+    colourCloset.returnAll(); // the returnAll method simply resets the closet to its intial state
+                              // that is, having all of its colours inside
+    //Draw pages
+    for(int p=pageViews.size()-1; p>=0; p--){
+        embedding_drawing->layout()->removeWidget(pageViews[p]);
+        QGraphicsScene *pp = pageViews[p]->scene();
+        delete pageViews[p]->scene();
+        delete pageViews[p];
+        pageViews.pop_back();
+    }
+
+
+    /*
+    for(int p=0; p< currBC->getNpages(); p++){
+        add_page_drawing(p);
+    }
+    */
     actionRedraw->setEnabled(false);
 }

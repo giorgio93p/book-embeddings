@@ -2,28 +2,91 @@
 #include <ogdf/energybased/SpringEmbedderFR.h>
 #include <ogdf/energybased/FMMMLayout.h>
 
-Graph::Graph(){
-    attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
+Graph::Graph():g2(g1)
+{
+    attr = ogdf::GraphAttributes(g1,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
     attr.setDirected(false);
-}
 
-Graph::Graph(Graph* graph){
-    g = ogdf::Graph(graph->toOGDF());
-    attr.setDirected(false);
-    attr = ogdf::GraphAttributes(g,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
-    
-    //NOTE:You might not always want to delete the original graph
-    //delete graph;
 
 
 }
 
-Graph::Graph(ogdf::Graph graph){
-    g=graph;
-    attr = ogdf::GraphAttributes(g);//no value given
+void Graph::setDefaultNumbering() {
+
+    ogdf::Graph& g = (use_g2) ? g2:g1;
+
+    //this methods sets the edge and node numbering tables to the default numbering
+    std::unordered_map<Node,int> n_to_i;
+    std::unordered_map<int,Node> i_to_n;
+    std::unordered_map<Edge,int> e_to_i;
+    std::unordered_map<int,Edge> i_to_e;
+
+
+    Node n;
+    int i=0;
+    forall_nodes(n,g) {
+
+        n_to_i[n] = i;
+        i_to_n[i] = n;
+        i++;
+
+    }
+
+    i=0;
+    Edge e;
+    forall_edges(e,g)
+    {
+        e_to_i[e] = i;
+        i_to_e[i] = e;
+        i++;
+    }
+
+    setNumbering(e_to_i,n_to_i,i_to_n,i_to_e);
+
+}
+
+Graph::Graph(Graph* graph)
+    :g2(g1)
+{
+    g1 = ogdf::Graph(graph->toOGDF());
+    attr.setDirected(false);
+    attr = ogdf::GraphAttributes(g1,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
+    setDefaultNumbering();
+    use_g2=false;
+
+}
+
+
+void Graph::setNumbering(std::unordered_map<Edge,int> e_to_num,
+                  std::unordered_map<Node,int> n_to_num,
+                  std::unordered_map<int,Node> num_to_n,
+                  std::unordered_map<int,Edge> num_to_e) {
+    e_to_int=e_to_num;
+    n_to_int=n_to_num;
+    int_to_n=num_to_n;
+    int_to_e=num_to_e;
+
+}
+
+Graph::Graph(ogdf::Graph graph): g2(g1){
+    use_g2=false;
+    g1=graph;
+    attr = ogdf::GraphAttributes(g1);//no value given
+    setDefaultNumbering();
+}
+
+Graph::Graph(ogdf::Graph& graph,bool weareusingreferences):g2(graph){
+    use_g2=true;
+
+    attr = ogdf::GraphAttributes(g2,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
+    setDefaultNumbering();
 }
 
 Node Graph::addNode(){
+
+    ogdf::Graph& g = (use_g2) ? g2:g1;
+
+
     return g.newNode();
 }
 
@@ -65,7 +128,7 @@ double Graph::getYcoord(const Node& v) const{
 
 bool Graph::graphIsPlanar() const{
     ogdf::BoothLueker blPlanarityCheck;
-    return blPlanarityCheck.isPlanar(toOGDF());
+    return blPlanarityCheck.isPlanar(toOGDFval());
 }
 
 Graph::~Graph(){
@@ -90,6 +153,8 @@ BookEmbeddedGraph* Graph::bookEmbedWithLeastPages(){
 
 BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
     attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
+    use_g2=false;
+    ogdf::Graph& g = (use_g2) ? g2:g1;
 
     //vertexOrder = NULL;
 
@@ -119,6 +184,9 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
 BookEmbeddedGraph::BookEmbeddedGraph() : BookEmbeddedGraph(new Graph()) {}
 
 BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph graph){
+    use_g2=false;
+    ogdf::Graph& g = (use_g2) ? g2:g1;
+
 
 
 
@@ -149,6 +217,42 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph graph){
 
 }
 
+BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph& graph, bool weareusingreferences)
+    :Graph(graph,weareusingreferences)
+{
+
+
+
+    use_g2=true;
+    g2=graph;
+
+
+    pages = std::vector<Page>();
+    attr = ogdf::GraphAttributes(g2,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics);
+    attr.setDirected(false);
+    attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
+    addPage();
+
+    Node v;
+    int i=0;
+    forall_nodes(v,g2){
+        attr.label(v) = std::to_string(i);
+        i++;
+    }
+
+    Edge e;
+    forall_edges(e,g2) addEdgeToPage(e,0);
+    permutation = std::vector<Node>(numberOfNodes());
+
+    bucketsNeedToBeGenerated = true;
+    crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
+    ncrossings = 0;
+    calculateCrossings();
+    std::cout << "BookEmbeddedGraph created" << std::endl;
+
+
+}
+
 
 
 
@@ -165,7 +269,9 @@ Edge BookEmbeddedGraph::addEdge(Node& from, Node& to, int pageNo){
     return e;
 }
 
-Edge BookEmbeddedGraph::firstEdge() const{
+Edge BookEmbeddedGraph::firstEdge() {
+    ogdf::Graph& g = (use_g2) ? g2:g1;
+
     return g.firstEdge();
 }
 
@@ -318,6 +424,9 @@ void BookEmbeddedGraph::calculateCrossings(const std::vector<int> pagesChanged){
 }
 
 bool BookEmbeddedGraph::readGML(std::string &fileName){
+    ogdf::Graph& g = (use_g2) ? g2:g1;
+
+
     if(! ogdf::GraphIO::readGML(attr,g,fileName)) return false;
 
     permutation.clear();
@@ -381,7 +490,8 @@ void BookEmbeddedGraph::updatePermutation(int originalIndex, int finalPos) {
 
 /******************************************** BCTree Implementation ********************************************/
 
-BCTree::BCTree(Graph &g) : originalGraph(g.toOGDF()), ogBCT(originalGraph,true){
+BCTree::BCTree(Graph &g) : originalGraph(g.toOGDF()),ogBCT(originalGraph,true),
+auxiliaryGraph(ogBCT.auxiliaryGraph()) {
 
 
 }
@@ -400,6 +510,45 @@ Node BCTree::lastNode(bool biconnected){
     return ogBCT.auxiliaryGraph().lastNode();
 
 }
+
+const std::unordered_map<Node,Node> BCTree::generateNodeMapping(){
+
+    const ogdf::Graph& aux = getAuxiliaryGraph();
+    agN_to_mgN = std::unordered_map<Node,Node>();
+
+    Node n;
+    forall_nodes(n,aux) {
+
+        agN_to_mgN[n]= ogBCT.original(n);
+
+    }
+
+    //const std::unordered_map<Node,Node>& ret = agN_to_mgN; //we create a const reference to the map we
+                                                           //just created.
+    return agN_to_mgN;
+
+
+}
+
+const std::unordered_map<Edge,Edge> BCTree::generateEdgeMapping(){
+
+    const ogdf::Graph& aux = getAuxiliaryGraph();
+    agE_to_mgE = std::unordered_map<Edge,Edge>();
+
+    Edge e;
+    forall_edges(e,aux) {
+
+        agE_to_mgE[e]= ogBCT.original(e);
+
+    }
+
+    //const std::unordered_map<Edge,Edge>& ret = agE_to_mgE; //we create a const reference to the map we
+                                                           //just created.
+    return agE_to_mgE;
+
+
+}
+
 
 
 
