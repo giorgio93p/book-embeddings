@@ -83,7 +83,7 @@
       <item>
        <widget class="QTabWidget" name="stats">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="graph_stats">
          <property name="sizePolicy">
@@ -106,7 +106,7 @@
           <item row="1" column="1">
            <widget class="QLabel" name="total_crossings_indicator">
             <property name="text">
-             <string>0</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -120,7 +120,7 @@
           <item row="2" column="1">
            <widget class="QLabel" name="number_of_pages_indicator">
             <property name="text">
-             <string>0</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -134,7 +134,7 @@
           <item row="3" column="1">
            <widget class="QLabel" name="number_of_nodes_indicator">
             <property name="text">
-             <string>0</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -148,20 +148,21 @@
           <item row="4" column="1">
            <widget class="QLabel" name="number_of_edges_indicator">
             <property name="text">
-             <string>0</string>
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="planarity_indicator">
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
           <item row="5" column="0">
-           <widget class="QCheckBox" name="planarity_indicator">
+           <widget class="QLabel" name="planarity_label">
             <property name="text">
              <string>Is Planar?</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="tristate">
-             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -309,7 +310,7 @@
          <x>0</x>
          <y>0</y>
          <width>614</width>
-         <height>611</height>
+         <height>613</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -318,7 +319,7 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <layout class="QGridLayout" name="gridLayout"/>
+       <layout class="QVBoxLayout" name="verticalLayout"/>
       </widget>
      </widget>
     </item>
@@ -330,69 +331,49 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
-    <addaction name="actionNew"/>
-    <addaction name="actionOpen_2"/>
+    <addaction name="actionOpen"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
-    <addaction name="actionExport"/>
-    <addaction name="separator"/>
     <addaction name="actionExit"/>
-    <addaction name="separator"/>
-    <addaction name="actionPrint"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
-    <addaction name="actionUndo"/>
-    <addaction name="actionRedo"/>
-    <addaction name="separator"/>
-    <addaction name="actionDelete"/>
-    <addaction name="separator"/>
-    <addaction name="actionSelecte"/>
-    <addaction name="actionUnselect_All"/>
-    <addaction name="separator"/>
-    <addaction name="actionFind"/>
+    <addaction name="actionAddPage"/>
+    <addaction name="actionDeletePage"/>
     <addaction name="separator"/>
     <addaction name="actionProperties"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
-    <widget class="QMenu" name="menuMode">
-     <property name="title">
-      <string>Mode</string>
-     </property>
-     <addaction name="actionEdit_Mode"/>
-     <addaction name="actionNavigation_Mode"/>
-    </widget>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="actionReset_Zoom"/>
     <addaction name="separator"/>
+    <addaction name="actionRedraw"/>
     <addaction name="actionFit_Content"/>
     <addaction name="separator"/>
-    <addaction name="menuMode"/>
-    <addaction name="separator"/>
-    <addaction name="actionFull_Screen"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
-     <string>Options</string>
+     <string>&amp;Options</string>
     </property>
     <widget class="QMenu" name="menuAlgorithms">
      <property name="title">
-      <string>Algorithms</string>
+      <string>&amp;Algorithms</string>
      </property>
      <addaction name="actionPlanarity"/>
     </widget>
@@ -401,24 +382,17 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
     <addaction name="actionAnalyze_Graph"/>
     <addaction name="separator"/>
     <addaction name="actionColorize_Edges"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionYou_dont_need_help"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuOptions"/>
    <addaction name="menuTools"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -434,18 +408,18 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
+   <addaction name="separator"/>
    <addaction name="separator"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionZoom_Out"/>
    <addaction name="actionReset_Zoom"/>
    <addaction name="separator"/>
-   <addaction name="separator"/>
    <addaction name="actionAddPage"/>
    <addaction name="separator"/>
    <addaction name="actionRedraw"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -458,6 +432,9 @@
    <property name="whatsThis">
     <string/>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionOpen">
    <property name="icon">
@@ -465,7 +442,7 @@
      <normaloff>../icons/Folder Open.png</normaloff>../icons/Folder Open.png</iconset>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string>&amp;Open</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -485,18 +462,21 @@
      <normaloff>../icons/save.png</normaloff>../icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
    <property name="toolTip">
     <string>Save the changes</string>
    </property>
-   <property name="statusTip">
-    <string>toolTip</string>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionSave_as">
    <property name="text">
-    <string>Save as</string>
+    <string>Save &amp;as</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionExport">
@@ -506,17 +486,26 @@
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Print</string>
+    <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionUndo">
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actionRedo">
    <property name="text">
     <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y, Ctrl+Shift+Z</string>
    </property>
   </action>
   <action name="actionCut">
@@ -527,6 +516,9 @@
    <property name="text">
     <string>Cut</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actionCopy">
    <property name="icon">
@@ -535,6 +527,9 @@
    </property>
    <property name="text">
     <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
    </property>
   </action>
   <action name="actionPaste">
@@ -545,10 +540,13 @@
    <property name="text">
     <string>Paste</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
   </action>
-  <action name="actionDelete">
+  <action name="actionDeletePage">
    <property name="text">
-    <string>Delete</string>
+    <string>&amp;Delete Page</string>
    </property>
   </action>
   <action name="actionSelecte">
@@ -568,7 +566,7 @@
   </action>
   <action name="actionProperties">
    <property name="text">
-    <string>Properties</string>
+    <string>&amp;Properties</string>
    </property>
   </action>
   <action name="actionZoom_In">
@@ -577,7 +575,10 @@
      <normaloff>../icons/Zoom-In-icon.png</normaloff>../icons/Zoom-In-icon.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom In</string>
+    <string>Zoom &amp;In</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
    </property>
   </action>
   <action name="actionZoom_Out">
@@ -586,7 +587,10 @@
      <normaloff>../icons/Zoom_Out-01.png</normaloff>../icons/Zoom_Out-01.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom Out</string>
+    <string>Zoom &amp;Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
   <action name="actionReset_Zoom">
@@ -595,12 +599,15 @@
      <normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</iconset>
    </property>
    <property name="text">
-    <string>Reset Zoom</string>
+    <string>Reset &amp;Zoom</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
    </property>
   </action>
   <action name="actionFit_Content">
    <property name="text">
-    <string>Fit Content</string>
+    <string>&amp;Fit Content</string>
    </property>
   </action>
   <action name="actionEdit_Mode">
@@ -625,22 +632,17 @@
   </action>
   <action name="actionAnalyze_Graph">
    <property name="text">
-    <string>Analyze Graph</string>
+    <string>&amp;Analyze Graph</string>
    </property>
   </action>
   <action name="actionColorize_Edges">
    <property name="text">
-    <string>Colorize Edges</string>
+    <string>&amp;Colorize Edges</string>
    </property>
   </action>
   <action name="actionLayouts">
    <property name="text">
-    <string>Layout</string>
-   </property>
-  </action>
-  <action name="actionNew_2">
-   <property name="text">
-    <string>New</string>
+    <string>&amp;Layout</string>
    </property>
   </action>
   <action name="actionYou_dont_need_help">
@@ -650,7 +652,10 @@
   </action>
   <action name="actionPrint">
    <property name="text">
-    <string>Exit</string>
+    <string>&amp;Print</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
   <action name="actionAddPage">
@@ -659,7 +664,7 @@
      <normaloff>../icons/Add.png</normaloff>../icons/Add.png</iconset>
    </property>
    <property name="text">
-    <string>Add Page</string>
+    <string>&amp;Add Page</string>
    </property>
   </action>
   <action name="actionRedraw">
@@ -667,10 +672,13 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Redraw</string>
+    <string>&amp;Redraw</string>
    </property>
    <property name="toolTip">
     <string>Redraw</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -692,22 +700,6 @@
     <hint type="destinationlabel">
      <x>52</x>
      <y>5</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionOpen_2</sender>
-   <signal>triggered()</signal>
-   <receiver>actionOpen</receiver>
-   <slot>trigger()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
     </hint>
    </hints>
   </connection>

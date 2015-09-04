@@ -7,6 +7,8 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
+#include <QLabel>
+#include <QPushButton>
 #include "graphs.h"
 //#include "node_graphics_item.h"
 #include "colors.h"
@@ -25,7 +27,8 @@ class PageScene : public QGraphicsScene
     int page;
 
 public:
-    PageScene(BookEmbeddedGraph& g, const int p, MainWindow *w, QColor col, int width=250, int height=50);
+
+    PageScene(const BookEmbeddedGraph& g, const int p, MainWindow *w, QColor col, QLabel* pageNumber, QLabel* crossings, QPushButton* del, int width=250, int height=50);
     int width();
     MainWindow* window();
 
@@ -34,6 +37,9 @@ public:
     void addEdge(const Edge &e);
     void removeEdge(const Edge &e);
     void setPageNumber(int p);
+    int pageNumber(){
+        return page;
+    }
     QColor getColour() {
         return colour;
     }
@@ -44,15 +50,17 @@ private:
     std::unordered_map<Edge, embedding_edge*> *edges;
     QRectF movementPath;
     MainWindow* mainWindow;
+    QLabel* crossingsIndicator;
+    QLabel* pageNumberIndicator;
+    QPushButton* deletePageButton;
 
     int m_width;
 
 public slots:
     void on_remove_page_request(){emit remove_page(page);}
+    void setCrossings(int crossings);
 signals:
     void remove_page(int);
-    void page_number_changed(int);
-    void crossings_changed(int);
 };
 
 

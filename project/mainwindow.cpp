@@ -7,16 +7,18 @@
 #include "colors.h"
 #include <QInputDialog>
 #include <QVBoxLayout>
-#include <QGridLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QAction>
 #include <QPushButton>
 #include <QPainterPath>
 #include <QRect>
 #include <QTransform>
+#include <QUndoStack>
 #include <ogdf/basic/GraphList.h>
-#include "auxiliarygraph.h"
 
+#include "auxiliarygraph.h"
+#include "commands.h"
 
 #define WINDOW_TITLE tr("P.E.O.S.")
 
@@ -25,12 +27,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     setupUi(this);
     setWindowTitle(WINDOW_TITLE);
+    connect(actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     connect(this, SIGNAL(number_of_nodes_changed(int)), number_of_nodes_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(number_of_edges_changed(int)), number_of_edges_indicator, SLOT(setNum(int)));
-    connect(this, SIGNAL(number_of_pages_changed(int)), number_of_pages_indicator, SLOT(setNum(int)));
     connect(this, SIGNAL(crossings_changed(std::vector<int>)), this, SLOT(on_crossings_changed(std::vector<int>)));
-    connect(this, SIGNAL(planarity_changed(bool)), planarity_indicator, SLOT(setChecked(bool)));
+    connect(this, SIGNAL(planarity_changed(QString)), planarity_indicator, SLOT(setText(QString)));
 
     //embedding_drawing->setScaledContents(true);
 
@@ -39,6 +41,17 @@ MainWindow::MainWindow(QWidget *parent) :
     actionAddPage->setEnabled(false);
 
     pageViews = std::vector<QGraphicsView*>();
+
+    commandHistory = new QUndoGroup(this);
+    commandHistory->addStack(new QUndoStack(commandHistory));
+    QAction* undoAction = commandHistory->createUndoAction(this);
+    undoAction->setShortcut(QKeySequence::Undo);
+    toolBar->addAction(undoAction);
+    menuEdit->addAction(undoAction);
+    QAction* redoAction = commandHistory->createRedoAction(this);
+    redoAction->setShortcut(QKeySequence::Redo);
+    toolBar->addAction(redoAction);
+    menuEdit->addAction(redoAction);
 }
 
 void MainWindow::drawBookEmbeddedGraph(){
@@ -51,225 +64,80 @@ void MainWindow::drawBookEmbeddedGraph(){
 
     colourCloset.returnAll(); // the returnAll method simply resets the closet to its intial state
                               // that is, having all of its colours inside
-    //Draw pages
-    for(int p=pageViews.size()-1; p>=0; p--){
-        embedding_drawing->layout()->removeWidget(pageViews[p]);
-        QGraphicsScene *pp = pageViews[p]->scene();
-        delete pageViews[p]->scene();
-        delete pageViews[p];
-        pageViews.pop_back();
+
+    //Remove previous page drawings
+    QLayoutItem *child;
+    while ((child = embedding_drawing->layout()->takeAt(0)) != 0) {
+        delete child;
     }
 
+    //Draw pages
     for(int p=0; p<mainGraph->getNpages(); p++){
         add_page_drawing(p);
     }
 
     actionRedraw->setEnabled(false);
+
+    commandHistory->setActiveStack(commandHistory->stacks().at(0));
 }
 
 void MainWindow::add_page_drawing(int page){
 
     /* embedding_drawing: a widget that we have created with QTDesigner.
      * It is used as ancestor widget for all page views.
+     * Its layout type is vertical.
      * Itself it is contained in a ScrollArea Widget
      * which we have named, not surprisignly, scrollArea.
      * All this was made in QTDesigner.
      *
-     * Below, we create the view for the page and, along with it,
-     * two QLabels (page_number and crossings_of_page)
-     * and one QPushButton (delete)
-     * which we align
-     *
      */
-    int rowNumber = ((QGridLayout*)embedding_drawing->layout())->rowCount();
-    QGraphicsView* view = new QGraphicsView();
+    QWidget* pageDrawing = new QWidget(embedding_drawing);
+    pageDrawing->setLayout(new QHBoxLayout());
+    ((QVBoxLayout*)embedding_drawing->layout())->insertWidget(page,pageDrawing);
+
+    QGraphicsView* view = new QGraphicsView(pageDrawing);
     pageViews.push_back(view);
-    PageScene* scene = new PageScene(*mainGraph,page,this,colourCloset.getPaint());//getting a new colour for the scene
-    view->setScene(scene);
-    connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));
-    ((QGridLayout*)embedding_drawing->layout())->addWidget(view,rowNumber,0);
+    pageDrawing->layout()->addWidget(view);
 
-    QWidget* vert = new QWidget(embedding_drawing);
-    vert->setLayout(new QVBoxLayout());
-    embedding_drawing->layout()->addWidget(vert);
-    connect(view,SIGNAL(destroyed(QObject*)),vert,SLOT(deleteLater()));
-    ((QGridLayout*)embedding_drawing->layout())->addWidget(vert,rowNumber,1);
+    QVBoxLayout* pageSidebar = new QVBoxLayout();
+    ((QHBoxLayout*)pageDrawing->layout())->addLayout(pageSidebar);
 
-    QLabel* page_number = new QLabel();
-    page_number->setNum(page);
+    QLabel* page_number = new QLabel(pageDrawing);
     page_number->setToolTip(tr("Page number"));
-    vert->layout()->addWidget(page_number);
-    connect(scene,SIGNAL(page_number_changed(int)),page_number,SLOT(setNum(int)));
+    pageSidebar->addWidget(page_number);
 
-    QLabel* crossings_of_page = new QLabel();
-    crossings_of_page->setNum(mainGraph->getNcrossings(page));
+    QLabel* crossings_of_page = new QLabel(pageDrawing);
     crossings_of_page->setToolTip(tr("Crossings"));
-    vert->layout()->addWidget(crossings_of_page);
-    connect(scene,SIGNAL(crossings_changed(int)),crossings_of_page,SLOT(setNum(int)));
+    pageSidebar->addWidget(crossings_of_page);
 
-    QPushButton* del = new QPushButton("Delete");
+    QPushButton* del = new QPushButton("Delete",pageDrawing);
     del->setToolTip(tr("Delete page"));
-    //if(mainGraph->pageSize(page)>0) del->setEnabled(false);
-    connect(del,SIGNAL(pressed()),scene,SLOT(on_remove_page_request()));
-    vert->layout()->addWidget(del);
+    pageSidebar->addWidget(del);
 
+    PageScene* scene = new PageScene(*mainGraph,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
+    view->setScene(scene);
+    scene->setCrossings(mainGraph->getNcrossings(page));
+    connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));
+    connect(del,SIGNAL(pressed()),scene,SLOT(on_remove_page_request()));
+
+    number_of_pages_indicator->setNum(mainGraph->getNpages());
 }
 
-void MainWindow::findBiconnectedComponentsOfMainGraph() {
+void MainWindow::remove_page_drawing(int page){
+    PageScene *ps = (PageScene*)this->pageViews[page]->scene();
+    QColor colourToBeReturned = ps->getColour(); //here we get the colour of the page
+    this->colourCloset.returnPaint(colourToBeReturned); // and we return it to the closet
 
+    delete pageViews[page]->parent();
 
+    this->pageViews.erase(this->pageViews.begin()+page);
 
-
-
-
-
-
-
-/*
-    ogdf::Graph g = mainGraph->toOGDF(); //one question here. Are g's nodes and edges the same
-                                         //as mainGraph's? If they are, then all we have to do
-                                        // is to create an nodearray with pairs of nodes.
-                                        //(node_in_bct,node_in_g).
-                                        //then using this nodearray we can access the nodes
-                                        //of main graph. (e.g. change a node lable or smthing)
-                                        //perhaps another way would be to use ...(fuck it lets
-                                        //check this way out first)
-
-
-    ogdf::BCTree bctree(g,true); //attention, passing by reference here.
-                                 //as soon as we get out of scope of this method
-                                // this bctree wont be of any use.
-
-    //note: thie above constructor takes a reference to a graph.
-    //for some reason, we cannot the return value of a method.
-    // we have to pass a variable! This means that the following line won't compile:
-    //ogdf::BCTree bctree(mainGraph->toOGDF(),true);
-
-
-    ogdf::Graph graf = bctree.auxiliaryGraph();
-
-    //now to create mappings from the edges and nodes of the bct to the main graph.
-    ogdf::EdgeArray<Edge> bct_to_main_graph_edges(graf);
-    ogdf::NodeArray<Node> bct_to_main_graph_nodes(graf); //attention
-                                                          //this wouldnt work
-                                                         //without setting graf as
-                                                         //the associated graph
-
-
-
-
-
-    //Node v;
-    forall_nodes(v,graf) {
-
-        bct_to_main_graph_nodes[v]= bctree.original(v); //original returns the corresponding
-                                                        //node of the original graph
-                                                        //(from which the bct was derived)
+    this->number_of_pages_indicator->setNum(this->mainGraph->getNpages());
+    for(int i=page; i<this->mainGraph->getNpages(); i++){
+        ((PageScene*)(this->pageViews[i]->scene()))->setPageNumber(i);
     }
 
-    Edge e;
-
-    forall_edges(e,graf) {
-        bct_to_main_graph_edges[e] = bctree.original(e); //same as above with edges
-    }
-
-
-
-
-    //now we shall start extracting each biconnected component from "graf" (graf is a variable).
-    //we remind that "graf" is the so-called auxiliary graph of the bctree
-    //of mainGraph. The auxilliary graph is all the biconnectedcomponents
-    //of the graphs, without the edges between them.
-    //This way, we can get every B.C. by extracting each connectedSubgraph
-    //of graf.
-
-    std::unordered_map<Node,int> explored;
-
-
-    forall_nodes(v,graf) { //explored: we hold for each vertex of graf
-        explored[v]=0;     //an exploration status. i.e. if we have visited them
-                           //or not. This way we can ignore the vertices
-                            //of already "is a way of  between
-    }                      //vertices of already "extracted" connected subgraphs.
-
-    biconnectedComponents = std::vector<BiconnectedComponent*>(); //initialize the vector holding
-                                                                  //our bc's
-
-    forall_nodes(v,graf) {
-
-        if (explored[v]==0) { //check if the vertex belongs to an already extracted subgraph
-
-            ogdf::Graph nuGraf;
-            //ogdf::NodeArray< Node > nodeMapping(); <-- attention! this doesnt work!
-            ogdf::NodeArray< Node > subgraph_to_bct_nodes;// a mapping from of nodes in G to nodes in SG
-            ogdf::EdgeArray< Edge > subgraph_to_bct_edges;// similarly
-            ogdf::NodeArray<Node> nG_to_nSG;
-            ogdf::EdgeArray<Edge> eG_to_eSG;
-
-
-            ogdf::ConnectedSubgraph<int>::call(graf,nuGraf,v,subgraph_to_bct_nodes,
-                                               subgraph_to_bct_edges,nG_to_nSG,eG_to_eSG);
-
-            if (nuGraf.numberOfNodes() <2){
-                explored[v]=1;
-                continue;
-            }
-            //else : we are facing a proper biconnected component
-            //ie it contains more than one vertex
-
-            //create the mappings
-            std::unordered_map<Node,Node> nMapping();
-            std::unordered_map<Edge,Edge> eMapping();
-
-            Node vv;
-
-            forall_nodes(vv,nuGraf) {
-
-
-
-                nMapping[vv]= bct_to_main_graph_nodes[subgraph_to_bct_nodes[vv]];
-
-            }
-
-            forall_edges(e,nuGraf) {
-
-                eMapping[e]= bct_to_main_graph_edges[subgraph_to_bct_edges[e]];
-
-            }
-
-            BiconnectedComponent *bc = new BiconnectedComponent(nuGraf,mainGraph,nMapping,eMapping);
-            //TODO: test if the mappings work
-
-            //now we must set all the vertices in the extracted subgraph as explored
-            Node n;
-            forall_nodes(n,nuGraf) {
-
-                Node correspondingNode = subgraph_to_bct_nodes[n];
-                std::unordered_map<Node,int>::const_iterator got = explored.find(correspondingNode);
-                if ( got == explored.end() )
-                    std::cout << "not found" << endl;
-                  else {
-
-                    explored.at(got->first) = 1;
-                    cout << "xplored a n0de " << endl;
-
-
-                }
-            }
-
-
-
-
-            biconnectedComponents.push_back(bc);
-
-
-
-
-        }
-    }
-
-    cout << "we have a number of binconnected components here: " << biconnectedComponents.size() << endl;
-*/
+    embedding_drawing->layout()->update();
 }
 
 
@@ -296,19 +164,6 @@ void MainWindow::drawBCTree() {
     bCTView->setScene(gs);                                           //final
     bCTView->fitInView((gs)->sceneRect());                           //things
 
-    //now we will display the first biconnected component of the graph in the 2nd tab.
-
-    //BiconnectedComponent* bc = biconnectedComponents[0];
-    //delete bCView->scene();
-    //bc->buildLayout(0.0,0.0,bCView->width(),bCView->height());
-
-
-    //gs =new BCTScene(*bc,250,50);              //BCTScene: new class, custom made to
-                                                                    //show bctrees. (it can also be used
-                                                                    // to display graphs in general)
-
-    //bCView->setScene(gs);                                           //final
-    //bCView->fitInView((gs)->sceneRect());                           //things
 
 
 
@@ -317,6 +172,10 @@ void MainWindow::drawBCTree() {
 bool MainWindow::openBookEmbeddedGraph(std::string filename){
     BookEmbeddedGraph* temp = new BookEmbeddedGraph();
     if (temp->readGML(filename)){
+        for(QUndoStack* s : commandHistory->stacks()){
+            commandHistory->removeStack(s);
+        }
+        commandHistory->addStack(new QUndoStack(commandHistory));//move this operation to drawBCTree() when we can work independently across Biconnected Components
         currentFile = filename;
         //delete mainGraph;
         mainGraph = temp;
@@ -334,9 +193,8 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         this->drawBookEmbeddedGraph();
         emit number_of_nodes_changed(mainGraph->numberOfNodes());
         emit number_of_edges_changed(mainGraph->numberOfEdges());
-        emit number_of_pages_changed(mainGraph->getNpages());
         emit crossings_changed(std::vector<int>());
-        emit planarity_changed(mainGraph->graphIsPlanar());
+        emit planarity_changed(mainGraph->graphIsPlanar() ? tr("Yes") : tr("No"));
         stats->setCurrentWidget(graph_stats);
         return true;
     } else {
@@ -346,9 +204,7 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
 }
 
 void MainWindow::on_actionAddPage_triggered(){
-    mainGraph->addPage();
-    add_page_drawing(mainGraph->getNpages()-1);
-    emit number_of_pages_changed(mainGraph->getNpages());
+    commandHistory->activeStack()->push(new PageAddCommand(mainGraph,this));
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -471,43 +327,24 @@ void MainWindow::on_node_deselected(Node& v){
 }
 
 void MainWindow::move_edge(Edge &e){
+    int currPage = mainGraph->getPageNo(e);
     bool ok;
     int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
-                                         tr("New page:"),0,0,mainGraph->getNpages()-1,1,&ok);
-    if (!ok) return;
-    int currPage = mainGraph->getPageNo(e);
-    mainGraph->moveToPage(e,newPage);
-    ((PageScene*)(pageViews[currPage]->scene()))->removeEdge(e);
-    ((PageScene*)(pageViews[newPage]->scene()))->addEdge(e);
-    ((GraphScene*)(graphView->scene()))->removeEdge(e);
-
-    PageScene * p = (PageScene*)pageViews[newPage]->scene();
-    ((GraphScene*)(graphView->scene()))->addEdge(e,p->getColour());
-    std::vector<int> temp = {newPage, currPage};
-
-
-
-    emit crossings_changed(temp);
+                                         tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
+    if (!ok || newPage==currPage) return;
+    commandHistory->activeStack()->push(new EdgeMoveCommand(e,(PageScene*)pageViews[currPage]->scene(),(PageScene*)pageViews[newPage]->scene(),mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
 }
 
 void MainWindow::on_remove_page(int page){
-    if(mainGraph->pageSize(page) == 0){
-        mainGraph->removePage(page);
-        QGraphicsView* temp = pageViews[page];
-        PageScene *ps = (PageScene*)pageViews[page]->scene();
-        QColor colourToBeReturned = ps->getColour(); //here we get the colour of the page
-        colourCloset.returnPaint(colourToBeReturned); // and we return it to the closet
-        pageViews.erase(pageViews.begin()+page);
-        delete temp;
-        emit number_of_pages_changed(mainGraph->getNpages());
-        for(int i=page; i<mainGraph->getNpages(); i++){
-            ((PageScene*)(pageViews[i]->scene()))->setPageNumber(i);
-        }
-    }
+    Q_ASSERT(mainGraph->pageSize(page) == 0);
+    commandHistory->activeStack()->push(new PageRemoveCommand(page, mainGraph, this));
 }
 
 void MainWindow::on_crossings_changed(std::vector<int> pagesChanged){
     total_crossings_indicator->setNum(mainGraph->getNcrossings());
+    for(int i : pagesChanged){
+        ((PageScene*)(pageViews[i]->scene()))->setCrossings(mainGraph->getNcrossings(i));
+    }
 }
 
 void MainWindow::on_actionSave_triggered(){

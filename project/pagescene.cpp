@@ -11,12 +11,19 @@
  */
 
 
-PageScene::PageScene(BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, int width, int height) : m_width(width){
+
+PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) : m_width(width){
     //Paint Nodes
 
     colour = col;
     mainWindow = w;
     page = p;
+    pageNumberIndicator = pageNumber;
+    crossingsIndicator = crossings;
+    deletePageButton = del;
+
+    deletePageButton->setEnabled(true);
+    pageNumberIndicator->setNum(page);
 
     nodes = new std::unordered_map<Node,PageNode*>();
     QBrush redBrush(Qt::red);
@@ -76,6 +83,8 @@ void PageScene::addEdge(const Edge& e){
 
     (*edges)[e]= path;
 
+    deletePageButton->setEnabled(false);
+
     connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
     connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
     connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
@@ -84,11 +93,17 @@ void PageScene::addEdge(const Edge& e){
 void PageScene::removeEdge(const Edge &e){
     this->removeItem(edges->at(e));
     delete edges->at(e);
+    edges->erase(e);
+    if(edges->size() == 0) deletePageButton->setEnabled(true);
 }
 
 void PageScene::setPageNumber(int p){
     page = p;
-    emit page_number_changed(page);
+    pageNumberIndicator->setNum(p);
+}
+
+void PageScene::setCrossings(int crossings){
+    crossingsIndicator->setNum(crossings);
 }
 
 int PageScene::width() {

@@ -118,13 +118,13 @@ class Graph  {
 
             return g.empty();
         }
-        int numberOfNodes() {
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+        int numberOfNodes() const {
+            const ogdf::Graph& g = (use_g2) ? g2:g1;
 
             return g.numberOfNodes();
         }
-        int numberOfEdges() {
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+        int numberOfEdges() const {
+            const ogdf::Graph& g = (use_g2) ? g2:g1;
 
             return g.numberOfEdges();
         }
@@ -207,7 +207,8 @@ class BookEmbeddedGraph : public Graph {
 
         Node addNode();
 
-        void addPage();
+        void addPage(int pageNo);
+        void addPage(){addPage(getNpages());}
         void removePage(int pageNo);
 
         /*
@@ -235,7 +236,7 @@ class BookEmbeddedGraph : public Graph {
             for(Edge e : pages[page]){
                 result += getNcrossings(e);
             }
-            return result;
+            return result/2; //we have counted each crossing twice
         }
         int getNcrossings(const Edge& e) const{
             return 0;//crossings.at(e).size();

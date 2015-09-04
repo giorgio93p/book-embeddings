@@ -153,7 +153,6 @@ BookEmbeddedGraph* Graph::bookEmbedWithLeastPages(){
 
 BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
     attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
-    use_g2=false;
     ogdf::Graph& g = (use_g2) ? g2:g1;
 
     //vertexOrder = NULL;
@@ -168,13 +167,6 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
     pages = std::vector<Page>();
     addPage();
 
-    Edge e;
-
-    forall_edges(e,g) addEdgeToPage(e,0);
-
-    permutation = std::vector<Node>(numberOfNodes());
-
-    bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
     ncrossings = 0;
     calculateCrossings(); //commented out because it wasnt working (segfault)
@@ -183,6 +175,7 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
 
 BookEmbeddedGraph::BookEmbeddedGraph() : BookEmbeddedGraph(new Graph()) {}
 
+/*
 BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph graph){
     use_g2=false;
     ogdf::Graph& g = (use_g2) ? g2:g1;
@@ -197,26 +190,21 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph graph){
     attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
     addPage();
 
-    Node v;
-    int i=0;
-    forall_nodes(v,g){
-        attr.label(v) = std::to_string(i);
-        i++;
-    }
 
     Edge e;
-    forall_edges(e,g) addEdgeToPage(e,0);
+    forall_edges(e,g){
+        crossings[e] = std::unordered_set<Edge>();
+        addEdgeToPage(e,0);
+    }
+
     permutation = std::vector<Node>(numberOfNodes());
 
     bucketsNeedToBeGenerated = true;
-    crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
     ncrossings = 0;
-    calculateCrossings();
+    calculateCrossings(); //commented out because it wasnt working (segfault)
     std::cout << "BookEmbeddedGraph created" << std::endl;
-
-
 }
-
+*/
 BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph& graph, bool weareusingreferences)
     :Graph(graph,weareusingreferences)
 {
@@ -265,6 +253,8 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph& graph, bool weareusingreferenc
 
 
 
+BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph graph) : BookEmbeddedGraph(new Graph(graph)) {}
+
 
 Node BookEmbeddedGraph::addNode(){
     Node n = Graph::addNode();
@@ -285,17 +275,22 @@ Edge BookEmbeddedGraph::firstEdge() {
     return g.firstEdge();
 }
 
-void BookEmbeddedGraph::addPage(){
+void BookEmbeddedGraph::addPage(int pageNo){
     Page newPage = std::set<Edge>();
     //bool (*cmpPtr)(const Edge&, const Edge&) = edgeCmp;
     //std::set<Edge, bool (*)(const Edge&, const Edge&)> newPage(cmpPtr);
-    pages.push_back(newPage);
+    pages.push_back(newPage);//this just increments the size of the vector
+    for(int i = getNpages()-1; i > pageNo; i--){
+        pages[i] = pages[i-1];
+        for(Edge e : pages[i]) attr.label(e) = std::to_string(i);
+    }
+    pages[pageNo] = newPage;
 }
 
 void BookEmbeddedGraph::removePage(int pageNo){
     for(int i = pageNo; i < getNpages() - 1; i++){
         pages[i] = pages[i+1];
-        for(auto e : pages[i]) attr.label(e) = std::to_string(i);
+        for(Edge e : pages[i]) attr.label(e) = std::to_string(i);
     }
     pages.pop_back();
 }

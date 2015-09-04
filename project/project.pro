@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     biconnectedcomponent.cpp\
     page_node.cpp \
     auxiliarygraph.cpp \
-    agnode.cpp
+    agnode.cpp \
+    commands.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
     biconnectedcomponent.h\
     page_node.h \
     auxiliarygraph.h \
-    agnode.h
+    agnode.h \
+    commands.h
 
 FORMS    += mainwindow.ui
 
