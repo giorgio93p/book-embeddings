@@ -11,23 +11,26 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QUndoGroup>
 #include <ogdf/internal/planarity/ConnectedSubgraph.h>
 #include "biconnectedcomponent.h"
 
 #include "colourcloset.h"
 
-class PageScene;
+
+class PageScene; //forward declaration
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
+
     ColourCloset colourCloset;
     std::vector<QGraphicsView*> pageViews;
     BookEmbeddedGraph* mainGraph;
     std::string currentFile;
     BCTree *bctree;
     std::vector<BiconnectedComponent*> biconnectedComponents;
-
+    QUndoGroup* commandHistory;
 
 
 public:
@@ -39,12 +42,12 @@ public:
     BookEmbeddedGraph* getMainGraph() const { return mainGraph;}
     void enableRedraw();
 
-
+    void remove_page_drawing(int page);
+    void add_page_drawing(int p);
 
 private:
     void drawBCTree();
     void drawBookEmbeddedGraph();
-    void add_page_drawing(int p);
     void findConnectedComponentsOfMainGraph();
     void deselectEverythingInAllPagesBut(int page = -1);
 
@@ -69,9 +72,8 @@ signals:
 
     void number_of_nodes_changed(int i);
     void number_of_edges_changed(int i);
-    void number_of_pages_changed(int i);
     void crossings_changed(std::vector<int>);
-    void planarity_changed(bool b);
+    void planarity_changed(QString);
 };
 
 #endif
