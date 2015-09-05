@@ -10,7 +10,6 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
     cout << "DEBUG: entering biconnected component constructor body" << endl;
 
 
-    cout << "debug\n";
 
     //we shall set the node and edge numbering according to the numbers of the original graph.
 
@@ -29,11 +28,11 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
     forall_nodes(v,g) {
 
 
-        cout<<"DEBUG: graph has nodes";
         Node corresponding = nodeMapping.at(v); //getting the corresponding node. if this fails,
                                                 // then nodes in g are other than the
 
         int num = wholeGraph->getNumberOf(corresponding);
+        int num2= wholeGraph->getPosition(corresponding);
         n_to_i[v]=num;
         i_to_n[num]=v;
 
@@ -45,7 +44,6 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
     Edge e;
     forall_edges(e,g){
 
-        cout << "DEBUG: graph has edges\n" ;
         Edge corresponding;
         corresponding= edgeMapping.at(e);
         int num = wholeGraph->getNumberOf(corresponding);
@@ -59,7 +57,7 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
 
     setNumbering(e_to_i,n_to_i,i_to_n,i_to_e);
 
-    cout << "debug end\n";
+
 
     cout << "DEBUG: exiting biconnected component constructor body" << endl;
 

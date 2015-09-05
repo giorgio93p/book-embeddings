@@ -15,6 +15,8 @@
 PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) : m_width(width){
     //Paint Nodes
 
+
+
     colour = col;
     mainWindow = w;
     page = p;
@@ -37,16 +39,25 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
         //std::cout << g.getPosition(v) << std::endl;
         QString indexStr = QString::number(v->index());
         QGraphicsSimpleTextItem* labelItem = this->addSimpleText(indexStr);
+
+
+
         PageNode* el = new PageNode(this, i, g.numberOfNodes(), interval);
         el->setBrush(redBrush);
         el->setPen(blackPen);
         el->setRect(-width+i*interval,0,12,12);
-        addItem(el);
+
         //QGraphicsEllipseItem* el = this->addEllipse(-width+i*interval,0,12,12,blackPen,redBrush);
+
+
+
+
+        addItem(el);
+
+
 
         labelItem->setPos(-width+i*interval,15);
         (*nodes)[v] = el;
-        //nodes[v] = el;
         i++;
     }
 

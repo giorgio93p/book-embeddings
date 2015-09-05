@@ -1,3 +1,33 @@
+/*
+ *
+ * Main window class. This is the class of our mainwindow object, and it
+ * derives from the QMainWindow class AND from the Ui::MainWindow class.
+ * This is a bit complicated:we load the ui, so  deriving from Ui::MainWindow is the way
+ * we connect our application to our form.
+ * (The form is the document that describes every change we have made
+ * with qtdesigner, and it is named 'mainwindow.ui')
+
+
+ * This is the "control center" of our application.
+ * In the constructor we load the interface we have designed
+ * with QtDesigner, using the setupUi method. Now we can access each object
+ * we have added to the designer by its name, as if it was a field of the
+ * mainwindow class. That's all about the designer, we don't need to know
+ * much more about that.
+
+
+ *
+ *
+ *
+ */
+
+
+
+
+
+
+
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -23,21 +53,56 @@
 
 class PageScene; //forward declaration
 
+
+
+
+
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
 
     ColourCloset colourCloset;
+    //this holds a number of available colors.
+    //we use it to control the colours in pages
+    //see [1]
+
     std::vector<QGraphicsView*> pageViews;
+    //this holds the views that show
+    //each pagescene. A pagescene
+    //simply displays a page.
+
+
     BookEmbeddedGraph* mainGraph;
+    //a pointer to the mainGraph object.
+    //this is the graph we read from the gml
+    //file, along with the information about the
+    //pages, and more.
     std::string currentFile;
+    //full name of the file we have opened.
+    //might be useful, might not.
     AuxiliaryGraph* auxiliaryGraph;
-    BCTree *bctree;
-    std::vector<BiconnectedComponent*> biconnectedComponents;
+    //this contains a vector of graphs,
+    //or to be more precise, a vector BiconnectedComponent
+    //objects. These derive from the Graph class, and are
+    //the biconnected components of mainGraph. They are
+    //completely independent, and they can 'communicate'
+    //with the graph through mappings from each node of
+    //theirs to the corresponding node in mainGraph.
+
     QUndoGroup* commandHistory;
 
+    //commandHistory is a stack of recently made changes.
+    //we use it to undo/redo actions performed on our graph,
+
+
     bool wholeGraphMode;
+    //this flag indicates if our pages are displaying the whole graph
+    //or just a biconnectedComponent of it.
+
     BiconnectedComponent* currBC;
+
+    //this is the biconnected component under examination, if
+    //of course wholeGraphMode is false.
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -50,9 +115,11 @@ public:
 
     void redrawPages();
 
-    //pitsi added
     void remove_page_drawing(int page);
     void add_page_drawing(int p);
+    bool isWholeGraphModeOn() {
+        return wholeGraphMode;
+    }
 
 
 private:

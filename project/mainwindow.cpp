@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     redoAction->setShortcut(QKeySequence::Redo);
     toolBar->addAction(redoAction);
     menuEdit->addAction(redoAction);
+    wholeGraphMode=true;
 }
 
 void MainWindow::drawBookEmbeddedGraph(){
@@ -83,6 +84,10 @@ void MainWindow::drawBookEmbeddedGraph(){
 
 void MainWindow::add_page_drawing(int page){
 
+
+    BookEmbeddedGraph* graphToDraw=(wholeGraphMode)?mainGraph : currBC;
+
+    if (!wholeGraphMode) return;
     /* embedding_drawing: a widget that we have created with QTDesigner.
      * It is used as ancestor widget for all page views.
      * Its layout type is vertical.
@@ -114,13 +119,15 @@ void MainWindow::add_page_drawing(int page){
     del->setToolTip(tr("Delete page"));
     pageSidebar->addWidget(del);
 
-    PageScene* scene = new PageScene(*mainGraph,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
+
+
+    PageScene* scene = new PageScene(*graphToDraw,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
     view->setScene(scene);
     scene->setCrossings(mainGraph->getNcrossings(page));
     connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));
     connect(del,SIGNAL(pressed()),scene,SLOT(on_remove_page_request()));
 
-    number_of_pages_indicator->setNum(mainGraph->getNpages());
+    number_of_pages_indicator->setNum(graphToDraw->getNpages());
 }
 
 void MainWindow::remove_page_drawing(int page){
@@ -170,6 +177,7 @@ void MainWindow::drawBCTree() {
 }
 
 bool MainWindow::openBookEmbeddedGraph(std::string filename){
+    wholeGraphMode=true;
     BookEmbeddedGraph* temp = new BookEmbeddedGraph();
     if (temp->readGML(filename)){
         for(QUndoStack* s : commandHistory->stacks()){
@@ -180,10 +188,6 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         //delete mainGraph;
         mainGraph = temp;
 
-        cout << endl << endl << mainGraph->getNcrossings() << endl;
-        //std::cout << "Read Successful!!!!!" << std::endl;
-        //std::cout << "Number of nodes in read graph ==" << mainGraph->numberOfNodes() << endl;
-        //std::cout << "Number of edges in read graph ==" << mainGraph->numberOfEdges() << endl;
         this->drawBCTree(); //drawBCTree
                             //added by kosms
                             //made to draw the Biconnected Components Tree
@@ -223,6 +227,7 @@ void MainWindow::on_actionOpen_triggered()
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
         file.close();
         if(openBookEmbeddedGraph(fileNameStr)){
+
             QMessageBox::information(this,tr("Read Book Embedded Graph"),tr("Successful"));
             setWindowTitle(WINDOW_TITLE + tr(" - ") + fileName);
             actionSave_as->setEnabled(true);
@@ -378,9 +383,9 @@ void MainWindow::loadBC(BiconnectedComponent* currbc) {
     cout << "loading another biconnected component!!" << endl;
     currBC = currbc;
     wholeGraphMode = false;
-    cout << currBC->numberOfNodes();
+    cout << "  " << currBC->numberOfEdges() << endl;
 
-    //redrawPages();
+    redrawPages();
 
 
 
@@ -403,10 +408,10 @@ void MainWindow::redrawPages() {
     }
 
 
-    /*
+
     for(int p=0; p< currBC->getNpages(); p++){
         add_page_drawing(p);
     }
-    */
+
     actionRedraw->setEnabled(false);
 }

@@ -75,6 +75,8 @@ Graph::Graph(ogdf::Graph graph): g2(g1){
     setDefaultNumbering();
 }
 
+
+
 Graph::Graph(ogdf::Graph& graph,bool weareusingreferences):g2(graph){
     use_g2=true;
 
@@ -91,7 +93,6 @@ Node Graph::addNode(){
 }
 
 void Graph::buildLayout(const double xmin, const double ymin, const double xmax, const double ymax){
-    cout << "entering buildLayout" << endl;
 
 
 
@@ -103,11 +104,9 @@ void Graph::buildLayout(const double xmin, const double ymin, const double xmax,
         drawer.newInitialPlacement(true);
         drawer.qualityVersusSpeed(ogdf::FMMMLayout::qvsGorgeousAndEfficient);
 
-    cout << "before call of drawer" << endl;
 
     drawer.call(attr);
 
-    cout << "after  call of drawer" << endl;
 
 
     ogdf::SpringEmbedderFR drawer2 = ogdf::SpringEmbedderFR();
@@ -451,6 +450,8 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
     bucketsNeedToBeGenerated=true;
     ncrossings=0;
     calculateCrossings();
+
+    setDefaultNumbering();
     return true;
 }
 
@@ -495,7 +496,7 @@ void BookEmbeddedGraph::updatePermutation(int originalIndex, int finalPos) {
 
 /******************************************** BCTree Implementation ********************************************/
 
-BCTree::BCTree(Graph &g) : originalGraph(g.toOGDF()),ogBCT(originalGraph,true),
+BCTree::BCTree(Graph g) : originalGraph(g.toOGDF()),ogBCT(originalGraph,true),
 auxiliaryGraph(ogBCT.auxiliaryGraph()) {
 
 
