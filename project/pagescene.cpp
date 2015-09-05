@@ -42,7 +42,7 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
 
 
 
-        PageNode* el = new PageNode(this, i, g.numberOfNodes(), interval);
+        PageNode* el = new PageNode(this, v, i, g.numberOfNodes(), interval);
         el->setBrush(redBrush);
         el->setPen(blackPen);
         el->setRect(-width+i*interval,0,12,12);
@@ -59,6 +59,9 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
         labelItem->setPos(-width+i*interval,15);
         (*nodes)[v] = el;
         i++;
+        connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+        connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
+        //connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
     }
 
     //Paint Edges

@@ -67,10 +67,10 @@ void MainWindow::drawBookEmbeddedGraph(){
                               // that is, having all of its colours inside
 
     //Remove previous page drawings
-    QLayoutItem *child;
-    while ((child = embedding_drawing->layout()->takeAt(0)) != 0) {
-        delete child;
+    for(QGraphicsView* view : pageViews){
+        delete view->parent();
     }
+    pageViews.clear();
 
     //Draw pages
     for(int p=0; p<mainGraph->getNpages(); p++){
@@ -101,7 +101,7 @@ void MainWindow::add_page_drawing(int page){
     ((QVBoxLayout*)embedding_drawing->layout())->insertWidget(page,pageDrawing);
 
     QGraphicsView* view = new QGraphicsView(pageDrawing);
-    pageViews.push_back(view);
+    pageViews.insert(pageViews.begin()+page,view);
     pageDrawing->layout()->addWidget(view);
 
     QVBoxLayout* pageSidebar = new QVBoxLayout();
@@ -127,7 +127,11 @@ void MainWindow::add_page_drawing(int page){
     connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));
     connect(del,SIGNAL(pressed()),scene,SLOT(on_remove_page_request()));
 
-    number_of_pages_indicator->setNum(graphToDraw->getNpages());
+    number_of_pages_indicator->setNum(mainGraph->getNpages());
+
+    for(int i=page+1; i<pageViews.size(); i++){
+        ((PageScene*)pageViews[i]->scene())->setPageNumber(i);
+    }
 }
 
 void MainWindow::remove_page_drawing(int page){
@@ -313,22 +317,30 @@ void MainWindow::on_edge_deselected(Edge& e){
     std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
 }
 
-void MainWindow::on_node_selected(Node& v){
+void MainWindow::on_node_selected(Node& v, int onPage){
+
+    deselectEverythingInAllPagesBut(onPage);
+
+
     edge_stats->setEnabled(false);
     node_stats->setEnabled(true);
     std::cout << "Node " << v->index() << " selected" << endl;
-    node_outdeg_indicator->setNum(v->outdeg());
-    node_indeg_indicator->setNum(v->indeg());
+    node_deg_indicator->setNum(v->degree());
     node_index_indicator->setNum(v->index());
     stats->setCurrentWidget(node_stats);
+
+    GraphScene* gs = (GraphScene*)graphView->scene();
+    gs->changeNodeColourAndWidth(v,MY_COLOR,6);
 }
 
 void MainWindow::on_node_deselected(Node& v){
     node_stats->setEnabled(false);
-    node_outdeg_indicator->clear();
-    node_indeg_indicator->clear();
+    node_deg_indicator->clear();
     node_index_indicator->clear();
     std::cout << "Node " << v->index() << " deselected" << endl;
+
+    GraphScene* gs = (GraphScene*)graphView->scene();
+    gs->changeNodeColourAndWidth(v);
 }
 
 void MainWindow::move_edge(Edge &e){
@@ -337,7 +349,7 @@ void MainWindow::move_edge(Edge &e){
     int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
                                          tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
     if (!ok || newPage==currPage) return;
-    commandHistory->activeStack()->push(new EdgeMoveCommand(e,(PageScene*)pageViews[currPage]->scene(),(PageScene*)pageViews[newPage]->scene(),mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
+    commandHistory->activeStack()->push(new EdgeMoveCommand(e,currPage,newPage,&pageViews,mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
 }
 
 void MainWindow::on_remove_page(int page){

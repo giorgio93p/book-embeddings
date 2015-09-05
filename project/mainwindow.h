@@ -141,7 +141,7 @@ public slots:
 
     void on_edge_selected(Edge &);
     void on_edge_deselected(Edge &);
-    void on_node_selected(Node &);
+    void on_node_selected(Node &, int);
     void on_node_deselected(Node &);
 
     void move_edge(Edge&);

@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 
-PageNode::PageNode(PageScene *scene, int i, int n, qreal inv) : pageScene(scene), index(i), numNodes(n), interval(inv){
+PageNode::PageNode(PageScene *scene, const Node& v, int i, int n, qreal inv) : pageScene(scene), node(v), index(i), numNodes(n), interval(inv){
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
 }
 
@@ -23,6 +23,14 @@ QVariant PageNode::itemChange(GraphicsItemChange change, const QVariant & value)
         newPos.setY(0);
 
         return newPos;
+    } else if (change == QGraphicsItem::ItemSelectedChange) {
+        if(value.toBool()) {
+            emit this->was_selected(node,pageScene->pageNumber());
+        }
+        else
+        {
+            emit this->was_deselected(node);
+        }
     }
 
     return QGraphicsEllipseItem::itemChange(change, value);
