@@ -69,6 +69,7 @@ void MainWindow::drawBookEmbeddedGraph(){
     for(QGraphicsView* view : pageViews){
         delete view->parent();
     }
+    pageViews.clear();
 
     //Draw pages
     for(int p=0; p<mainGraph->getNpages(); p++){
@@ -311,22 +312,30 @@ void MainWindow::on_edge_deselected(Edge& e){
     std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
 }
 
-void MainWindow::on_node_selected(Node& v){
+void MainWindow::on_node_selected(Node& v, int onPage){
+
+    deselectEverythingInAllPagesBut(onPage);
+
+
     edge_stats->setEnabled(false);
     node_stats->setEnabled(true);
     std::cout << "Node " << v->index() << " selected" << endl;
-    node_outdeg_indicator->setNum(v->outdeg());
-    node_indeg_indicator->setNum(v->indeg());
+    node_deg_indicator->setNum(v->degree());
     node_index_indicator->setNum(v->index());
     stats->setCurrentWidget(node_stats);
+
+    GraphScene* gs = (GraphScene*)graphView->scene();
+    gs->changeNodeColourAndWidth(v,MY_COLOR,6);
 }
 
 void MainWindow::on_node_deselected(Node& v){
     node_stats->setEnabled(false);
-    node_outdeg_indicator->clear();
-    node_indeg_indicator->clear();
+    node_deg_indicator->clear();
     node_index_indicator->clear();
     std::cout << "Node " << v->index() << " deselected" << endl;
+
+    GraphScene* gs = (GraphScene*)graphView->scene();
+    gs->changeNodeColourAndWidth(v);
 }
 
 void MainWindow::move_edge(Edge &e){

@@ -10,6 +10,8 @@
 #include "graphs.h"
 #include "embedding_edge.h"
 
+#define DEFAULT_NODE_WIDTH 4
+
 class GraphScene : public QGraphicsScene
 {
 public:
@@ -18,11 +20,12 @@ public:
 
     void addEdgeInitial(const Edge &e, const int page);
     void addEdge(const Edge &e, const QColor, const int width = 2);
-
     void removeEdge(const Edge &e);
-    void changeEdgeColourAndWidth(const Edge e,const QColor col, const int width = 2);
+    void changeEdgeColourAndWidth(const Edge &e, const QColor col, const int width = 2);
 
-
+    void addNode(const Node &, QRectF boundingRect, const QColor col=Qt::black);
+    void removeNode(const Node &v);
+    void changeNodeColourAndWidth(const Node& v, const QColor col=Qt::black, const int width = DEFAULT_NODE_WIDTH);
 private:
     std::unordered_map<Node, QGraphicsEllipseItem*> *nodes;
     std::unordered_map<Edge, QGraphicsItem*> *edges;
