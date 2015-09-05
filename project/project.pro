@@ -18,10 +18,12 @@ SOURCES += main.cpp\
     graphs.cpp \
     embedding_edge.cpp \
     pagescene.cpp \
-    bctscene.cpp \
+    agscene.cpp \
     colourcloset.cpp \
     biconnectedcomponent.cpp\
     page_node.cpp \
+    auxiliarygraph.cpp \
+    agnode.cpp \
     commands.cpp
 
 
@@ -31,10 +33,12 @@ HEADERS  += mainwindow.h \
     embedding_edge.h \
     pagescene.h \
     colors.h \
-    bctscene.h \
+    agscene.h \
     colourcloset.h \
     biconnectedcomponent.h\
     page_node.h \
+    auxiliarygraph.h \
+    agnode.h \
     commands.h
 
 FORMS    += mainwindow.ui

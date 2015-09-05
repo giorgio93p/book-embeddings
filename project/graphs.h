@@ -29,56 +29,134 @@ typedef std::vector<Bucket> Buckets;
 class BookEmbeddedGraph;
 
 class Graph  {
+
+
+
+
     protected:
-        ogdf::Graph g;
+        ogdf::Graph g1;
+        ogdf::Graph& g2; //this is a reference to an ogdf graph!
         ogdf::GraphAttributes attr;
+        bool use_g2; //this is set to true when we use a reference
+        //to an ogdf graph instead of a graph
+    private:
+        std::unordered_map<Edge,int> e_to_int;
+        std::unordered_map<Node,int> n_to_int;
+        std::unordered_map<int,Node> int_to_n;
+        std::unordered_map<int,Edge> int_to_e;
+        bool listshavebeenset; //this is to ensure that the above lists are
+                               //given their values only once.
+                               //we could have used the const keyword, but
+                               //this would create a number of problems,
+                               //because we want the capability of initializing
+                               //outside the constructor of class Graph.
+
+
+
 
     public:
         Graph();
         Graph(ogdf::Graph graph);
         Graph(Graph*);
+        Graph(ogdf::Graph& graph,bool weareusingreference);
+
+        //the second arguement allows us to choose
+        //if the graph will create the four unordered_maps
+        // automatically. This allows the user to use the method
+        // setNumbering to use custom numbering for the nodes and
+        // edges
+
+        void setNumbering(std::unordered_map<Edge,int> e_to_num,
+                          std::unordered_map<Node,int> n_to_num,
+                          std::unordered_map<int,Node> num_to_n,
+                          std::unordered_map<int,Edge> num_to_e);
+
+        void setDefaultNumbering();
+
+        int getNumberOf(Node n) {
+            return n_to_int[n];
+        }
+
+        int getNumberOf(Edge e) {
+            return e_to_int[e];
+        }
+
+        Node getNode(int num) {
+            return int_to_n[num];
+        }
+
+        Edge getEdge(int num) {
+            return int_to_e[num];
+        }
+
+        ogdf::Graph toOGDFval() const {
+            ogdf::Graph& g = g2 ;
 
 
-        ogdf::Graph toOGDF() const{
             return g;
+        }
+
+         ogdf::Graph& toOGDF() {
+            ogdf::Graph& g = (use_g2) ? g2:g1;
+
+            ogdf::Graph& graf= g;
+            return graf;
         }
 
 
         virtual bool readGML(std::string& fileName){
+            ogdf::Graph& g = (use_g2) ? g2:g1;
+
+
             return ogdf::GraphIO::readGML(attr,g,fileName);
         }
         virtual bool writeGML(std::string& fileName){
             return ogdf::GraphIO::writeGML(attr,fileName);
         }
-        bool empty() const {
+        bool empty() {
+            ogdf::Graph& g = (use_g2) ? g2:g1;
+
             return g.empty();
         }
-        int numberOfNodes() const{
+        int numberOfNodes() const {
+            const ogdf::Graph& g = (use_g2) ? g2:g1;
+
             return g.numberOfNodes();
         }
-        int numberOfEdges() const{
+        int numberOfEdges() const {
+            const ogdf::Graph& g = (use_g2) ? g2:g1;
+
             return g.numberOfEdges();
         }
 
         Node addNode();
 
         virtual Edge addEdge(Node& from, Node& to){
+            ogdf::Graph& g = (use_g2) ? g2:g1;
+
             return g.newEdge(from, to);
         }
 
-        virtual Node firstNode() const{
+        virtual Node firstNode() {
+            ogdf::Graph& g = (use_g2) ? g2:g1;
+
             return g.firstNode();
         }
 
-        virtual Edge firstEdge() const {
+        virtual Edge firstEdge()  {
+            ogdf::Graph& g = (use_g2) ? g2:g1;
+
             return g.firstEdge();
         }
 
         ogdf::GraphAttributes getGraphAttributes() {
+
             return attr;
         }
 
         ogdf::Graph getGraph() {
+            ogdf::Graph& g = (use_g2) ? g2:g1;
+
             return g;
         }
 
@@ -115,6 +193,8 @@ class BookEmbeddedGraph : public Graph {
     public:
         BookEmbeddedGraph(Graph* g);
 
+        BookEmbeddedGraph(ogdf::Graph&,bool weareusingreferences);
+
         BookEmbeddedGraph();
         BookEmbeddedGraph(ogdf::Graph );
 
@@ -123,7 +203,7 @@ class BookEmbeddedGraph : public Graph {
         Edge addEdge(Node& from, Node& to) override{
             return addEdge(from,to,0);
         }
-        Edge firstEdge() const;
+        Edge firstEdge() ;
 
         Node addNode();
 
@@ -226,14 +306,33 @@ class BCTree {
         //BCTree's constructor with a temp argument, so we need to use
         //that (see constructor definition)
         
-        ogdf::Graph originalGraph;
+        ogdf::Graph& originalGraph;
         ogdf::BCTree ogBCT;
-    public:
-        BCTree(Graph &);
+        const ogdf::Graph& auxiliaryGraph;  //auxiliary graph: this is the graph that contains all biconnected components
+                                            //without any edges between them
+                                            //we chose const reference, because ogdf::BCTree::auxiliaryGraph()
+                                           //returns const
 
-        ogdf::Graph getBCTree() const {
+        std::unordered_map<Node,Node> agN_to_mgN; //a(uxiliary)g(raph)N(ode)_to_m(ain)g(raph)N(ode)
+        std::unordered_map<Edge,Edge> agE_to_mgE; //similarly with edges
+
+
+
+
+    public:
+        BCTree(Graph &g);
+
+        const ogdf::Graph& getAuxiliaryGraph() {
+            //ogdf::Graph &ax = ogBCT.auxiliaryGraph();
+            return auxiliaryGraph;
+        }
+
+        ogdf::Graph getBCTree2() const {
             return ogBCT.auxiliaryGraph();
         }
+
+        const std::unordered_map<Node,Node> generateNodeMapping();
+        const std::unordered_map<Edge,Edge> generateEdgeMapping();
 
         Node firstNode(bool);
         Node lastNode(bool);

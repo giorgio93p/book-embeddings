@@ -13,7 +13,7 @@
 class GraphScene : public QGraphicsScene
 {
 public:
-    GraphScene(const BookEmbeddedGraph &g, const double width=250.0, const double height=50.0);
+    GraphScene(BookEmbeddedGraph &g, const double width=250.0, const double height=50.0);
     //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
     void addEdgeInitial(const Edge &e, const int page);

@@ -3,7 +3,7 @@
 #include "ui_mainwindow.h"
 #include "graphscene.h"
 #include "pagescene.h"
-#include "bctscene.h"
+#include "agscene.h"
 #include "colors.h"
 #include <QInputDialog>
 #include <QVBoxLayout>
@@ -16,6 +16,8 @@
 #include <QTransform>
 #include <QUndoStack>
 #include <ogdf/basic/GraphList.h>
+
+#include "auxiliarygraph.h"
 #include "commands.h"
 
 #define WINDOW_TITLE tr("P.E.O.S.")
@@ -141,230 +143,30 @@ void MainWindow::remove_page_drawing(int page){
     embedding_drawing->layout()->update();
 }
 
-void MainWindow::findConnectedComponentsOfMainGraph() {
-
-
-
-    ogdf::Graph g = mainGraph->toOGDF(); //one question here. Are g's nodes and edges the same
-                                         //as mainGraph's? If they are, then all we have to do
-                                        // is to create an nodearray with pairs of nodes.
-                                        //(node_in_bct,node_in_g).
-                                        //then using this nodearray we can access the nodes
-                                        //of main graph. (e.g. change a node lable or smthing)
-                                        //perhaps another way would be to use ...(fuck it lets
-                                        //check this way out first)
-
-
-    ogdf::BCTree bctree(g,true); //attention, passing by reference here.
-                                 //as soon as we get out of scope of this method
-                                // this bctree wont be of any use.
-
-    //note: thie above constructor takes a reference to a graph.
-    //for some reason, we cannot the return value of a method.
-    // we have to pass a variable! This means that the following line won't compile:
-    //ogdf::BCTree bctree(mainGraph->toOGDF(),true);
-
-
-    ogdf::Graph graf = bctree.auxiliaryGraph();
-
-    //now to create mappings from the edges and nodes of the bct to the main graph.
-    ogdf::EdgeArray<Edge> bct_to_main_graph_edges(graf);
-    ogdf::NodeArray<Node> bct_to_main_graph_nodes(graf); //attention
-                                                          //this wouldnt work
-                                                         //without setting graf as
-                                                         //the associated graph
-
-
-
-
-    Edge e;
-    ogdf::Graph G = graf;
-
-    for((e)=(G).firstEdge(); (e); (e)=(e)->succ()){}
-/*
-    for (e=graf.firstEdge();(e);e->succ()){
-         cout << "infinite loop!!" << endl;
-    }
-*/
-    //e=graf.firstEdge();
-    //e=e->succ();
-    //bct_to_main_graph_edges[e]=bctree.original(e);
-
-    forall_edges(e,graf) {
-    }
-
-    forall_edges(e,graf) {
-        bct_to_main_graph_edges[e] = bctree.original(e); //same as above with edges
-    }
-
-    Node v;
-    forall_nodes(v,graf) {
-
-        bct_to_main_graph_nodes[v]= bctree.original(v); //original returns the corresponding
-                                                        //node of the original graph
-                                                        //(from which the bct was derived)
-    }
-
-    //v = bct_to_main_graph_nodes[graf.firstNode()];
-    //int pos = mainGraph->getPosition(v); //DEBUG
-    //cout << "this should be a valid position baby: " << pos << endl;            //DEBUG
-
-    //now we shall start extracting each biconnected component from "graf" (graf is a variable).
-    //we remind that "graf" is the so-called auxilliary graph of the bctree
-    //of mainGraph. The auxilliary graph is all the biconnectedcomponents
-    //of the graphs, without the edges between them.
-    //This way, we can get every B.C. by extracting each connectedSubgraph
-    //of graf.
-
-    std::unordered_map<Node,int> explored;
-
-
-    forall_nodes(v,graf) { //explored: we hold for each vertex of graf
-        explored[v]=0;     //an exploration status. i.e. if we have visited them
-                           //or not. This way we can ignore the vertices
-                            //of already "is a way of  between
-    }                      //vertices of already "extracted" connected subgraphs.
-
-    biconnectedComponents = std::vector<BiconnectedComponent*>(); //initialize the vector holding
-                                                                  //our bc's
-
-    forall_nodes(v,graf) {
-
-        if (explored[v]==0) { //check if the vertex belongs to an already extracted subgraph
-
-            ogdf::Graph nuGraf;
-            //ogdf::NodeArray< Node > nodeMapping(); <-- attention! this doesnt work!
-            ogdf::NodeArray< Node > subgraph_to_bct_nodes;// a mapping from of nodes in G to nodes in SG
-            ogdf::EdgeArray< Edge > subgraph_to_bct_edges;// similarly
-            ogdf::NodeArray<Node> nG_to_nSG;
-            ogdf::EdgeArray<Edge> eG_to_eSG;
-
-
-            ogdf::ConnectedSubgraph<int>::call(graf,nuGraf,v,subgraph_to_bct_nodes,
-                                               subgraph_to_bct_edges,nG_to_nSG,eG_to_eSG);
-
-            if (nuGraf.numberOfNodes() <2){
-                explored[v]=1;
-                continue;
-            }
-            //else : we are facing a proper biconnected component
-            //ie it contains more than one vertex
-
-            //create the mappings
-            ogdf::NodeArray<Node> nMapping(nuGraf);
-            ogdf::EdgeArray<Edge> eMapping(nuGraf);
-
-            Node vv;
-
-            forall_nodes(vv,nuGraf) {
-
-
-
-                nMapping[vv]= bct_to_main_graph_nodes[subgraph_to_bct_nodes[vv]];
-
-            }
-
-            forall_edges(e,nuGraf) {
-
-                eMapping[e]= bct_to_main_graph_edges[subgraph_to_bct_edges[e]];
-
-            }
-
-            BiconnectedComponent *bc = new BiconnectedComponent(nuGraf,mainGraph,nMapping,eMapping);
-            //TODO: test if the mappings work
-
-            //now we must set all the vertices in the extracted subgraph as explored
-            Node n;
-            forall_nodes(n,nuGraf) {
-
-                Node correspondingNode = subgraph_to_bct_nodes[n];
-                std::unordered_map<Node,int>::const_iterator got = explored.find(correspondingNode);
-                if ( got == explored.end() )
-                    std::cout << "not found" << endl;
-                  else {
-
-                    explored.at(got->first) = 1;
-                    cout << "xplored a n0de " << endl;
-
-
-                }
-            }
-
-
-
-
-            biconnectedComponents.push_back(bc);
-
-
-
-
-        }
-    }
-
-    cout << "we have a number of binconnected components here: " << biconnectedComponents.size() << endl;
-
-}
-
 
 
 void MainWindow::drawBCTree() {
 
-
-    //this draws the Biconnected Compenents Tree of the input graph on Tab1, right below the mainGraph.
-    //it is drawn in a QGraphicsView object which was made in Desinger, named bCTView.
-
-    bctree = new BCTree(*mainGraph);  //make a new object of clss BCTree
-    cout << bctree->numberOfNodes(true) << endl; //testing if class works
-    ogdf::Graph graf = bctree->getBCTree();     //get the bct in ogdf::graph representation
-
-
-
-
-    findConnectedComponentsOfMainGraph(); //this splits the graph into
-                                          //the biconnected components
-                                          //and stores them in the
-                                          //vector biconnectedComponents
-
-    //ogdf::GraphIO::writeGML(graf, "/home/kosmas/sierpinski_04-layout.gml");
-
-
-
-
-    Graph* bCGraph = new Graph(graf);    //create a new Graph object that represents the bct.
-                                        //check the Graph constructor that takes an ogdf::Graph
-                                        //as a parameter
-
-
+    auxiliaryGraph = new AuxiliaryGraph(mainGraph);
 
 
     delete bCTView->scene();             //deleting previous scene if any
 
 
-    bCGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
+    auxiliaryGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
                                                                      //segfaults :(.
                                                                      //we use it to make some
                                                                     // settings in the attr member of graphs
 
-    QGraphicsScene *gs =new BCTScene(*bCGraph,bCTView->width(),bCTView->height());
-                                                                    //BCTScene: new class, custom made to
+
+
+    QGraphicsScene *gs =new AGScene(auxiliaryGraph,this,bCTView->width(),bCTView->height());
+                                                                    //AGScene: new class, custom made to
                                                                     //show bctrees.
 
     bCTView->setScene(gs);                                           //final
     bCTView->fitInView((gs)->sceneRect());                           //things
 
-    //now we will display the first biconnected component of the graph in the 2nd tab.
-
-    BiconnectedComponent* bc = biconnectedComponents[0];
-    delete bCView->scene();
-    bc->buildLayout(0.0,0.0,bCView->width(),bCView->height());
-
-
-    gs =new BCTScene(*bc,250,50);              //BCTScene: new class, custom made to
-                                                                    //show bctrees. (it can also be used
-                                                                    // to display graphs in general)
-
-    bCView->setScene(gs);                                           //final
-    bCView->fitInView((gs)->sceneRect());                           //things
 
 
 
@@ -495,10 +297,6 @@ void MainWindow::on_edge_deselected(Edge& e){
     edge_target_indicator->clear();
     edge_page_indicator->clear();
 
-    //kosmas added the following 3 lines:
-    //int pageNo = mainGraph->getPageNo(e);
-    //PageScene* pageScene = (PageScene*) pageViews[pageNo]->scene();
-    //pageScene->repaintEdge(e);
 
 
     int pageNo = mainGraph->getPageNo(e);
@@ -574,5 +372,44 @@ void MainWindow::on_actionRedraw_triggered(){
         add_page_drawing(p);
     }
 
+    actionRedraw->setEnabled(false);
+}
+
+
+void MainWindow::loadBC(BiconnectedComponent* currbc) {
+
+    cout << "loading another biconnected component!!" << endl;
+    currBC = currbc;
+    wholeGraphMode = false;
+    cout << currBC->numberOfNodes();
+
+    //redrawPages();
+
+
+
+
+
+}
+
+void MainWindow::redrawPages() {
+
+
+    colourCloset.returnAll(); // the returnAll method simply resets the closet to its intial state
+                              // that is, having all of its colours inside
+    //Draw pages
+    for(int p=pageViews.size()-1; p>=0; p--){
+        embedding_drawing->layout()->removeWidget(pageViews[p]);
+        QGraphicsScene *pp = pageViews[p]->scene();
+        delete pageViews[p]->scene();
+        delete pageViews[p];
+        pageViews.pop_back();
+    }
+
+
+    /*
+    for(int p=0; p< currBC->getNpages(); p++){
+        add_page_drawing(p);
+    }
+    */
     actionRedraw->setEnabled(false);
 }

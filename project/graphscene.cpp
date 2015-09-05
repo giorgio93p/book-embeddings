@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-GraphScene::GraphScene(const BookEmbeddedGraph& g, const double width, const double height){
+GraphScene::GraphScene(BookEmbeddedGraph& g, const double width, const double height){
     //Paint Nodes
     nodes = new std::unordered_map<Node,QGraphicsEllipseItem*>();
     QBrush redBrush(Qt::black);

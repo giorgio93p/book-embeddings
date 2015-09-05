@@ -8,17 +8,18 @@
 class BiconnectedComponent : public BookEmbeddedGraph
 {
 public:
-    BiconnectedComponent(ogdf::Graph gr, BookEmbeddedGraph* mainGraph,
-                         ogdf::NodeArray<Node> nMapping, ogdf::EdgeArray<Edge> eMapping) :
-                         BookEmbeddedGraph(gr), wholeGraph(mainGraph), edgeMapping(eMapping),
-                         nodeMapping(nMapping){};
+    BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* mainGraph,
+                         std::unordered_map<Node,Node> nMapping, std::unordered_map<Edge,Edge> eMapping);
+
+
+
 
 private:
 
     BookEmbeddedGraph* wholeGraph;
-    ogdf::EdgeArray<Edge> edgeMapping;
+    std::unordered_map<Edge,Edge> edgeMapping;
 
-    ogdf::NodeArray<Node> nodeMapping;
+    std::unordered_map<Node,Node> nodeMapping;
 };
 
 #endif // BICONNECTEDCOMPONENT_H

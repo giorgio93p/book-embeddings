@@ -448,6 +448,14 @@
     <string>Ctrl+O</string>
    </property>
   </action>
+  <action name="actionOpen_2">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a Graph.gml</string>
+   </property>
+  </action>
   <action name="actionSave">
    <property name="icon">
     <iconset>

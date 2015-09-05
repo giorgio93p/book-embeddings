@@ -7,11 +7,8 @@
 
 /*
  *
- * added colors.h
- *
- * add bc tree
- *
- */
+ * cleaned some garbage comments
+ **/
 
 
 int main(int argc, char *argv[])

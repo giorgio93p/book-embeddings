@@ -1,5 +1,5 @@
-#ifndef BCTSCENE_H
-#define BCTSCENE_H
+#ifndef AGSCENE_H
+#define AGSCENE_H
 
 #include <vector>
 #include <QGraphicsScene>
@@ -15,17 +15,20 @@
  * all the nodes and edges in the form of QGraphicsItems.
  */
 
-class BCTScene : public QGraphicsScene
+class AGNode;
+class AuxiliaryGraph;
+class MainWindow;
+class AGScene : public QGraphicsScene
 {
 public:
-    BCTScene(const Graph& g, const double width=250.0, const double height=50.0);
+    AGScene( AuxiliaryGraph* g,MainWindow* mainwindow,const double width=250.0, const double height=50.0);
     //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
 private:
 
-    std::unordered_map<Node, QGraphicsEllipseItem*> nodes;
+    std::unordered_map<Node, AGNode*> nodes;
     std::unordered_map<Edge, QGraphicsItem*> edges;
 
 };
 
-#endif // BCTSCENE_H
+#endif // AGSCENE_H
