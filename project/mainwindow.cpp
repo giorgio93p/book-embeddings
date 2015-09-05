@@ -64,9 +64,8 @@ void MainWindow::drawBookEmbeddedGraph(){
                               // that is, having all of its colours inside
 
     //Remove previous page drawings
-    QLayoutItem *child;
-    while ((child = embedding_drawing->layout()->takeAt(0)) != 0) {
-        delete child;
+    for(QGraphicsView* view : pageViews){
+        delete view->parent();
     }
 
     //Draw pages
@@ -94,7 +93,7 @@ void MainWindow::add_page_drawing(int page){
     ((QVBoxLayout*)embedding_drawing->layout())->insertWidget(page,pageDrawing);
 
     QGraphicsView* view = new QGraphicsView(pageDrawing);
-    pageViews.push_back(view);
+    pageViews.insert(pageViews.begin()+page,view);
     pageDrawing->layout()->addWidget(view);
 
     QVBoxLayout* pageSidebar = new QVBoxLayout();
@@ -119,6 +118,10 @@ void MainWindow::add_page_drawing(int page){
     connect(del,SIGNAL(pressed()),scene,SLOT(on_remove_page_request()));
 
     number_of_pages_indicator->setNum(mainGraph->getNpages());
+
+    for(int i=page+1; i<pageViews.size(); i++){
+        ((PageScene*)pageViews[i]->scene())->setPageNumber(i);
+    }
 }
 
 void MainWindow::remove_page_drawing(int page){
@@ -534,7 +537,7 @@ void MainWindow::move_edge(Edge &e){
     int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
                                          tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
     if (!ok || newPage==currPage) return;
-    commandHistory->activeStack()->push(new EdgeMoveCommand(e,(PageScene*)pageViews[currPage]->scene(),(PageScene*)pageViews[newPage]->scene(),mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
+    commandHistory->activeStack()->push(new EdgeMoveCommand(e,currPage,newPage,&pageViews,mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
 }
 
 void MainWindow::on_remove_page(int page){

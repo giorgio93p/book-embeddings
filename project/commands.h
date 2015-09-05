@@ -7,14 +7,15 @@
 class EdgeMoveCommand : public QUndoCommand{
 
     Edge edge;
-    PageScene* fromScene;
-    PageScene* toScene;
+    int from;
+    int to;
+    std::vector<QGraphicsView*>* views;
     GraphScene* graphScene;
     QLabel* crossingsIndicator;
     BookEmbeddedGraph* graph;
 
 public:
-    EdgeMoveCommand(Edge &e, PageScene* fromScene, PageScene* to, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings);
+    EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<QGraphicsView *> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings);
     void undo();
     void redo();
 private:

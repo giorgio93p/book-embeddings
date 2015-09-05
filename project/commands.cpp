@@ -2,31 +2,30 @@
 #include "pagescene.h"
 #include "graphscene.h"
 
-EdgeMoveCommand::EdgeMoveCommand(Edge &e, PageScene* from, PageScene* to, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings){
+EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<QGraphicsView*> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings){
     setText("Move edge");
     edge = e;
-    fromScene = from;
-    toScene = to;
+    from = fromPage;
+    to = toPage;
     graph = g;
+    views = pageViews;
     graphScene = gs;
     crossingsIndicator = crossings;
 }
 
 void EdgeMoveCommand::moveEdge(bool reverse){
-    graph->moveToPage(edge,(reverse?fromScene:toScene)->pageNumber());
+    graph->moveToPage(edge,reverse?from:to);
 
-    if(!reverse){
-        fromScene->removeEdge(edge);
-        toScene->addEdge(edge);
-    }else{
-        toScene->removeEdge(edge);
-        fromScene->addEdge(edge);
-    }
+    PageScene* fromScene = (PageScene*)(views->at(reverse?to:from)->scene());
+    PageScene* toScene = (PageScene*)(views->at(reverse?from:to)->scene());
+
+    fromScene->removeEdge(edge);
+    toScene->addEdge(edge);
     fromScene->update();
     toScene->update();
 
     graphScene->removeEdge(edge);
-    graphScene->addEdge(edge, (reverse?fromScene:toScene)->getColour());
+    graphScene->addEdge(edge, toScene->getColour());
 
     crossingsIndicator->setNum(graph->getNcrossings());
 }
