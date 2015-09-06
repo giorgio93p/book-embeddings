@@ -10,19 +10,19 @@
  * It is used as a scene that shows a single page.
  */
 
+//class MainWind
+
 
 
 PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) : m_width(width){
     //Paint Nodes
-
-
-
     colour = col;
     mainWindow = w;
     page = p;
     pageNumberIndicator = pageNumber;
     crossingsIndicator = crossings;
     deletePageButton = del;
+
 
     deletePageButton->setEnabled(true);
     pageNumberIndicator->setNum(page);

@@ -10,7 +10,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include "graphs.h"
-//#include "node_graphics_item.h"
 #include "colors.h"
 #include "page_node.h"
 #include <unordered_map>

@@ -1,11 +1,13 @@
 #include "graphscene.h"
 #include "colors.h"
+#include "mainwindow.h"
 
 #include <iostream>
 
-GraphScene::GraphScene(BookEmbeddedGraph& g, const double width, const double height){
+GraphScene::GraphScene(BookEmbeddedGraph& g,MainWindow* w, const double width, const double height){
     //Paint Nodes
     nodes = new std::unordered_map<Node,QGraphicsEllipseItem*>();
+    mainWindow=w;
 
     Node v;
     forall_nodes(v,g){
@@ -26,7 +28,7 @@ GraphScene::GraphScene(BookEmbeddedGraph& g, const double width, const double he
 }
 
 void GraphScene::addEdgeInitial(const Edge &e, const int page){
-    addEdge(e,getPageColor(page),2);
+    addEdge(e,mainWindow->getPageColour(page),2);
 }
 
 void GraphScene::addEdge(const Edge &e, const QColor col, const int width){

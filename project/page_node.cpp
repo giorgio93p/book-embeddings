@@ -10,10 +10,20 @@ PageNode::PageNode(PageScene *scene, const Node& v, int i, int n, qreal inv) : p
 }
 
 QVariant PageNode::itemChange(GraphicsItemChange change, const QVariant & value){
+
+
     if (change == ItemPositionChange && scene()) {
+        //node has changed its position (even slightly)-> we redraw it. We
+        // set its y position to 0, because we don't want it to be able
+        //to move on the y axis.
+
         QPointF newPos = value.toPointF();
+
+
         qreal distCovered = newPos.rx();
 
+
+        //???
         if (distCovered < -index * interval - interval / 4) {
             newPos.setX(-index * interval - interval / 4);
         }else if (distCovered > (numNodes - index - 1) * interval + interval / 4) {
@@ -62,8 +72,14 @@ void PageNode::mouseReleaseEvent(QGraphicsSceneMouseEvent * event){
             if (needToRedraw){
                 //calculate finalPos
                 int finalPos = ceil((finalCoords.rx() + width) / interval);
-                scene()->window()->getMainGraph()->updatePermutation(index, finalPos);
 
+                if (scene()->window()->isWholeGraphModeOn() )
+                    scene()->window()->getMainGraph()->updatePermutation(index, finalPos);
+                else{
+                    scene()->window()->getMainGraph()->updatePermutation(index, finalPos);
+
+                    scene()->window()->getCurrBC()->updatePermutation(index,finalPos);
+                }
                 scene()->window()->enableRedraw();
             }else{
 

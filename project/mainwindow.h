@@ -111,6 +111,8 @@ public:
     ~MainWindow() = default;
     //vector<Page> *pages;(
     BookEmbeddedGraph* getMainGraph() const { return mainGraph;}
+    BiconnectedComponent* getCurrBC() const { return currBC;}
+
     void enableRedraw();
 
     void redrawPages();
@@ -120,6 +122,7 @@ public:
     bool isWholeGraphModeOn() {
         return wholeGraphMode;
     }
+    QColor getPageColour(int pageno);
 
 
 private:

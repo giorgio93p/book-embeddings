@@ -241,10 +241,7 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph& graph, bool weareusingreferenc
     ncrossings = 0;
     calculateCrossings();
 
-    forall_nodes(v,g){
 
-        cout << "DEBUG: graph newBC has nodes";
-    }
     std::cout << "exiting BookEmbeddedGraph Constructor (with references)" << std::endl;
 
 

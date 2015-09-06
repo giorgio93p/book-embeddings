@@ -12,10 +12,10 @@
 class ColourCloset
 {
 public:
-    ColourCloset();
-    QColor getPaint();
-    void returnPaint(QColor);
-    void returnAll();
+    ColourCloset();  //class constructor
+    QColor getPaint();//returns a colour from the ones available
+    void returnPaint(QColor); //make given colour available again
+    void returnAll();        //makes all colours available
 private:
 
     std::vector<QColor> *availableColours;
