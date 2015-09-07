@@ -38,7 +38,7 @@ class Graph  {
         ogdf::Graph& g2; //this is a reference to an ogdf graph!
         ogdf::GraphAttributes attr;
         bool use_g2; //this is set to true when we use a reference
-        //to an ogdf graph instead of a graph
+        //to an ogdf graph instead of a graphz
     private:
         std::unordered_map<Edge,int> e_to_int;
         std::unordered_map<Node,int> n_to_int;
@@ -120,6 +120,7 @@ class Graph  {
         }
         int numberOfNodes() const {
             const ogdf::Graph& g = (use_g2) ? g2:g1;
+
 
             return g.numberOfNodes();
         }
@@ -325,7 +326,7 @@ class BCTree {
 
 
     public:
-        BCTree(Graph &g);
+        BCTree(Graph g);
 
         const ogdf::Graph& getAuxiliaryGraph() {
             //ogdf::Graph &ax = ogBCT.auxiliaryGraph();

@@ -10,17 +10,19 @@
  * It is used as a scene that shows a single page.
  */
 
+//class MainWind
+
 
 
 PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) : m_width(width){
     //Paint Nodes
-
     colour = col;
     mainWindow = w;
     page = p;
     pageNumberIndicator = pageNumber;
     crossingsIndicator = crossings;
     deletePageButton = del;
+
 
     deletePageButton->setEnabled(true);
     pageNumberIndicator->setNum(page);
@@ -48,7 +50,6 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
         addItem(el);
         //std::cout << "nodePositions[" << i << "].x(): " << nodePositions[i].x() << std::endl;
         //std::cout << "Node " << v->index() <<  " drawn at position " << i << " (" << el->scenePos().x() << "," << el->scenePos().y() << ")" << std::endl;
-
         (*nodes)[v] = el;
 
         connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));

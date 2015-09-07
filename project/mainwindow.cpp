@@ -4,7 +4,6 @@
 #include "graphscene.h"
 #include "pagescene.h"
 #include "agscene.h"
-#include "colors.h"
 #include <QInputDialog>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -19,6 +18,7 @@
 
 #include "auxiliarygraph.h"
 #include "commands.h"
+#include "pagescene.h"
 
 #define WINDOW_TITLE tr("P.E.O.S.")
 
@@ -52,15 +52,15 @@ MainWindow::MainWindow(QWidget *parent) :
     redoAction->setShortcut(QKeySequence::Redo);
     toolBar->addAction(redoAction);
     menuEdit->addAction(redoAction);
+
+    wholeGraphMode=true;
 }
 
 void MainWindow::drawBookEmbeddedGraph(){
-    //Draw graph
-    delete graphView->scene(); //delete scene that shows the whole graph
-    mainGraph->buildLayout(-graphView->width(),-graphView->height(),graphView->width(),graphView->height());
-    GraphScene* gs = new GraphScene(*mainGraph);
-    graphView->setScene(gs);
-    //graphView->fitInView(gs->sceneRect());
+
+    //kosmas 6/9: changed the order. first pages are drawn, then the main graph.
+    //the reason for this is because it was more convenient to give colours to each page
+    // and then paint each maingraph edge according to the colour assigned to the pageview it is in.
 
     colourCloset.returnAll(); // the returnAll method simply resets the closet to its intial state
                               // that is, having all of its colours inside
@@ -79,9 +79,27 @@ void MainWindow::drawBookEmbeddedGraph(){
     actionRedraw->setEnabled(false);
 
     commandHistory->setActiveStack(commandHistory->stacks().at(0));
+    //Draw graph
+    delete graphView->scene(); //delete scene that shows the whole graph
+    mainGraph->buildLayout(-graphView->width(),-graphView->height(),graphView->width(),graphView->height());
+    GraphScene* gs = new GraphScene(*mainGraph,this);
+    graphView->setScene(gs);
+    //graphView->fitInView(gs->sceneRect());
+
+
+
+
 }
 
 void MainWindow::add_page_drawing(int page){
+
+
+    BookEmbeddedGraph* graphToDraw=(wholeGraphMode)?mainGraph : currBC;
+
+    if (!wholeGraphMode) return;
+
+
+
 
     /* embedding_drawing: a widget that we have created with QTDesigner.
      * It is used as ancestor widget for all page views.
@@ -114,7 +132,9 @@ void MainWindow::add_page_drawing(int page){
     del->setToolTip(tr("Delete page"));
     pageSidebar->addWidget(del);
 
-    PageScene* scene = new PageScene(*mainGraph,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
+
+
+    PageScene* scene = new PageScene(*graphToDraw,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
     view->setScene(scene);
     scene->setCrossings(mainGraph->getNcrossings(page));
     connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));
@@ -174,6 +194,7 @@ void MainWindow::drawBCTree() {
 }
 
 bool MainWindow::openBookEmbeddedGraph(std::string filename){
+    wholeGraphMode=true;
     BookEmbeddedGraph* temp = new BookEmbeddedGraph();
     if (temp->readGML(filename)){
         for(QUndoStack* s : commandHistory->stacks()){
@@ -184,17 +205,14 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         //delete mainGraph;
         mainGraph = temp;
 
-        cout << endl << endl << mainGraph->getNcrossings() << endl;
-        //std::cout << "Read Successful!!!!!" << std::endl;
-        //std::cout << "Number of nodes in read graph ==" << mainGraph->numberOfNodes() << endl;
-        //std::cout << "Number of edges in read graph ==" << mainGraph->numberOfEdges() << endl;
+
+        this->drawBookEmbeddedGraph();
         this->drawBCTree(); //drawBCTree
                             //added by kosms
                             //made to draw the Biconnected Components Tree
                             // and to split the maingraph into
                             // its biconnected components and storing
                             // them into the vector called biconnectedComponenets
-        this->drawBookEmbeddedGraph();
         emit number_of_nodes_changed(mainGraph->numberOfNodes());
         emit number_of_edges_changed(mainGraph->numberOfEdges());
         emit crossings_changed(std::vector<int>());
@@ -205,6 +223,15 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         //delete temp;
         return false;
     }
+}
+
+QColor MainWindow::getPageColour(int pageno) {
+    //this method returns the colour that has been assigned to
+    //a pagescene. Pageno is the index of the pageViews array
+    //said scene is stored in.
+
+    PageScene* scene = (PageScene*)pageViews[pageno]->scene();
+    return scene->getColour();
 }
 
 void MainWindow::on_actionAddPage_triggered(){
@@ -227,6 +254,7 @@ void MainWindow::on_actionOpen_triggered()
         std::string fileNameStr = fileName.toUtf8().constData();//PROSOXI PAIZEI NA MIN PAIZEI PADOU
         file.close();
         if(openBookEmbeddedGraph(fileNameStr)){
+
             QMessageBox::information(this,tr("Read Book Embedded Graph"),tr("Successful"));
             setWindowTitle(WINDOW_TITLE + tr(" - ") + fileName);
             actionSave_as->setEnabled(true);
@@ -374,7 +402,5 @@ void MainWindow::loadBC(BiconnectedComponent* currbc) {
     cout << "loading another biconnected component!!" << endl;
     currBC = currbc;
     wholeGraphMode = false;
-    cout << currBC->numberOfNodes();
-
-    //redrawPages();
+    cout << "  " << currBC->numberOfEdges() << endl;
 }

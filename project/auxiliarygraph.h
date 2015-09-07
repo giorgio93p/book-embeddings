@@ -3,15 +3,23 @@
 #include "graphs.h"
 
 
+/* this class is my (kosmas hier) latest big contribution to this project.
+ * it is responsible for find the biconnected components of the mainGraph,
+ * creating mapping tables from/to mainGraph from/to each biconnectedComponent
+ *
+ * creating the BiconnectedComponent graphs.
+ * */
+
 class BiconnectedComponent;
 
-class AuxiliaryGraph  //public Graph
+class AuxiliaryGraph //: public Graph
 {
     BookEmbeddedGraph* originalGraph;
     BCTree bCTreeObj;
     const ogdf::Graph& g;
     ogdf::GraphAttributes attr;
-    std::vector<ogdf::Graph> subGraphs;
+    //ogdf::GraphAttributes attr;
+    std::vector<ogdf::Graph*> subGraphs;
     std::unordered_map<Node,bool> is_cut_node;
     //each biconnected component has a reference to a graph,
     //so we have to store the graphs themselves somewhere.

@@ -23,6 +23,7 @@ AGScene::AGScene(AuxiliaryGraph* g,MainWindow* mainwindow,const double width, co
 
         if (g->isCutNode(v) ) continue;
         BiconnectedComponent* b = g->getBCOf(v);
+
         AGNode* n = new AGNode(v,b);
         double x=g->getXcoord(v);
         double y=g->getYcoord(v);
