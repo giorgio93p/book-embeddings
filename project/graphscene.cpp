@@ -40,6 +40,7 @@ void GraphScene::addEdge(const Edge &e, const QColor col, const int width){
 
     QGraphicsItem * path = this->addLine(x1,y1,x2,y2,pen);
     path->setFlags(QGraphicsItem::ItemIsSelectable);
+    path->setZValue(0);
     (*edges)[e] = path;
 }
 
@@ -61,6 +62,7 @@ void GraphScene::addNode(const Node& v, QRectF boundingRect, const QColor col){
     QGraphicsEllipseItem* el = this->addEllipse(boundingRect,pen,brush);
 
     el->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    el->setZValue(1);
     (*nodes)[v] = el;
 }
 

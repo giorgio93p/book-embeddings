@@ -157,10 +157,13 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
 
     //vertexOrder = NULL;
 
+    permutation = std::vector<Node>(numberOfNodes());
+
     Node n;
     int i=0;
     forall_nodes(n,g){
         attr.label(n) = std::to_string(i);
+        permutation[i] = n;
         i++;
     }
 
@@ -311,8 +314,6 @@ int BookEmbeddedGraph::getPageNo(const Edge &e) const{
 }
 
 int BookEmbeddedGraph::getPosition(const Node &v) const{
-
-
     return std::stoi(attr.label(v));
 }
 
@@ -326,6 +327,12 @@ void BookEmbeddedGraph::swap(Node &v1, Node &v2){
 }
 
 void BookEmbeddedGraph::moveTo(Node &v, const int position){
+    //for(Node n : permutation){
+    //    std::cout << n->index() << " ";
+    //}
+    //std::cout << std::endl;
+    //std::cout << "Move node " << v->index() << " from position " << getPosition(v) << " to position " << position << std::endl;
+
     if(getPosition(v) > position){
         for(int i=getPosition(v); i>position; i--){
             attr.label(permutation[i-1]) = std::to_string(i);
@@ -339,6 +346,7 @@ void BookEmbeddedGraph::moveTo(Node &v, const int position){
     }
     permutation[position] = v;
     attr.label(v) = std::to_string(position);
+
     //recalculate crossings?
 }
 
@@ -435,7 +443,7 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
     if(! ogdf::GraphIO::readGML(attr,g,fileName)) return false;
 
     permutation.clear();
-    permutation.reserve(numberOfNodes());
+    permutation.resize(numberOfNodes());
     Node v;
     forall_nodes(v,g){
         permutation[getPosition(v)] = v;

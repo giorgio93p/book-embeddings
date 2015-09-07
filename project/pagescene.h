@@ -45,6 +45,7 @@ public:
     }
     void repaintEdge(const Edge e);
 
+    void redraw(BookEmbeddedGraph &g);
 private:
     std::unordered_map<Node, PageNode*> *nodes;
     std::unordered_map<Edge, embedding_edge*> *edges;
@@ -53,6 +54,7 @@ private:
     QLabel* crossingsIndicator;
     QLabel* pageNumberIndicator;
     QPushButton* deletePageButton;
+    std::vector<QPointF> nodePositions;
 
     int m_width;
 

@@ -2,67 +2,72 @@
 #include <QMenu>
 #include <QAction>
 #include <QActionEvent>
+#include <cmath>
 #include "pagescene.h"
 
+#define VSCALINGFACTOR 0.7
 
-
-embedding_edge::embedding_edge(/*double h, qreal n1, qreal n2,*/ QPainterPath *path, QPen p, const Edge &e) {
-
-
-    /*
-     *
-    height = h;
-
-    left = n1;
-    right = n2;
-    */
-
-    painterPath = path;
+embedding_edge::embedding_edge(QPointF sourceC, QPointF targetC, QPen p, const Edge &e) {
     pen = p;
-
+    sourceCenter = sourceC;
+    targetCenter = targetC;
     edge = e;
+
+    setFlag(QGraphicsItem::ItemClipsToShape);
+    setZValue(0);
+
+    adjustPainterPath();
     //std::cout << "Drawing edge " << (*e)->source() << "," << (*e)->target() << std::endl;
 }
 
+void embedding_edge::adjust(Node& v, QPointF newPosition){
+    if(v == edge->source()) sourceCenter = newPosition;
+    if(v == edge->target()) targetCenter = newPosition;
+    adjustPainterPath();
+}
 
+void embedding_edge::adjustPainterPath(){
+    const qreal left = qMin(mapFromScene(sourceCenter).x(),mapFromScene(targetCenter).x());
+    const qreal right = qMax(mapFromScene(sourceCenter).x(),mapFromScene(targetCenter).x());
+    const qreal width = right-left;
+    const qreal height = width*VSCALINGFACTOR;
 
-QRectF embedding_edge::boundingRect() const {
-    qreal left = painterPath->boundingRect().left();
-    qreal right = painterPath->boundingRect().right();
-    qreal height = painterPath->boundingRect().height();
-    qreal width = painterPath->boundingRect().width();
-
-    QRectF bounding =  QRectF(left + 0.45 * width, -height, 0.1 * width, 0.6 * height);/*QRectF(left, -height, width, height);*/
-    return bounding;
+    prepareGeometryChange();
+    painterPath = QPainterPath(QPointF(right,mapFromScene(sourceCenter).y()));
+    painterPath.arcTo(left,-height/2,width,height,0,180);//The first two arguments are the corrdinates of the top-left point.
 }
 
 void embedding_edge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget){
-    /*if (this->isSelected()) {
-        QPen aPen(Qt::darkGray);
-        aPen.setWidth(12);
-        painter->setPen(aPen);
-    }
-    else*/ painter->setPen(pen);
-    painter->drawPath(*painterPath);
+    painter->setBackgroundMode(Qt::TransparentMode);
+    painter->setPen(pen);
+    painter->drawPath(painterPath);
+    //painter->drawPath(shape());//for debugging
+}
+
+QRectF embedding_edge::boundingRect() const{
+    return painterPath.boundingRect();
 }
 
 QPainterPath embedding_edge::shape() const{
-    qreal left = painterPath->boundingRect().left();
-    qreal right = painterPath->boundingRect().right();
-    qreal height = painterPath->boundingRect().height();
-    qreal width = painterPath->boundingRect().width();
+    const qreal width = painterPath.boundingRect().width();
+    const qreal height = painterPath.boundingRect().height();
+    const qreal dx = 3; //dx and dy are used to make clicking on edge simpler
+    const qreal dy = 6; //essentialy, we draw two ellipses -which define the clickable area- around painterPath
+    const QPointF center = QPointF(painterPath.boundingRect().center().x(),painterPath.boundingRect().bottom());
 
-    //NOTE:this is the _original_ bounding rect... should we change it?
-    QRectF rect= QRectF(left, -height, width, height);
+    //instead of ellipses, we will draw line segments (easier to calculate coordinates)
+    QPointF currPoint = QPointF(painterPath.boundingRect().right(),painterPath.boundingRect().bottom());
+    QPainterPath shape = QPainterPath(currPoint);
+    for(int i=1; i<=8; i++){//first the inner one
+        currPoint = center + QPointF(std::cos(i*M_PI/8)*(width-dx)/2,-std::sin(i*M_PI/8)*(height-dy));
+        shape.lineTo(currPoint);
+    }
+    for(int i=7; i>=0; i--){//and then the outer one
+        currPoint = center + QPointF(std::cos(i*M_PI/8)*(width+dx)/2,-std::sin(i*M_PI/8)*(height+dy));
+        shape.lineTo(currPoint);
+    }
 
-    //NOTE:enable the following line with the clipsToShape flag enabled to see
-    //the area of the bounding rect used for selection
-    //QRectF rect= QRectF(left + 0.45 * width, -height, 0.1 * width, 0.6 * height);
-
-    QPainterPath path;
-    path.addRect(rect);
-
-    return path;
+    return shape;
 }
 
 QVariant embedding_edge::itemChange(GraphicsItemChange change, const QVariant & value) {

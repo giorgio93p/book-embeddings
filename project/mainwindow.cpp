@@ -137,7 +137,7 @@ void MainWindow::remove_page_drawing(int page){
     this->pageViews.erase(this->pageViews.begin()+page);
 
     this->number_of_pages_indicator->setNum(this->mainGraph->getNpages());
-    for(int i=page; i<this->mainGraph->getNpages(); i++){
+    for(int i=page; i<this->pageViews.size(); i++){
         ((PageScene*)(this->pageViews[i]->scene()))->setPageNumber(i);
     }
 
@@ -256,7 +256,7 @@ void MainWindow::on_edge_selected(Edge& e){
 
     node_stats->setEnabled(false);
     edge_stats->setEnabled(true);
-    std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") selected" << endl;
+    //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") selected" << endl;
     //edge_crossings_indicator->setNum(mainGraph->getNcrossings(e));
     edge_source_indicator->setNum(e->source()->index());
     edge_target_indicator->setNum(e->target()->index());
@@ -309,7 +309,7 @@ void MainWindow::on_edge_deselected(Edge& e){
     GraphScene* gs = (GraphScene*)graphView->scene();
     gs->changeEdgeColourAndWidth(e,ps->getColour(),2);
 
-    std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
+    //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
 }
 
 void MainWindow::on_node_selected(Node& v, int onPage){
@@ -319,7 +319,7 @@ void MainWindow::on_node_selected(Node& v, int onPage){
 
     edge_stats->setEnabled(false);
     node_stats->setEnabled(true);
-    std::cout << "Node " << v->index() << " selected" << endl;
+    //std::cout << "Node " << v->index() << " selected" << endl;
     node_deg_indicator->setNum(v->degree());
     node_index_indicator->setNum(v->index());
     stats->setCurrentWidget(node_stats);
@@ -332,7 +332,7 @@ void MainWindow::on_node_deselected(Node& v){
     node_stats->setEnabled(false);
     node_deg_indicator->clear();
     node_index_indicator->clear();
-    std::cout << "Node " << v->index() << " deselected" << endl;
+    //std::cout << "Node " << v->index() << " deselected" << endl;
 
     GraphScene* gs = (GraphScene*)graphView->scene();
     gs->changeNodeColourAndWidth(v);
@@ -345,6 +345,12 @@ void MainWindow::move_edge(Edge &e){
                                          tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
     if (!ok || newPage==currPage) return;
     commandHistory->activeStack()->push(new EdgeMoveCommand(e,currPage,newPage,&pageViews,mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
+}
+
+void MainWindow::move_node(Node &v, int newPosition){
+    Q_ASSERT(mainGraph->getPosition(v) != newPosition);
+    deselectEverythingInAllPagesBut(-1);
+    commandHistory->activeStack()->push(new NodeMoveCommand(v,mainGraph, newPosition, &pageViews));
 }
 
 void MainWindow::on_remove_page(int page){
@@ -363,28 +369,6 @@ void MainWindow::on_actionSave_triggered(){
     if(mainGraph->writeGML(currentFile)) std::cout << "Graph saved to " << currentFile << endl;
 }
 
-void MainWindow::enableRedraw(){
-    actionRedraw->setEnabled(true);
-}
-
-void MainWindow::on_actionRedraw_triggered(){
-    for(int p=pageViews.size()-1; p>=0; p--){
-        embedding_drawing->layout()->removeWidget(pageViews[p]);
-        delete pageViews[p]->scene();
-        delete pageViews[p];
-        pageViews.pop_back();
-    }
-    colourCloset.returnAll();//kosm: this is necessary in order
-                             //for our colouring mechanism to work.
-
-    for(int p=0; p<mainGraph->getNpages(); p++){
-        add_page_drawing(p);
-    }
-
-    actionRedraw->setEnabled(false);
-}
-
-
 void MainWindow::loadBC(BiconnectedComponent* currbc) {
 
     cout << "loading another biconnected component!!" << endl;
@@ -393,32 +377,4 @@ void MainWindow::loadBC(BiconnectedComponent* currbc) {
     cout << currBC->numberOfNodes();
 
     //redrawPages();
-
-
-
-
-
-}
-
-void MainWindow::redrawPages() {
-
-
-    colourCloset.returnAll(); // the returnAll method simply resets the closet to its intial state
-                              // that is, having all of its colours inside
-    //Draw pages
-    for(int p=pageViews.size()-1; p>=0; p--){
-        embedding_drawing->layout()->removeWidget(pageViews[p]);
-        QGraphicsScene *pp = pageViews[p]->scene();
-        delete pageViews[p]->scene();
-        delete pageViews[p];
-        pageViews.pop_back();
-    }
-
-
-    /*
-    for(int p=0; p< currBC->getNpages(); p++){
-        add_page_drawing(p);
-    }
-    */
-    actionRedraw->setEnabled(false);
 }

@@ -29,27 +29,33 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     QBrush redBrush(Qt::red);
     QPen blackPen(Qt::black);
     blackPen.setWidth(2);
-    qreal interval=(2*width/g.numberOfNodes()); //space between two consequent vertices
+
+    nodePositions.reserve(g.numberOfNodes());
+    qreal interval=width/(g.numberOfNodes()-1); //space between two consequent vertices
+    for(int i=0; i<g.numberOfNodes(); i++){
+        nodePositions.push_back(QPointF(i*interval,0));
+    }
 
     int i=0;
     Node v;
     forall_nodes_embedded(v,g){
-        //std::cout << g.getPosition(v) << std::endl;
-        QString indexStr = QString::number(v->index());
-        QGraphicsSimpleTextItem* labelItem = this->addSimpleText(indexStr);
-        PageNode* el = new PageNode(this, v, i, g.numberOfNodes(), interval);
+        PageNode* el = new PageNode(this, v, &nodePositions);
         el->setBrush(redBrush);
         el->setPen(blackPen);
-        el->setRect(-width+i*interval,0,12,12);
+        el->setRect(0,0,12,12);
+        el->setPosition(i);
+        el->setParent(this);
         addItem(el);
-        //QGraphicsEllipseItem* el = this->addEllipse(-width+i*interval,0,12,12,blackPen,redBrush);
+        //std::cout << "nodePositions[" << i << "].x(): " << nodePositions[i].x() << std::endl;
+        //std::cout << "Node " << v->index() <<  " drawn at position " << i << " (" << el->scenePos().x() << "," << el->scenePos().y() << ")" << std::endl;
 
-        labelItem->setPos(-width+i*interval,15);
         (*nodes)[v] = el;
-        i++;
+
         connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
         connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
-        //connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
+        connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
+
+        i++;
     }
 
     //Paint Edges
@@ -63,6 +69,7 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     for (Edge e : g.edgesIn(page)) {
         this->addEdge(e);
     }
+    this->update();
 }
 
 void PageScene::repaintEdge(const Edge e) {
@@ -70,20 +77,19 @@ void PageScene::repaintEdge(const Edge e) {
 }
 
 void PageScene::addEdge(const Edge& e){
-    qreal x1 = std::min((*nodes)[e->source()]->boundingRect().center().x(),(*nodes)[e->target()]->boundingRect().center().x());
-    qreal x2 = std::max((*nodes)[e->source()]->boundingRect().center().x(),(*nodes)[e->target()]->boundingRect().center().x());
+    PageNode* source = (*nodes)[e->source()];
+    const QPointF sourceCenter = source->mapToScene(source->boundingRect().center());
+    PageNode* target = (*nodes)[e->target()];
+    const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
 
-    double vscalingfactor = 0.7;
-    double h = ((x2-x1)/2)*vscalingfactor;
-    QPainterPath* edg = new QPainterPath();
-    edg->moveTo(x2,0);
-    edg->arcTo(x1,-h,(x2-x1),2*h,0,180);
-
-    embedding_edge * path = new embedding_edge(edg, pen, e);
+    embedding_edge * path = new embedding_edge(sourceCenter, targetCenter, pen, e);
     this->addItem(path);
     path->setFlags(QGraphicsItem::ItemIsSelectable);
+    path->setParent(this);
 
     (*edges)[e]= path;
+    source->addIncidentEdge(path);
+    target->addIncidentEdge(path);
 
     deletePageButton->setEnabled(false);
 
@@ -116,8 +122,21 @@ MainWindow* PageScene::window(){
     return mainWindow;
 }
 
+void PageScene::redraw(BookEmbeddedGraph& g){
+    //Move nodes
+    Q_ASSERT(g.numberOfNodes()==nodes->size());
+    int i=0;
+    Node v;
+    forall_nodes_embedded(v,g){
+        PageNode* nodeGraphic = (*nodes)[v];
+        //std::cout << "node " << v->index() << " from " << nodeGraphic->scenePos().x() << " to " << nodePositions[i].x() << std::endl;
+        nodeGraphic->setPosition(i);
 
+        i++;
+    }
 
+    this->update();
+}
 
 void PageScene::deselectAll() {
 
