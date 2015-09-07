@@ -29,7 +29,6 @@ public:
 
     PageScene(const BookEmbeddedGraph& g, const int p, MainWindow *w, QColor col, QLabel* pageNumber, QLabel* crossings, QPushButton* del, int width=250, int height=50);
     int width();
-    MainWindow* window();
 
     void deselectAll();
 
@@ -45,6 +44,7 @@ public:
     void repaintEdge(const Edge e);
 
     void redraw(BookEmbeddedGraph &g);
+    void moveNode(Node &v, QPointF toPos);
 private:
     std::unordered_map<Node, PageNode*> *nodes;
     std::unordered_map<Edge, embedding_edge*> *edges;

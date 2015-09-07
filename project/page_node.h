@@ -34,8 +34,8 @@ protected:
 signals:
         void was_selected(Node&,int);
         void was_deselected(Node&);
-
-        void move(Node&,int);
+        void was_dragged(Node&,int atPage, QPointF toPos);
+        void move(Node&,int atPage);
 private:
         void adjustIncidentEdges(QPointF newPosition);
 };

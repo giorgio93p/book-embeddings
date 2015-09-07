@@ -146,11 +146,6 @@ void MainWindow::add_page_drawing(int page){
     zoomout->setIcon(QIcon(":zoom-out"));
     zoomButtons->addWidget(zoomout);
     connect(zoomout,SIGNAL(pressed()),view,SLOT(zoomOut()));
-    QPushButton* resetzoom = new QPushButton(pageDrawing);
-    resetzoom->setToolTip(tr("Reset Zoom"));
-    resetzoom->setIcon(QIcon(":zoom-fit"));
-    zoomButtons->addWidget(resetzoom);
-    connect(resetzoom,SIGNAL(pressed()),view,SLOT(resetZoom()));
 
     PageScene* scene = new PageScene(*graphToDraw,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
     view->setScene(scene);
@@ -298,8 +293,6 @@ void MainWindow::on_edge_selected(Edge& e){
 
     deselectEverythingInAllPagesBut(mainGraph->getPageNo(e));
 
-
-    node_stats->setEnabled(false);
     edge_stats->setEnabled(true);
     //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") selected" << endl;
     //edge_crossings_indicator->setNum(mainGraph->getNcrossings(e));
@@ -361,8 +354,6 @@ void MainWindow::on_node_selected(Node& v, int onPage){
 
     deselectEverythingInAllPagesBut(onPage);
 
-
-    edge_stats->setEnabled(false);
     node_stats->setEnabled(true);
     //std::cout << "Node " << v->index() << " selected" << endl;
     node_deg_indicator->setNum(v->degree());
@@ -396,6 +387,13 @@ void MainWindow::move_node(Node &v, int newPosition){
     Q_ASSERT(mainGraph->getPosition(v) != newPosition);
     deselectEverythingInAllPagesBut(-1);
     commandHistory->activeStack()->push(new NodeMoveCommand(v,mainGraph, newPosition, &pageViews));
+}
+
+void MainWindow::on_node_dragged(Node&v, int atPage, QPointF toPos){
+    for(PageView* view : pageViews){
+        if(view->scene()->pageNumber() == atPage) continue;
+        view->scene()->moveNode(v, toPos);
+    }
 }
 
 void MainWindow::on_remove_page(int page){

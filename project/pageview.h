@@ -7,7 +7,6 @@
 class PageView : public QGraphicsView
 {
     Q_OBJECT
-    void scaleView(qreal scaleFactor);
 public:
     PageView();
     PageScene *scene();
@@ -17,7 +16,8 @@ public:
 public slots:
     void zoomIn();
     void zoomOut();
-    void resetZoom();
+private:
+    void scaleView(qreal scaleFactor);
 };
 
 #endif // PAGEVIEW_H

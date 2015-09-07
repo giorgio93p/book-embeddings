@@ -21,10 +21,6 @@ void PageView::zoomOut(){
     scaleView(1 / qreal(1.2));
 }
 
-void PageView::resetZoom(){
-    scale(1,1);
-}
-
 PageScene *PageView::scene(){
     return (PageScene*) QGraphicsView::scene();
 }
@@ -32,7 +28,7 @@ PageScene *PageView::scene(){
 #ifndef QT_NO_WHEELEVENT
 //! [5]
 void PageView::wheelEvent(QWheelEvent *event){ //copied from elasticnodes example
-    scaleView(pow((double)2, -event->delta() / 240.0));
+    scaleView(pow((double)2, event->delta() / 240.0));
 }
 //! [5]
 #endif

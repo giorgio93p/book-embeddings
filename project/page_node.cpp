@@ -7,11 +7,12 @@
 
 PageNode::PageNode(PageScene *scene, const Node& v, std::vector<QPointF>* positions) : pageScene(scene), node(v), nodePositions(positions){
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
-    position = v->index();
     nodeDragged = false;
+    position = v->index();
     incidentEdges = std::unordered_set<embedding_edge*>();
 
     label = scene->addSimpleText(QString::number(v->index()));
+    label->setPos(QPointF(nodePositions->at(position).x(), nodePositions->at(position).y()+15));
 
     setZValue(1);
 }
@@ -37,6 +38,7 @@ QVariant PageNode::itemChange(GraphicsItemChange change, const QVariant & value)
 
         label->setPos(QPointF(newPos.x(), newPos.y()+15));
         adjustIncidentEdges(newPos);
+        emit was_dragged(node,pageScene->pageNumber(),newPos);
         return newPos;
     } else if (change == QGraphicsItem::ItemSelectedChange) {
         if(value.toBool()) {
@@ -110,6 +112,7 @@ void PageNode::mouseReleaseEvent(QGraphicsSceneMouseEvent * event){
             }
             //execution goes here if node was not moved past another node
             resetPosition();
+            emit was_dragged(node,pageScene->pageNumber(),pos());
         }
 
     }

@@ -144,6 +144,8 @@ public slots:
 
     void move_edge(Edge&);
     void move_node(Node&, int newPosition);
+    void on_node_dragged(Node &v, int atPage, QPointF toPos);
+
     void on_remove_page(int);
     void on_crossings_changed(std::vector<int>);
 

@@ -54,6 +54,7 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
 
         connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
         connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
+        connect(el,SIGNAL(was_dragged(Node&,int,QPointF)),mainWindow,SLOT(on_node_dragged(Node&,int,QPointF)));
         connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
 
         i++;
@@ -123,10 +124,6 @@ int PageScene::width() {
     return m_width;
 }
 
-MainWindow* PageScene::window(){
-    return mainWindow;
-}
-
 void PageScene::redraw(BookEmbeddedGraph& g){
     //Move nodes
     Q_ASSERT(g.numberOfNodes()==nodes->size());
@@ -141,6 +138,10 @@ void PageScene::redraw(BookEmbeddedGraph& g){
     }
 
     this->update();
+}
+
+void PageScene::moveNode(Node& v, QPointF toPos){
+    (*nodes)[v]->setPos(toPos);
 }
 
 void PageScene::deselectAll() {
