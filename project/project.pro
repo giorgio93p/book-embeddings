@@ -16,32 +16,31 @@ SOURCES += main.cpp\
         mainwindow.cpp\
         graphscene.cpp \
     graphs.cpp \
-    embedding_edge.cpp \
     pagescene.cpp \
     agscene.cpp \
     colourcloset.cpp \
     biconnectedcomponent.cpp\
-    page_node.cpp \
     auxiliarygraph.cpp \
     agnode.cpp \
     commands.cpp \
-    pageview.cpp
+    pageview.cpp \
+    edge_graphics.cpp \
+    node_graphics.cpp
 
 
 HEADERS  += mainwindow.h \
             graphscene.h \
     graphs.h \
-    embedding_edge.h \
     pagescene.h \
-    colors.h \
     agscene.h \
     colourcloset.h \
     biconnectedcomponent.h\
-    page_node.h \
     auxiliarygraph.h \
     agnode.h \
     commands.h \
-    pageview.h
+    pageview.h \
+    edge_graphics.h \
+    node_graphics.h
 
 FORMS    += mainwindow.ui
 

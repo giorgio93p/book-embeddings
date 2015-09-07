@@ -1,7 +1,7 @@
 #include "pageview.h"
 
 PageView::PageView(){
-
+    setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 }
 
 
@@ -27,8 +27,10 @@ PageScene *PageView::scene(){
 
 #ifndef QT_NO_WHEELEVENT
 //! [5]
-void PageView::wheelEvent(QWheelEvent *event){ //copied from elasticnodes example
-    scaleView(pow((double)2, event->delta() / 240.0));
+void PageView::wheelEvent(QWheelEvent *event){
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    scaleView(pow((double)2, event->delta() / 240.0));//copied from elasticnodes example
+    setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 }
 //! [5]
 #endif

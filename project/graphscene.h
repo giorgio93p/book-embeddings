@@ -8,32 +8,30 @@
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
 #include "graphs.h"
-#include "embedding_edge.h"
-
-#define DEFAULT_NODE_WIDTH 4
-
+#include "edge_graphics.h"
+#include "node_graphics.h"
 class MainWindow;
 
 class GraphScene : public QGraphicsScene
 {
+    Q_OBJECT
 public:
     GraphScene(BookEmbeddedGraph &g,MainWindow* w, const double width=250.0, const double height=50.0);
     //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
     void addEdgeInitial(const Edge &e, const int page);
-    void addEdge(const Edge &e, const QColor, const int width = 2);
+    void addEdge(const Edge &e, const QColor);
     void removeEdge(const Edge &e);
-    void changeEdgeColourAndWidth(const Edge &e, const QColor col, const int width = 2);
 
-    void addNode(const Node &, QRectF boundingRect, const QColor col=Qt::black);
+    void addNode(const Node &, QPointF position);
     void removeNode(const Node &v);
-    void changeNodeColourAndWidth(const Node& v, const QColor col=Qt::black, const int width = DEFAULT_NODE_WIDTH);
+    void highlightNode(const Node &v, bool enable);
+    void deselectAll();
+    void highlightEdge(const Edge &e, bool enable);
 private:
-    std::unordered_map<Node, QGraphicsEllipseItem*> *nodes;
-    std::unordered_map<Edge, QGraphicsItem*> *edges;
+    std::unordered_map<Node, GraphNode*> *nodes;
+    std::unordered_map<Edge, GraphEdge*> *edges;
     MainWindow* mainWindow;
-
-
 };
 
 #endif // GRAPHSCENE_H

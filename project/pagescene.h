@@ -10,11 +10,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include "graphs.h"
-#include "colors.h"
-#include "page_node.h"
+#include "node_graphics.h"
 #include <unordered_map>
 
-class embedding_edge;
+class PageEdge;
 class MainWindow;
 
 class PageScene : public QGraphicsScene
@@ -22,7 +21,6 @@ class PageScene : public QGraphicsScene
     Q_OBJECT
     QColor colour;
 
-    QPen pen;
     int page;
 
 public:
@@ -45,9 +43,11 @@ public:
 
     void redraw(BookEmbeddedGraph &g);
     void moveNode(Node &v, QPointF toPos);
+    void highlightNode(Node &v, bool enable);
+    void highlightEdge(Edge &v, bool enable);
 private:
     std::unordered_map<Node, PageNode*> *nodes;
-    std::unordered_map<Edge, embedding_edge*> *edges;
+    std::unordered_map<Edge, PageEdge*> *edges;
     QRectF movementPath;
     MainWindow* mainWindow;
     QLabel* crossingsIndicator;

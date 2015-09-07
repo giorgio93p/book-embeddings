@@ -2,17 +2,13 @@
 #include "mainwindow.h"
 #include <iostream>
 #include <QGraphicsView>
-#include "embedding_edge.h"
+#include "edge_graphics.h"
 
 
 /*
  * This class used to be called "BookEmbeddedScene", but for obvious reasons it was renamed.
  * It is used as a scene that shows a single page.
  */
-
-//class MainWind
-
-
 
 PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) : m_width(width){
     //Paint Nodes
@@ -28,9 +24,6 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     pageNumberIndicator->setNum(page);
 
     nodes = new std::unordered_map<Node,PageNode*>();
-    QBrush redBrush(Qt::red);
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(2);
 
     nodePositions.reserve(g.numberOfNodes());
     qreal interval=width/(g.numberOfNodes()-1); //space between two consequent vertices
@@ -42,9 +35,6 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     Node v;
     forall_nodes_embedded(v,g){
         PageNode* el = new PageNode(this, v, &nodePositions);
-        el->setBrush(redBrush);
-        el->setPen(blackPen);
-        el->setRect(0,0,12,12);
         el->setPosition(i);
         el->setParent(this);
         addItem(el);
@@ -62,11 +52,7 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
 
     //Paint Edges
     //std::printf("%d is the number of edges here\n",m);
-    edges = new std::unordered_map<Edge, embedding_edge*>();
-
-
-    pen = QPen(colour);
-    pen.setWidth(2);
+    edges = new std::unordered_map<Edge, PageEdge*>();
 
     for (Edge e : g.edgesIn(page)) {
         this->addEdge(e);
@@ -84,9 +70,8 @@ void PageScene::addEdge(const Edge& e){
     PageNode* target = (*nodes)[e->target()];
     const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
 
-    embedding_edge * path = new embedding_edge(sourceCenter, targetCenter, pen, e);
+    PageEdge * path = new PageEdge(sourceCenter, targetCenter, colour, e);
     this->addItem(path);
-    path->setFlags(QGraphicsItem::ItemIsSelectable);
     path->setParent(this);
 
     (*edges)[e]= path;
@@ -156,4 +141,11 @@ void PageScene::deselectAll() {
         curr->setSelected(false);
     }
 
+}
+
+void PageScene::highlightNode(Node& v, bool enable){
+    nodes->at(v)->toggleHighlight(enable);
+}
+void PageScene::highlightEdge(Edge& v, bool enable){
+    edges->at(v)->toggleHighlight(enable);
 }

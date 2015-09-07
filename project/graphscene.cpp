@@ -1,55 +1,40 @@
 #include "graphscene.h"
-#include "colors.h"
 #include "mainwindow.h"
 
 #include <iostream>
 
 GraphScene::GraphScene(BookEmbeddedGraph& g,MainWindow* w, const double width, const double height){
     //Paint Nodes
-    nodes = new std::unordered_map<Node,QGraphicsEllipseItem*>();
+    nodes = new std::unordered_map<Node,GraphNode*>();
     mainWindow=w;
 
     Node v;
     forall_nodes(v,g){
-        int w = DEFAULT_NODE_WIDTH;
-        qreal x = g.getXcoord(v);
-        qreal y = g.getYcoord(v);
-        QRectF rect = QRectF(QPointF(x-w,y-w),QPointF(x+w,y+w));
-        addNode(v,rect);
+        addNode(v,QPointF(g.getXcoord(v),g.getYcoord(v)));
     }
 
     //Paint Edges
-    edges = new std::unordered_map<Edge, QGraphicsItem*>();
+    edges = new std::unordered_map<Edge, GraphEdge*>();
 
     Edge e;
     forall_edges(e,g) {
-        addEdgeInitial(e,g.getPageNo(e));
+        addEdge(e,mainWindow->getPageColour(g.getPageNo(e)));
     }
 }
 
-void GraphScene::addEdgeInitial(const Edge &e, const int page){
-    addEdge(e,mainWindow->getPageColour(page),2);
-}
+void GraphScene::addEdge(const Edge &e, const QColor col){
+    GraphNode* source = (*nodes)[e->source()];
+    const QPointF sourceCenter = source->mapToScene(source->boundingRect().center());
+    GraphNode* target = (*nodes)[e->target()];
+    const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
 
-void GraphScene::addEdge(const Edge &e, const QColor col, const int width){
-    QPen pen = QPen();
-    pen.setWidth(width);
-    pen.setColor(col);
-    qreal x1 = (*nodes)[e->source()]->boundingRect().center().x();
-    qreal y1 = (*nodes)[e->source()]->boundingRect().center().y();
-    qreal x2 = (*nodes)[e->target()]->boundingRect().center().x();
-    qreal y2 = (*nodes)[e->target()]->boundingRect().center().y();
-
-    QGraphicsItem * path = this->addLine(x1,y1,x2,y2,pen);
-    path->setFlags(QGraphicsItem::ItemIsSelectable);
-    path->setZValue(0);
+    GraphEdge * path = new GraphEdge(sourceCenter,targetCenter,col,e);
+    this->addItem(path);
     (*edges)[e] = path;
-}
 
-void GraphScene::changeEdgeColourAndWidth(const Edge& e,const QColor col,const int width) {
-
-    this->removeEdge(e);
-    this->addEdge(e,col,width);
+    connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
+    connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
+    connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
 }
 
 void GraphScene::removeEdge(const Edge &e){
@@ -57,15 +42,14 @@ void GraphScene::removeEdge(const Edge &e){
     delete edges->at(e);
 }
 
-void GraphScene::addNode(const Node& v, QRectF boundingRect, const QColor col){
-    QBrush brush(col);
-    QPen pen(col);
+void GraphScene::addNode(const Node& v, QPointF position){
     //std::cout << g.getPosition(v) << std::endl;
-    QGraphicsEllipseItem* el = this->addEllipse(boundingRect,pen,brush);
-
-    el->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    el->setZValue(1);
+    GraphNode* el = new GraphNode(v);
+    this->addItem(el);
+    el->setPos(position);
     (*nodes)[v] = el;
+    connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+    connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
 }
 
 void GraphScene::removeNode(const Node& v){
@@ -73,12 +57,25 @@ void GraphScene::removeNode(const Node& v){
     delete nodes->at(v);
 }
 
-void GraphScene::changeNodeColourAndWidth(const Node& v, const QColor col, const int width){
-    qreal x = (*nodes)[v]->boundingRect().center().x();
-    qreal y = (*nodes)[v]->boundingRect().center().y();
-    QRectF rect = QRectF(QPointF(x-width,y-width),QPointF(x+width,y+width));//create new rectangle aligned at the center of the old one
-    this->removeNode(v);
-    this->addNode(v,rect,col);
+void GraphScene::highlightNode(const Node& v, bool enable){
+    nodes->at(v)->toggleHighlight(enable);
 }
 
+void GraphScene::highlightEdge(const Edge& e, bool enable){
+    edges->at(e)->toggleHighlight(enable);
+}
+
+void GraphScene::deselectAll() {
+
+    for ( auto it = edges->begin(); it != edges->end(); ++it ) {
+        QGraphicsItem* curr = (QGraphicsItem*)it->second;
+        curr->setSelected(false);
+    }
+
+    for ( auto it = nodes->begin(); it != nodes->end(); ++it ) {
+        QGraphicsItem* curr = (QGraphicsItem*)it->second;
+        curr->setSelected(false);
+    }
+
+}
 

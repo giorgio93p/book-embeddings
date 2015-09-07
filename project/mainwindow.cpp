@@ -113,6 +113,7 @@ void MainWindow::add_page_drawing(int page){
      */
     QWidget* pageDrawing = new QWidget(embedding_drawing);
     pageDrawing->setLayout(new QHBoxLayout());
+    pageDrawing->layout()->setContentsMargins(4,5,4,5);
     ((QVBoxLayout*)embedding_drawing->layout())->insertWidget(page,pageDrawing);
 
     PageView* view = new PageView();
@@ -132,6 +133,7 @@ void MainWindow::add_page_drawing(int page){
 
     QPushButton* del = new QPushButton("Delete",pageDrawing);
     del->setToolTip(tr("Delete page"));
+    del->setIcon(QIcon(":remove"));
     pageSidebar->addWidget(del);
 
     QHBoxLayout* zoomButtons = new QHBoxLayout();
@@ -303,12 +305,10 @@ void MainWindow::on_edge_selected(Edge& e){
 
     int pgno =mainGraph->getPageNo(e);
     PageScene* pg = pageViews[pgno]->scene();
-    //pg->changeEdgeColour(e,Qt::black); //TODO: implement this shit
-                                         //this method must change the colour of an edge
-                                         //we can use it to show which edge is currently selected.
+    pg->highlightEdge(e,true);
 
     GraphScene* gs = (GraphScene*)graphView->scene();
-    gs->changeEdgeColourAndWidth(e,MY_COLOR,5);
+    gs->highlightEdge(e,true);
 }
 
 void MainWindow::deselectEverythingInAllPagesBut(int pageNo) {
@@ -322,9 +322,9 @@ void MainWindow::deselectEverythingInAllPagesBut(int pageNo) {
 
         PageScene* ps = pageViews[i]->scene();
         ps->deselectAll();
-
-
     }
+
+    ((GraphScene*)graphView->scene())->deselectAll();
 }
 
 
@@ -340,12 +340,10 @@ void MainWindow::on_edge_deselected(Edge& e){
 
     int pageNo = mainGraph->getPageNo(e);
     PageScene* ps = pageViews[pageNo]->scene();
-
-    //ps->changeEdgeColour(e); //TODO: implement this shit:
-                             //changeEdgeColour(Edge e) must redraw edge e with the page colour
+    ps->highlightEdge(e,false);
 
     GraphScene* gs = (GraphScene*)graphView->scene();
-    gs->changeEdgeColourAndWidth(e,ps->getColour(),2);
+    gs->highlightEdge(e,false);
 
     //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
 }
@@ -360,8 +358,12 @@ void MainWindow::on_node_selected(Node& v, int onPage){
     node_index_indicator->setNum(v->index());
     stats->setCurrentWidget(node_stats);
 
+    for(PageView* view : pageViews){
+        view->scene()->highlightNode(v,true);
+    }
+
     GraphScene* gs = (GraphScene*)graphView->scene();
-    gs->changeNodeColourAndWidth(v,MY_COLOR,6);
+    gs->highlightNode(v,true);
 }
 
 void MainWindow::on_node_deselected(Node& v){
@@ -370,8 +372,11 @@ void MainWindow::on_node_deselected(Node& v){
     node_index_indicator->clear();
     //std::cout << "Node " << v->index() << " deselected" << endl;
 
+    for(PageView* view : pageViews){
+        view->scene()->highlightNode(v,false);
+    }
     GraphScene* gs = (GraphScene*)graphView->scene();
-    gs->changeNodeColourAndWidth(v);
+    gs->highlightNode(v,false);
 }
 
 void MainWindow::move_edge(Edge &e){

@@ -7,8 +7,7 @@
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
 #include "graphs.h"
-#include "embedding_edge.h"
-#include "colors.h"
+#include "edge_graphics.h"
 
 /*
  * scene to display a bctree. Its constructor creates
