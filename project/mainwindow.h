@@ -47,7 +47,7 @@
 
 #include "biconnectedcomponent.h"
 #include "auxiliarygraph.h"
-
+#include "pageview.h"
 #include "colourcloset.h"
 
 
@@ -66,7 +66,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
     //we use it to control the colours in pages
     //see [1]
 
-    std::vector<QGraphicsView*> pageViews;
+    std::vector<PageView*> pageViews;
     //this holds the views that show
     //each pagescene. A pagescene
     //simply displays a page.

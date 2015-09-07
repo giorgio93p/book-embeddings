@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     page_node.cpp \
     auxiliarygraph.cpp \
     agnode.cpp \
-    commands.cpp
+    commands.cpp \
+    pageview.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     page_node.h \
     auxiliarygraph.h \
     agnode.h \
-    commands.h
+    commands.h \
+    pageview.h
 
 FORMS    += mainwindow.ui
 
@@ -60,3 +62,6 @@ win32 {
     LIBS += -L$$_PRO_FILE_PWD_/../OGDF/_release -lOGDF -lCOIN
     QMAKE_CXXFLAGS +=-pthread
 }
+
+RESOURCES += \
+    icons.qrc

@@ -9,13 +9,13 @@ class EdgeMoveCommand : public QUndoCommand{
     Edge edge;
     int from;
     int to;
-    std::vector<QGraphicsView*>* views;
+    std::vector<PageView*>* views;
     GraphScene* graphScene;
     QLabel* crossingsIndicator;
     BookEmbeddedGraph* graph;
 
 public:
-    EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<QGraphicsView *> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings);
+    EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<PageView *> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings);
     void undo();
     void redo();
 private:
@@ -48,10 +48,10 @@ class NodeMoveCommand : public QUndoCommand{
     int to;
     Node node;
     BookEmbeddedGraph* graph;
-    std::vector<QGraphicsView *>* pageViews;
+    std::vector<PageView *>* pageViews;
 
 public:
-    NodeMoveCommand(Node& v, BookEmbeddedGraph*, int, std::vector<QGraphicsView *>*);
+    NodeMoveCommand(Node& v, BookEmbeddedGraph*, int, std::vector<PageView *> *);
     void undo();
     void redo();
 private:

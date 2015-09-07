@@ -11,7 +11,7 @@ PageNode::PageNode(PageScene *scene, const Node& v, std::vector<QPointF>* positi
     nodeDragged = false;
     incidentEdges = std::unordered_set<embedding_edge*>();
 
-    label = pageScene->addSimpleText(QString::number(v->index()));
+    label = scene->addSimpleText(QString::number(v->index()));
 
     setZValue(1);
 }
@@ -79,6 +79,10 @@ PageScene* PageNode::scene() {
 
 void PageNode::addIncidentEdge(embedding_edge *e){
     incidentEdges.insert(e);
+}
+
+void PageNode::removeIncidentEdge(embedding_edge *e){
+    incidentEdges.erase(e);
 }
 
 void PageNode::mouseReleaseEvent(QGraphicsSceneMouseEvent * event){

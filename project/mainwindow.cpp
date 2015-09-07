@@ -40,16 +40,18 @@ MainWindow::MainWindow(QWidget *parent) :
     actionSave->setEnabled(false);
     actionAddPage->setEnabled(false);
 
-    pageViews = std::vector<QGraphicsView*>();
+    pageViews = std::vector<PageView*>();
 
     commandHistory = new QUndoGroup(this);
     commandHistory->addStack(new QUndoStack(commandHistory));
     QAction* undoAction = commandHistory->createUndoAction(this);
     undoAction->setShortcut(QKeySequence::Undo);
+    undoAction->setIcon(QIcon(":previous"));
     toolBar->addAction(undoAction);
     menuEdit->addAction(undoAction);
     QAction* redoAction = commandHistory->createRedoAction(this);
     redoAction->setShortcut(QKeySequence::Redo);
+    redoAction->setIcon(QIcon(":next"));
     toolBar->addAction(redoAction);
     menuEdit->addAction(redoAction);
 
@@ -66,7 +68,7 @@ void MainWindow::drawBookEmbeddedGraph(){
                               // that is, having all of its colours inside
 
     //Remove previous page drawings
-    for(QGraphicsView* view : pageViews){
+    for(PageView* view : pageViews){
         delete view->parent();
     }
     pageViews.clear();
@@ -113,7 +115,7 @@ void MainWindow::add_page_drawing(int page){
     pageDrawing->setLayout(new QHBoxLayout());
     ((QVBoxLayout*)embedding_drawing->layout())->insertWidget(page,pageDrawing);
 
-    QGraphicsView* view = new QGraphicsView(pageDrawing);
+    PageView* view = new PageView();
     pageViews.insert(pageViews.begin()+page,view);
     pageDrawing->layout()->addWidget(view);
 
@@ -132,7 +134,23 @@ void MainWindow::add_page_drawing(int page){
     del->setToolTip(tr("Delete page"));
     pageSidebar->addWidget(del);
 
-
+    QHBoxLayout* zoomButtons = new QHBoxLayout();
+    pageSidebar->addLayout(zoomButtons);
+    QPushButton* zoomin = new QPushButton(pageDrawing);
+    zoomin->setToolTip(tr("Zoom In"));
+    zoomin->setIcon(QIcon(":zoom-in"));
+    zoomButtons->addWidget(zoomin);
+    connect(zoomin,SIGNAL(pressed()),view,SLOT(zoomIn()));
+    QPushButton* zoomout = new QPushButton(pageDrawing);
+    zoomout->setToolTip(tr("Zoom Out"));
+    zoomout->setIcon(QIcon(":zoom-out"));
+    zoomButtons->addWidget(zoomout);
+    connect(zoomout,SIGNAL(pressed()),view,SLOT(zoomOut()));
+    QPushButton* resetzoom = new QPushButton(pageDrawing);
+    resetzoom->setToolTip(tr("Reset Zoom"));
+    resetzoom->setIcon(QIcon(":zoom-fit"));
+    zoomButtons->addWidget(resetzoom);
+    connect(resetzoom,SIGNAL(pressed()),view,SLOT(resetZoom()));
 
     PageScene* scene = new PageScene(*graphToDraw,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
     view->setScene(scene);
@@ -143,12 +161,12 @@ void MainWindow::add_page_drawing(int page){
     number_of_pages_indicator->setNum(mainGraph->getNpages());
 
     for(int i=page+1; i<pageViews.size(); i++){
-        ((PageScene*)pageViews[i]->scene())->setPageNumber(i);
+        pageViews[i]->scene()->setPageNumber(i);
     }
 }
 
 void MainWindow::remove_page_drawing(int page){
-    PageScene *ps = (PageScene*)this->pageViews[page]->scene();
+    PageScene *ps = this->pageViews[page]->scene();
     QColor colourToBeReturned = ps->getColour(); //here we get the colour of the page
     this->colourCloset.returnPaint(colourToBeReturned); // and we return it to the closet
 
@@ -158,12 +176,11 @@ void MainWindow::remove_page_drawing(int page){
 
     this->number_of_pages_indicator->setNum(this->mainGraph->getNpages());
     for(int i=page; i<this->pageViews.size(); i++){
-        ((PageScene*)(this->pageViews[i]->scene()))->setPageNumber(i);
+        this->pageViews[i]->scene()->setPageNumber(i);
     }
 
     embedding_drawing->layout()->update();
 }
-
 
 
 void MainWindow::drawBCTree() {
@@ -230,7 +247,7 @@ QColor MainWindow::getPageColour(int pageno) {
     //a pagescene. Pageno is the index of the pageViews array
     //said scene is stored in.
 
-    PageScene* scene = (PageScene*)pageViews[pageno]->scene();
+    PageScene* scene = pageViews[pageno]->scene();
     return scene->getColour();
 }
 
@@ -292,7 +309,7 @@ void MainWindow::on_edge_selected(Edge& e){
     stats->setCurrentWidget(edge_stats);
 
     int pgno =mainGraph->getPageNo(e);
-    PageScene* pg = (PageScene*)pageViews[pgno]->scene();
+    PageScene* pg = pageViews[pgno]->scene();
     //pg->changeEdgeColour(e,Qt::black); //TODO: implement this shit
                                          //this method must change the colour of an edge
                                          //we can use it to show which edge is currently selected.
@@ -310,7 +327,7 @@ void MainWindow::deselectEverythingInAllPagesBut(int pageNo) {
                                 //is the page of the selected edge
                                 //then we won't touch
 
-        PageScene* ps = (PageScene*) pageViews[i]->scene();
+        PageScene* ps = pageViews[i]->scene();
         ps->deselectAll();
 
 
@@ -329,7 +346,7 @@ void MainWindow::on_edge_deselected(Edge& e){
 
 
     int pageNo = mainGraph->getPageNo(e);
-    PageScene* ps = (PageScene*)pageViews[pageNo]->scene();
+    PageScene* ps = pageViews[pageNo]->scene();
 
     //ps->changeEdgeColour(e); //TODO: implement this shit:
                              //changeEdgeColour(Edge e) must redraw edge e with the page colour
@@ -389,7 +406,7 @@ void MainWindow::on_remove_page(int page){
 void MainWindow::on_crossings_changed(std::vector<int> pagesChanged){
     total_crossings_indicator->setNum(mainGraph->getNcrossings());
     for(int i : pagesChanged){
-        ((PageScene*)(pageViews[i]->scene()))->setCrossings(mainGraph->getNcrossings(i));
+        pageViews[i]->scene()->setCrossings(mainGraph->getNcrossings(i));
     }
 }
 

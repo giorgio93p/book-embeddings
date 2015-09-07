@@ -349,7 +349,6 @@
     <addaction name="actionZoom_Out"/>
     <addaction name="actionReset_Zoom"/>
     <addaction name="separator"/>
-    <addaction name="actionRedraw"/>
     <addaction name="actionFit_Content"/>
     <addaction name="separator"/>
    </widget>
@@ -404,13 +403,11 @@
    <addaction name="separator"/>
    <addaction name="actionAddPage"/>
    <addaction name="separator"/>
-   <addaction name="actionRedraw"/>
-   <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/new.png</normaloff>../icons/new.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/new</normaloff>:/new</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -424,8 +421,8 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Folder Open.png</normaloff>../icons/Folder Open.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/open-folder</normaloff>:/open-folder</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
@@ -434,18 +431,10 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionOpen_2">
-   <property name="text">
-    <string>Open</string>
-   </property>
-   <property name="toolTip">
-    <string>Open a Graph.gml</string>
-   </property>
-  </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/save.png</normaloff>../icons/save.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/save</normaloff>:/save</iconset>
    </property>
    <property name="text">
     <string>&amp;Save</string>
@@ -458,6 +447,10 @@
    </property>
   </action>
   <action name="actionSave_as">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/save</normaloff>:/save</iconset>
+   </property>
    <property name="text">
     <string>Save &amp;as</string>
    </property>
@@ -471,6 +464,10 @@
    </property>
   </action>
   <action name="actionExit">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/exit</normaloff>:/exit</iconset>
+   </property>
    <property name="text">
     <string>&amp;Exit</string>
    </property>
@@ -479,6 +476,10 @@
    </property>
   </action>
   <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/previous</normaloff>:/previous</iconset>
+   </property>
    <property name="text">
     <string>Undo</string>
    </property>
@@ -487,6 +488,10 @@
    </property>
   </action>
   <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/next</normaloff>:/next</iconset>
+   </property>
    <property name="text">
     <string>Redo</string>
    </property>
@@ -496,8 +501,8 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Avosoft-Warm-Toolbar-Cut.ico</normaloff>../icons/Avosoft-Warm-Toolbar-Cut.ico</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/cut</normaloff>:/cut</iconset>
    </property>
    <property name="text">
     <string>Cut</string>
@@ -508,8 +513,8 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Copy.png</normaloff>../icons/Copy.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/copy</normaloff>:/copy</iconset>
    </property>
    <property name="text">
     <string>Copy</string>
@@ -520,8 +525,8 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/136837629872716929332x32-paste_from_clipboard-4-md.png</normaloff>../icons/136837629872716929332x32-paste_from_clipboard-4-md.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/paste</normaloff>:/paste</iconset>
    </property>
    <property name="text">
     <string>Paste</string>
@@ -531,8 +536,15 @@
    </property>
   </action>
   <action name="actionDeletePage">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/remove</normaloff>:/remove</iconset>
+   </property>
    <property name="text">
     <string>&amp;Delete Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
   <action name="actionSelecte">
@@ -557,8 +569,8 @@
   </action>
   <action name="actionZoom_In">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Zoom-In-icon.png</normaloff>../icons/Zoom-In-icon.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/zoom-in</normaloff>:/zoom-in</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;In</string>
@@ -569,8 +581,8 @@
   </action>
   <action name="actionZoom_Out">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Zoom_Out-01.png</normaloff>../icons/Zoom_Out-01.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/zoom-out</normaloff>:/zoom-out</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;Out</string>
@@ -581,8 +593,8 @@
   </action>
   <action name="actionReset_Zoom">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/zoom-fit</normaloff>:/zoom-fit</iconset>
    </property>
    <property name="text">
     <string>Reset &amp;Zoom</string>
@@ -646,16 +658,23 @@
   </action>
   <action name="actionAddPage">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Add.png</normaloff>../icons/Add.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/add</normaloff>:/add</iconset>
    </property>
    <property name="text">
     <string>&amp;Add Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="actionRedraw">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/refresh</normaloff>:/refresh</iconset>
    </property>
    <property name="text">
     <string>&amp;Redraw</string>
@@ -671,7 +690,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>menubar</sender>

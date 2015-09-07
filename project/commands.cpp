@@ -2,7 +2,7 @@
 #include "pagescene.h"
 #include "graphscene.h"
 
-EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<QGraphicsView*> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings){
+EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<PageView*> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings){
     setText("Move edge");
     edge = e;
     from = fromPage;
@@ -16,8 +16,8 @@ EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<
 void EdgeMoveCommand::moveEdge(int fromPage, int toPage){
     graph->moveToPage(edge,toPage);
 
-    PageScene* fromScene = (PageScene*)(views->at(fromPage)->scene());
-    PageScene* toScene = (PageScene*)(views->at(toPage)->scene());
+    PageScene* fromScene = views->at(fromPage)->scene();
+    PageScene* toScene = views->at(toPage)->scene();
 
     fromScene->removeEdge(edge);
     toScene->addEdge(edge);
@@ -75,7 +75,7 @@ void PageRemoveCommand::undo(){
 }
 
 
-NodeMoveCommand::NodeMoveCommand(Node& v, BookEmbeddedGraph* g, int newIdx, std::vector<QGraphicsView *> *views){
+NodeMoveCommand::NodeMoveCommand(Node& v, BookEmbeddedGraph* g, int newIdx, std::vector<PageView *> *views){
     node = v;
     from = g->getPosition(v);
     to = newIdx;
@@ -94,7 +94,7 @@ void NodeMoveCommand::undo(){
 
 void NodeMoveCommand::move(int fromPosition, int toPosition){
     graph->moveTo(node,toPosition);
-    for(QGraphicsView* view : *pageViews){
-        ((PageScene*)view->scene())->redraw(*graph);
+    for(PageView* view : *pageViews){
+        view->scene()->redraw(*graph);
     }
 }

@@ -56,14 +56,15 @@ QPainterPath embedding_edge::shape() const{
     const QPointF center = QPointF(painterPath.boundingRect().center().x(),painterPath.boundingRect().bottom());
 
     //instead of ellipses, we will draw line segments (easier to calculate coordinates)
+    const int intermediatePoints = 8;
     QPointF currPoint = QPointF(painterPath.boundingRect().right(),painterPath.boundingRect().bottom());
     QPainterPath shape = QPainterPath(currPoint);
-    for(int i=1; i<=8; i++){//first the inner one
-        currPoint = center + QPointF(std::cos(i*M_PI/8)*(width-dx)/2,-std::sin(i*M_PI/8)*(height-dy));
+    for(int i=1; i<=intermediatePoints; i++){//first the inner one
+        currPoint = center + QPointF(std::cos(i*M_PI/intermediatePoints)*(width-dx)/2,-std::sin(i*M_PI/intermediatePoints)*(height-dy));
         shape.lineTo(currPoint);
     }
-    for(int i=7; i>=0; i--){//and then the outer one
-        currPoint = center + QPointF(std::cos(i*M_PI/8)*(width+dx)/2,-std::sin(i*M_PI/8)*(height+dy));
+    for(int i=intermediatePoints-1; i>=0; i--){//and then the outer one
+        currPoint = center + QPointF(std::cos(i*M_PI/intermediatePoints)*(width+dx)/2,-std::sin(i*M_PI/intermediatePoints)*(height+dy));
         shape.lineTo(currPoint);
     }
 

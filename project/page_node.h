@@ -24,6 +24,7 @@ public:
         QVariant itemChange(GraphicsItemChange, const QVariant&);
         PageScene* scene();
         void addIncidentEdge(embedding_edge* e);
+        void removeIncidentEdge(embedding_edge *e);
         void setPosition(int p);
         void resetPosition();
 protected:

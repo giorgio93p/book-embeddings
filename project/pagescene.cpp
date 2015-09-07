@@ -100,6 +100,10 @@ void PageScene::addEdge(const Edge& e){
 }
 
 void PageScene::removeEdge(const Edge &e){
+    PageNode* source = (*nodes)[e->source()];
+    PageNode* target = (*nodes)[e->target()];
+    source->removeIncidentEdge(edges->at(e));
+    target->removeIncidentEdge(edges->at(e));
     this->removeItem(edges->at(e));
     delete edges->at(e);
     edges->erase(e);
