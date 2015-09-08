@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     commands.cpp \
     pageview.cpp \
     edge_graphics.cpp \
-    node_graphics.cpp
+    node_graphics.cpp \
+    graphview.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     commands.h \
     pageview.h \
     edge_graphics.h \
-    node_graphics.h
+    node_graphics.h \
+    graphview.h
 
 FORMS    += mainwindow.ui
 

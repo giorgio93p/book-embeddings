@@ -14,9 +14,11 @@ GraphEdge::GraphEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e
     this->setPen(pen);
     edge = e;
     highlighted = false;
+    sourceCenter = sourceC;
+    targetCenter = targetC;
 
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setLine(QLineF(sourceC,targetC));
+    setLine(QLineF(sourceCenter,targetCenter));
     setZValue(zValue);
 }
 
@@ -35,7 +37,7 @@ QVariant GraphEdge::itemChange(QGraphicsItem::GraphicsItemChange change, const Q
 }
 
 void GraphEdge::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
-    //emit was_selected(edge);
+    this->setSelected(true);
     QMenu menu;
     //QAction *removeAction = menu.addAction("Remove");
     QAction *moveAction = menu.addAction(tr("Move to Page"));
@@ -54,6 +56,13 @@ void GraphEdge::toggleHighlight(bool enable){
         setZValue(zValue);
     }
 
+}
+
+void GraphEdge::adjust(Node &v, QPointF newPosition){
+    if(v == edge->source()) sourceCenter = newPosition;
+    if(v == edge->target()) targetCenter = newPosition;
+    prepareGeometryChange();
+    this->setLine(QLineF(sourceCenter, targetCenter));
 }
 
 
@@ -147,7 +156,7 @@ QVariant PageEdge::itemChange(GraphicsItemChange change, const QVariant & value)
 }
 
 void PageEdge::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
-    //emit was_selected(edge);
+    this->setSelected(true);
     QMenu menu;
     //QAction *removeAction = menu.addAction("Remove");
     QAction *moveAction = menu.addAction(tr("Move to Page"));

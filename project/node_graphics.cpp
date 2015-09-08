@@ -15,8 +15,9 @@ const qreal GraphNode::zValue = 2;
 
 GraphNode::GraphNode(const Node& v){
     node = v;
+    incidentEdges = std::unordered_set<GraphEdge*>();
 
-    setFlags(QGraphicsItem::ItemIsSelectable);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
     setRect(0,0,defaultWidth,defaultHeight);
 
     setBrush(defaultBrush);
@@ -25,14 +26,33 @@ GraphNode::GraphNode(const Node& v){
     setZValue(zValue);
 }
 
+void GraphNode::adjustIncidentEdges(QPointF newPosition){
+    for(GraphEdge *e : incidentEdges){
+        e->adjust(node,newPosition + QPointF(this->boundingRect().width()/2,this->boundingRect().height()/2));
+    }
+}
+
+void GraphNode::addIncidentEdge(GraphEdge *e){
+    incidentEdges.insert(e);
+}
+
+void GraphNode::removeIncidentEdge(GraphEdge *e){
+    incidentEdges.erase(e);
+}
+
 QVariant GraphNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
+    if (change == ItemPositionChange) { //if node position was changed
+        QPointF newPosition = value.toPointF();
+        adjustIncidentEdges(newPosition);
+        emit coordinates_changed(node,newPosition);
+    }
     if (change == QGraphicsItem::ItemSelectedChange) {
-            if(value.toBool()) {
-                emit this->was_selected(node,-1);
-            }else{
-                emit this->was_deselected(node);
-            }
+        if(value.toBool()) {
+            emit this->was_selected(node,-1);
+        }else{
+            emit this->was_deselected(node);
         }
+    }
     return QGraphicsEllipseItem::itemChange(change, value);
 }
 
@@ -127,10 +147,6 @@ void PageNode::setPosition(int p){
 
 void PageNode::resetPosition(){
     setPosition(position);
-}
-
-void PageNode::mousePressEvent(QGraphicsSceneMouseEvent *event){
-    QGraphicsEllipseItem::mousePressEvent(event);
 }
 
 void PageNode::mouseMoveEvent(QGraphicsSceneMouseEvent *event){

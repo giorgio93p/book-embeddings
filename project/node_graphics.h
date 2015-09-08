@@ -18,13 +18,19 @@ class GraphNode : public QObject, public QGraphicsEllipseItem{
     static const qreal highlightScalingFactor;
     static const QColor highlightColor;
     static const qreal zValue;
+    std::unordered_set<GraphEdge*> incidentEdges;
 public:
     GraphNode(const Node& v);
     QVariant itemChange(GraphicsItemChange, const QVariant&);
     void toggleHighlight(bool enable);
+    void addIncidentEdge(GraphEdge* e);
+    void removeIncidentEdge(GraphEdge *e);
 signals:
     void was_selected(Node&,int);
     void was_deselected(Node&);
+    void coordinates_changed(Node&,QPointF);
+private:
+    void adjustIncidentEdges(QPointF newPosition);
 };
 
 class PageScene;
@@ -58,7 +64,6 @@ public:
         void toggleHighlight(bool enable);
 protected:
         void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
-        void mousePressEvent(QGraphicsSceneMouseEvent*);
         void mouseMoveEvent (QGraphicsSceneMouseEvent*);
 signals:
         void was_selected(Node&,int);

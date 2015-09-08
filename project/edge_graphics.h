@@ -16,6 +16,8 @@ class GraphEdge : public QObject, public QGraphicsLineItem{
     Edge edge;
     QPen pen;
     bool highlighted;
+    QPointF sourceCenter;
+    QPointF targetCenter;
 
     static const qreal defaultWidth;
     static const QPen highlightPen;
@@ -25,6 +27,7 @@ public:
     QVariant itemChange(GraphicsItemChange, const QVariant&);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void toggleHighlight(bool enable);
+    void adjust(Node &v, QPointF newPosition);
 public slots:
     void on_move_request(){emit move(edge);}
 signals:

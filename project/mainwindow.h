@@ -89,10 +89,17 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
     //with the graph through mappings from each node of
     //theirs to the corresponding node in mainGraph.
 
+    /**
+     * @brief commandHistory commandHistory contains stacks of recently made changes. We use it to undo/redo actions performed on our graph.
+     * In case we decide to use one tab for each biconnected component, each biconnected component will have its own stack in the group.
+     *
+     */
     QUndoGroup* commandHistory;
 
-    //commandHistory is a stack of recently made changes.
-    //we use it to undo/redo actions performed on our graph,
+    //commandHistory contains stacks of recently made changes.
+    //we use it to undo/redo actions performed on our graph.
+    //In case we decide to use one tab for each biconnected component,
+    //each
 
 
     bool wholeGraphMode;
@@ -145,6 +152,7 @@ public slots:
     void move_edge(Edge&);
     void move_node(Node&, int newPosition);
     void on_node_dragged(Node &v, int atPage, QPointF toPos);
+    void node_coordinates_changed(Node&,QPointF);
 
     void on_remove_page(int);
     void on_crossings_changed(std::vector<int>);

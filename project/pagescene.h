@@ -34,6 +34,9 @@ class PageScene : public QGraphicsScene
 
     static const qreal margin;
     static const qreal minIntervalBetweenNodes;
+    /**
+     * @brief bottomMargin It is used as a margin and also to make space for node labels
+     */
     static const qreal bottomMargin;
 
 public:

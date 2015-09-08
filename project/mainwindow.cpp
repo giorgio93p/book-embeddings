@@ -83,7 +83,9 @@ void MainWindow::drawBookEmbeddedGraph(){
     commandHistory->setActiveStack(commandHistory->stacks().at(0));
     //Draw graph
     delete graphView->scene(); //delete scene that shows the whole graph
-    mainGraph->buildLayout(-graphView->width(),-graphView->height(),graphView->width(),graphView->height());
+    if(!mainGraph->hasLayout()){
+        mainGraph->buildLayout(-graphView->width(),-graphView->height(),graphView->width(),graphView->height());
+    }
     GraphScene* gs = new GraphScene(mainGraph,this);
     graphView->setScene(gs);
     //graphView->fitInView(gs->sceneRect());
@@ -307,7 +309,7 @@ void MainWindow::on_edge_selected(Edge& e){
     PageScene* pg = pageViews[pgno]->scene();
     pg->highlightEdge(e,true);
 
-    GraphScene* gs = (GraphScene*)graphView->scene();
+    GraphScene* gs = graphView->scene();
     gs->highlightEdge(e,true);
 }
 
@@ -324,7 +326,7 @@ void MainWindow::deselectEverythingInAllPagesBut(int pageNo) {
         ps->deselectAll();
     }
 
-    ((GraphScene*)graphView->scene())->deselectAll();
+    graphView->scene()->deselectAll();
 }
 
 
@@ -342,7 +344,7 @@ void MainWindow::on_edge_deselected(Edge& e){
     PageScene* ps = pageViews[pageNo]->scene();
     ps->highlightEdge(e,false);
 
-    GraphScene* gs = (GraphScene*)graphView->scene();
+    GraphScene* gs = graphView->scene();
     gs->highlightEdge(e,false);
 
     //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
@@ -362,7 +364,7 @@ void MainWindow::on_node_selected(Node& v, int onPage){
         view->scene()->highlightNode(v,true);
     }
 
-    GraphScene* gs = (GraphScene*)graphView->scene();
+    GraphScene* gs = graphView->scene();
     gs->highlightNode(v,true);
 }
 
@@ -375,7 +377,7 @@ void MainWindow::on_node_deselected(Node& v){
     for(PageView* view : pageViews){
         view->scene()->highlightNode(v,false);
     }
-    GraphScene* gs = (GraphScene*)graphView->scene();
+    GraphScene* gs = graphView->scene();
     gs->highlightNode(v,false);
 }
 
@@ -385,7 +387,7 @@ void MainWindow::move_edge(Edge &e){
     int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
                                          tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
     if (!ok || newPage==currPage) return;
-    commandHistory->activeStack()->push(new EdgeMoveCommand(e,currPage,newPage,&pageViews,mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
+    commandHistory->activeStack()->push(new EdgeMoveCommand(e,currPage,newPage,&pageViews,mainGraph,graphView->scene(),total_crossings_indicator));
 }
 
 void MainWindow::move_node(Node &v, int newPosition){
@@ -399,6 +401,11 @@ void MainWindow::on_node_dragged(Node&v, int atPage, QPointF toPos){
         if(view->scene()->pageNumber() == atPage) continue;
         view->scene()->moveNode(v, toPos);
     }
+}
+
+void MainWindow::node_coordinates_changed(Node &v, QPointF to){
+    mainGraph->setXcoord(v,to.x());
+    mainGraph->setYcoord(v,to.y());
 }
 
 void MainWindow::on_remove_page(int page){

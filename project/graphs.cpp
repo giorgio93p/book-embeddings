@@ -92,8 +92,17 @@ Node Graph::addNode(){
     return g.newNode();
 }
 
-void Graph::buildLayout(const double xmin, const double ymin, const double xmax, const double ymax){
+bool Graph::hasLayout() const{
+    Node v;
+    ogdf::Graph g = (use_g2) ? g2:g1;
+    forall_nodes(v,g){
+        if(getXcoord(v) != 0 || getYcoord(v) != 0) return true;
+    }
+    return false;
+}
 
+void Graph::buildLayout(const double xmin, const double ymin, const double xmax, const double ymax){
+    std::cout << "Building layout" << std::endl;
 
 
     ogdf::FMMMLayout drawer = ogdf::FMMMLayout();
@@ -123,6 +132,14 @@ double Graph::getXcoord(const Node& v) const{
 
 double Graph::getYcoord(const Node& v) const{
     return attr.y(v);
+}
+
+void Graph::setXcoord(Node &v, double x){
+    attr.x(v) = x;
+}
+
+void Graph::setYcoord(Node &v, double y){
+    attr.y(v) = y;
 }
 
 bool Graph::graphIsPlanar() const{

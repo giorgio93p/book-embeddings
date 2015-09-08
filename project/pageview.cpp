@@ -1,4 +1,5 @@
 #include "pageview.h"
+#include <QSizeGrip>
 
 PageView::PageView(BookEmbeddedGraph* g) : graph(g){
     setTransformationAnchor(QGraphicsView::AnchorViewCenter);
@@ -6,8 +7,8 @@ PageView::PageView(BookEmbeddedGraph* g) : graph(g){
     isBeingResized = false;
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    //this->setCornerWidget();
 }
-
 
 void PageView::scaleView(qreal scaleFactor){ //copied from elasticnodes example
     qreal factor = transform().scale(scaleFactor, 1).mapRect(QRectF(0, 0, 1, 1)).width();

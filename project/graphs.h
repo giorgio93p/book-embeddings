@@ -161,9 +161,12 @@ class Graph  {
             return g;
         }
 
+        bool hasLayout() const;
         void buildLayout(const double xmin, const double ymin, const double xmax, const double ymax);
         double getXcoord(const Node &v) const;
         double getYcoord(const Node &v) const;
+        void setXcoord(Node &v, double x);
+        void setYcoord(Node &v, double y);
         double getBoxWidth(const Node &v) const;
         double getBoxHeight(const Node &v) const;
 

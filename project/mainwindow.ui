@@ -18,7 +18,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QGraphicsView" name="graphView">
+       <widget class="GraphView" name="graphView">
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -691,6 +691,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GraphView</class>
+   <extends>QGraphicsView</extends>
+   <header>graphview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="icons.qrc"/>
  </resources>
