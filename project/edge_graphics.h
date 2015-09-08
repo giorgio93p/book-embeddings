@@ -43,15 +43,15 @@ class PageEdge : public QObject, public QGraphicsItem
     QPen pen;
     Edge edge;
     bool highlighted;
+    qreal vScalingFactor;
 
     static const qreal defaultWidth;
-    static const qreal vScalingFactor;
     static const qreal dx;
     static const qreal dy;
     static const QPen highlightPen;
     static const qreal zValue;
 public:
-        PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e);
+        PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e, qreal vScaling);
 
         QRectF boundingRect() const;
         void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
@@ -61,6 +61,8 @@ public:
         void adjust(Node &v, QPointF newPosition);
 
         void toggleHighlight(bool enable);
+        void setVScalingFactor(const qreal &value);
+
 public slots:
         void on_move_request(){emit move(edge);}
 protected:

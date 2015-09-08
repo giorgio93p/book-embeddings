@@ -46,24 +46,34 @@ void GraphEdge::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
 void GraphEdge::toggleHighlight(bool enable){
     highlighted = enable;
     prepareGeometryChange();
-    if(enable) setPen(highlightPen);
-    else setPen(pen);
+    if(enable){
+        setPen(highlightPen);
+        setZValue(zValue+1);
+    }else{
+        setPen(pen);
+        setZValue(zValue);
+    }
+
 }
 
 
 const qreal PageEdge::defaultWidth = 2;
-const qreal PageEdge::vScalingFactor = 0.7;
 const QPen PageEdge::highlightPen = QPen(QBrush(QColor(230,0,230)),4);
 const qreal PageEdge::zValue = 0;
 const qreal PageEdge::dx = 3; //dx and dy are used to make clicking on edge simpler
 const qreal PageEdge::dy = 6; //essentialy, we use shape() to draw two ellipses -which define the clickable area- around painterPath
 
-PageEdge::PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e) {
+
+void PageEdge::setVScalingFactor(const qreal &value){
+    vScalingFactor = value;
+}
+PageEdge::PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e, qreal vScaling) {
     pen = QPen(QBrush(col),defaultWidth);
     sourceCenter = sourceC;
     targetCenter = targetC;
     edge = e;
     highlighted = false;
+    vScalingFactor = vScaling;
 
     setFlag(QGraphicsItem::ItemIsSelectable);
     setZValue(zValue);
@@ -86,7 +96,7 @@ void PageEdge::adjustPainterPath(){
 
     prepareGeometryChange();
     painterPath = QPainterPath(QPointF(right,mapFromScene(sourceCenter).y()));
-    painterPath.arcTo(left,-height/2,width,height,0,180);//The first two arguments are the coordinates of the top-left point.
+    painterPath.arcTo(left,-height,width,2*height,0,180);//The first two arguments are the coordinates of the top-left point.
 }
 
 void PageEdge::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget){
@@ -148,4 +158,5 @@ void PageEdge::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
 void PageEdge::toggleHighlight(bool enable){
     highlighted = enable;
     prepareGeometryChange();
+    this->setZValue(enable ? zValue+1 : zValue);
 }

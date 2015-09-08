@@ -3,22 +3,22 @@
 
 #include <iostream>
 
-GraphScene::GraphScene(BookEmbeddedGraph& g,MainWindow* w, const double width, const double height){
+GraphScene::GraphScene(BookEmbeddedGraph* g,MainWindow* w, const double width, const double height){
     //Paint Nodes
     nodes = new std::unordered_map<Node,GraphNode*>();
     mainWindow=w;
 
     Node v;
-    forall_nodes(v,g){
-        addNode(v,QPointF(g.getXcoord(v),g.getYcoord(v)));
+    forall_nodes(v,*g){
+        addNode(v,QPointF(g->getXcoord(v),g->getYcoord(v)));
     }
 
     //Paint Edges
     edges = new std::unordered_map<Edge, GraphEdge*>();
 
     Edge e;
-    forall_edges(e,g) {
-        addEdge(e,mainWindow->getPageColour(g.getPageNo(e)));
+    forall_edges(e,*g) {
+        addEdge(e,mainWindow->getPageColour(g->getPageNo(e)));
     }
 }
 

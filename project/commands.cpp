@@ -95,6 +95,6 @@ void NodeMoveCommand::undo(){
 void NodeMoveCommand::move(int fromPosition, int toPosition){
     graph->moveTo(node,toPosition);
     for(PageView* view : *pageViews){
-        view->scene()->redraw(*graph);
+        view->scene()->redraw(graph);
     }
 }

@@ -11,7 +11,7 @@ const qreal GraphNode::defaultWidth = 6;
 const qreal GraphNode::defaultHeight = 6;
 const qreal GraphNode::highlightScalingFactor = 1.2;
 const QColor GraphNode::highlightColor = QColor(230,0,230);
-const qreal GraphNode::zValue = 1;
+const qreal GraphNode::zValue = 2;
 
 GraphNode::GraphNode(const Node& v){
     node = v;
@@ -61,7 +61,7 @@ const qreal PageNode::defaultHeight = 12;
 const qreal PageNode::labelOffset = 15;
 const qreal PageNode::highlightScalingFactor = 1.1;
 const QColor PageNode::highlightColor = QColor(230,0,230);
-const qreal PageNode::zValue = 1;
+const qreal PageNode::zValue = 2;
 
 PageNode::PageNode(PageScene *scene, const Node& v, std::vector<QPointF>* positions) : node(v), pageScene(scene), nodePositions(positions){
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);

@@ -84,7 +84,7 @@ void MainWindow::drawBookEmbeddedGraph(){
     //Draw graph
     delete graphView->scene(); //delete scene that shows the whole graph
     mainGraph->buildLayout(-graphView->width(),-graphView->height(),graphView->width(),graphView->height());
-    GraphScene* gs = new GraphScene(*mainGraph,this);
+    GraphScene* gs = new GraphScene(mainGraph,this);
     graphView->setScene(gs);
     //graphView->fitInView(gs->sceneRect());
 
@@ -116,7 +116,7 @@ void MainWindow::add_page_drawing(int page){
     pageDrawing->layout()->setContentsMargins(4,5,4,5);
     ((QVBoxLayout*)embedding_drawing->layout())->insertWidget(page,pageDrawing);
 
-    PageView* view = new PageView();
+    PageView* view = new PageView(mainGraph);
     pageViews.insert(pageViews.begin()+page,view);
     pageDrawing->layout()->addWidget(view);
 
@@ -149,7 +149,7 @@ void MainWindow::add_page_drawing(int page){
     zoomButtons->addWidget(zoomout);
     connect(zoomout,SIGNAL(pressed()),view,SLOT(zoomOut()));
 
-    PageScene* scene = new PageScene(*graphToDraw,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
+    PageScene* scene = new PageScene(graphToDraw,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del,view->width(), view->height());//getting a new colour for the scene
     view->setScene(scene);
     scene->setCrossings(mainGraph->getNcrossings(page));
     connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));

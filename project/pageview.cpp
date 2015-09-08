@@ -1,12 +1,16 @@
 #include "pageview.h"
 
-PageView::PageView(){
+PageView::PageView(BookEmbeddedGraph* g) : graph(g){
     setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    //setMinimumSize(g.numberOfNodes()*10,100); //TODO: make minimumInterval a variable
+    isBeingResized = false;
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 
 
 void PageView::scaleView(qreal scaleFactor){ //copied from elasticnodes example
-    qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+    qreal factor = transform().scale(scaleFactor, 1).mapRect(QRectF(0, 0, 1, 1)).width();
     if (factor < 0.07 || factor > 100)
         return;
 
@@ -34,3 +38,17 @@ void PageView::wheelEvent(QWheelEvent *event){
 }
 //! [5]
 #endif
+
+void PageView::resizeEvent(QResizeEvent *event){
+    isBeingResized = true;
+    scene()->setSize(event->size());
+    return QGraphicsView::resizeEvent(event);
+}
+
+void PageView::paintEvent(QPaintEvent *event){
+    if(isBeingResized){
+        scene()->setSceneRect(scene()->redraw(graph));
+        isBeingResized = false;
+    }
+    return QGraphicsView::paintEvent(event);
+}

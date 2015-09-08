@@ -2,15 +2,17 @@
 #include "mainwindow.h"
 #include <iostream>
 #include <QGraphicsView>
-#include "edge_graphics.h"
 
 
 /*
  * This class used to be called "BookEmbeddedScene", but for obvious reasons it was renamed.
  * It is used as a scene that shows a single page.
  */
+const qreal PageScene::margin = 10;
+const qreal PageScene::minIntervalBetweenNodes = 10;
+const qreal PageScene::bottomMargin = 30;
 
-PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QColor col, QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) : m_width(width){
+PageScene::PageScene(const BookEmbeddedGraph *g, const int p, MainWindow* w, QColor col, QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) {
     //Paint Nodes
     colour = col;
     mainWindow = w;
@@ -19,21 +21,16 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     crossingsIndicator = crossings;
     deletePageButton = del;
 
-
     deletePageButton->setEnabled(true);
     pageNumberIndicator->setNum(page);
 
     nodes = new std::unordered_map<Node,PageNode*>();
-
-    nodePositions.reserve(g.numberOfNodes());
-    qreal interval=width/(g.numberOfNodes()-1); //space between two consequent vertices
-    for(int i=0; i<g.numberOfNodes(); i++){
-        nodePositions.push_back(QPointF(i*interval,0));
-    }
+    nodePositions.resize(g->numberOfNodes());
+    setSize(QSize(width,height));
 
     int i=0;
     Node v;
-    forall_nodes_embedded(v,g){
+    forall_nodes_embedded(v,*g){
         PageNode* el = new PageNode(this, v, &nodePositions);
         el->setPosition(i);
         el->setParent(this);
@@ -54,7 +51,7 @@ PageScene::PageScene(const BookEmbeddedGraph& g, const int p, MainWindow* w, QCo
     //std::printf("%d is the number of edges here\n",m);
     edges = new std::unordered_map<Edge, PageEdge*>();
 
-    for (Edge e : g.edgesIn(page)) {
+    for (Edge e : g->edgesIn(page)) {
         this->addEdge(e);
     }
     this->update();
@@ -70,7 +67,7 @@ void PageScene::addEdge(const Edge& e){
     PageNode* target = (*nodes)[e->target()];
     const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
 
-    PageEdge * path = new PageEdge(sourceCenter, targetCenter, colour, e);
+    PageEdge * path = new PageEdge(sourceCenter, targetCenter, colour, e, vScalingFactor);
     this->addItem(path);
     path->setParent(this);
 
@@ -105,16 +102,31 @@ void PageScene::setCrossings(int crossings){
     crossingsIndicator->setNum(crossings);
 }
 
-int PageScene::width() {
-    return m_width;
+void PageScene::setSize(QSize newSize) {
+    int n = nodePositions.size();
+    qreal interval=qMax((newSize.width()-2*margin)/n, minIntervalBetweenNodes); //space between two consequent vertices
+    qreal pos=margin+interval/2;
+    for(int i=0; i<n; i++){
+        nodePositions[i] = (QPointF(pos,0));
+        pos+=interval;
+    }
+
+    vScalingFactor = qMin((newSize.height()-bottomMargin)/(nodePositions.back().x()-nodePositions.front().x()),1.0);
+    //std::cout << newSize.height()-30 << " / " << (nodePositions.back().x()-nodePositions.front().x()) << " = " << vScalingFactor << std::endl;
 }
 
-void PageScene::redraw(BookEmbeddedGraph& g){
+QRectF PageScene::redraw(BookEmbeddedGraph* g){
+    //Notify edges of new height
+    for ( auto it = edges->begin(); it != edges->end(); ++it ) {
+        PageEdge* curr = (PageEdge*)it->second;
+        curr->setVScalingFactor(vScalingFactor);
+    }
+
     //Move nodes
-    Q_ASSERT(g.numberOfNodes()==nodes->size());
+    Q_ASSERT(g->numberOfNodes()==nodes->size());
     int i=0;
     Node v;
-    forall_nodes_embedded(v,g){
+    forall_nodes_embedded(v,*g){
         PageNode* nodeGraphic = (*nodes)[v];
         //std::cout << "node " << v->index() << " from " << nodeGraphic->scenePos().x() << " to " << nodePositions[i].x() << std::endl;
         nodeGraphic->setPosition(i);
@@ -123,6 +135,14 @@ void PageScene::redraw(BookEmbeddedGraph& g){
     }
 
     this->update();
+
+    //return sceneRect, so that the view can adjust scrollbars
+    int n = nodePositions.size();
+    qreal interval= (nodePositions.back().x()-nodePositions.front().x())/(n-1); //space between two consequent vertices
+
+    QPointF topleft = QPointF(nodePositions.front().x()-interval/2-margin,-(nodePositions.back().x()-nodePositions.front().x())*vScalingFactor);
+    QPointF bottomRight = QPointF(nodePositions.back()) + QPointF(interval/2+margin,bottomMargin);
+    return QRectF(topleft,bottomRight);
 }
 
 void PageScene::moveNode(Node& v, QPointF toPos){
