@@ -124,6 +124,12 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
             }
 
+            if (newBC->numberOfNodes()== mg->numberOfNodes()) { //in case this is the whole graph
+                mg->setAsBiconnected(); //TODO: CREATE FUN
+                break;
+
+            }
+
 
 
             //else : we are facing a proper biconnected component
@@ -190,10 +196,20 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
 
             bCs.push_back(bc);   //storing the results
+
+            if (bCs.size() == 1) mg->setAsBiconnected(); //if this condition holds true
+                                                         //that means that our graph
+                                                         //has one biconnected component
+                                                         //and a number of lonely vertices.
+
             subGraphs.push_back(newBC);// in the vectors
 
         }
+
+
     }
+
+
 
     subGraphs.shrink_to_fit();
 

@@ -192,9 +192,25 @@ void MainWindow::remove_page_drawing(int page){
 void MainWindow::drawBCTree() {
 
     auxiliaryGraph = new AuxiliaryGraph(mainGraph);
+    delete bCTView->scene();    //deleting previous scene if any
+
+    if (mainGraph->getIsBiconnected()) {
+        //the main graph is already biconnected, so we won't use the auxiliary graph at all
+        delete auxiliaryGraph;
+        QGraphicsScene * gs = new QGraphicsScene(this); //the scene now won't show any graph at all
+        //QFont * qf = new QFont("Dejavu Serif",6);
+
+        QGraphicsSimpleTextItem* txt =new QGraphicsSimpleTextItem("it's biconnectd");
+        txt->setPos(0,0);
+        txt->setFont(QFont("Dejavu Serif",10));
+        gs->addItem(txt);                              //the scene will display this text
+        bCTView->setScene(gs);                          //setting the view's scene as gs.
+        bCTView->fitInView((gs)->sceneRect());
+        return;                                         //done.
+
+    }
 
 
-    delete bCTView->scene();             //deleting previous scene if any
 
 
     auxiliaryGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
@@ -301,6 +317,8 @@ void MainWindow::on_actionSave_as_triggered()
 }
 
 void MainWindow::on_edge_selected(Edge& e){
+
+
 
     deselectEverythingInAllPagesBut(mainGraph->getPageNo(e));
 

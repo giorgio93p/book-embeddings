@@ -29,7 +29,28 @@ typedef std::vector<Bucket> Buckets;
 class BookEmbeddedGraph;
 class BiconnectedComponent;
 
+/* note:
+ *
+ *  Since sept 3d I (kosmas) have changed a very basic aspect of
+ * class Graph. Because I needed to be able to create a
+ * Graph object that uses an ogdf::graph created by another class
+ * I had to enable the graph being stored as a reference to
+ * an ogdf::graph.
+ * So I renamed the old 'g' field to 'g1', and also I added
+ * ogdf::Graph& field 'g2'.
+ *
+ *  Now Graph has two kinds of constructors (same is for all its
+ * child-classes). Constructors like the old ones, that set the
+ * flag 'use_g2' (yes I added this too) to false, and constructors
+ * that set 'use_g2' to true, according to what is given as an arguement
+ * to the constructor.
+ *
+ *
+ */
+
+
 class Graph  {
+
 
 
 
@@ -53,8 +74,14 @@ class Graph  {
 
 
 
-        std::unordered_map<Edge,BiconnectedComponent*> mgE_to_bc;
-        bool isBiconnected;
+        std::unordered_map<Edge,BiconnectedComponent*> mgE_to_bc; //main graph nodes to their bc
+        bool isBiconnected=false;
+        //the above shall serve as a flag that, among other things, will determine whether
+        //this graph is the original graph or a biconnected comp of it.
+        //it is to false at the constructor of Graph, and it is set to true in two cases:
+        //a. in the constructor of class BiconnectedComponent (which derives from graph)
+        //b. in the analysis made during the creation of our AuxiliaryGraph object.
+
 
 
 
@@ -69,6 +96,14 @@ class Graph  {
         // automatically. This allows the user to use the method
         // setNumbering to use custom numbering for the nodes and
         // edges
+
+        void setAsBiconnected() {
+            isBiconnected=true;
+        }
+        bool getIsBiconnected() const {  //get
+            return isBiconnected;
+        }
+
 
         void setNumbering(std::unordered_map<Edge,int> e_to_num,
                           std::unordered_map<Node,int> n_to_num,
