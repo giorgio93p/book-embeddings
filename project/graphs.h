@@ -27,9 +27,9 @@ typedef std::set<Edge>      Bucket;
 typedef std::vector<Bucket> Buckets;
 
 class BookEmbeddedGraph;
+class BiconnectedComponent;
 
 class Graph  {
-
 
 
 
@@ -53,6 +53,10 @@ class Graph  {
 
 
 
+        std::unordered_map<Edge,BiconnectedComponent*> mgE_to_bc;
+        bool isBiconnected;
+
+
 
     public:
         Graph();
@@ -68,25 +72,49 @@ class Graph  {
 
         void setNumbering(std::unordered_map<Edge,int> e_to_num,
                           std::unordered_map<Node,int> n_to_num,
-                          std::unordered_map<int,Node> num_to_n,
-                          std::unordered_map<int,Edge> num_to_e);
+                          std::unordered_map<int, Node > num_to_n,
+                          std::unordered_map<int, Edge > num_to_e);
 
         void setDefaultNumbering();
 
         int getNumberOf(Node n) {
-            return n_to_int[n];
+            return n_to_int.at(n);
         }
 
         int getNumberOf(Edge e) {
-            return e_to_int[e];
+            return e_to_int.at(e);
         }
 
-        Node getNode(int num) {
-            return int_to_n[num];
+
+        int getNumberOfConst(Node n) const{
+            return n_to_int.at(n);
         }
 
-        Edge getEdge(int num) {
-            return int_to_e[num];
+        int getNumberOfConst(Edge e) const{
+            return e_to_int.at(e);
+        }
+
+        Node& getNode(int num) {
+            Node& n =int_to_n.at(num);//latest change
+
+            return n;
+        }
+
+        const Node& getNodeConst(int num) const{
+            const Node& n =int_to_n.at(num);//latest change
+
+            return n;
+        }
+
+
+        Edge& getEdge(int num) {
+            Edge& e = int_to_e.at(num);
+            return e;
+        }
+
+        const Edge& getEdgeConst(int num) const {
+            const Edge& e = int_to_e.at(num);
+            return e;
         }
 
         ogdf::Graph toOGDFval() const {
@@ -224,7 +252,7 @@ class BookEmbeddedGraph : public Graph {
         void moveTo(Node& v, const int position);
 
         Page edgesIn(int page) const {
-            return pages[page];
+            return pages.at(page);
         }
         int getNpages() const {
             return pages.size();
@@ -234,7 +262,7 @@ class BookEmbeddedGraph : public Graph {
         }
         int getNcrossings(const int page) const{
             int result = 0;
-            for(Edge e : pages[page]){
+            for(Edge e : pages.at(page)){
                 result += getNcrossings(e);
             }
             return result/2; //we have counted each crossing twice
@@ -246,7 +274,7 @@ class BookEmbeddedGraph : public Graph {
             return crossings.at(e);
         }
         int pageSize(int p) const{
-            return pages[p].size();
+            return pages.at(p).size();
         }
         /*
         void setVertexOrder(int *order){
@@ -321,7 +349,7 @@ class BCTree {
 
 
     public:
-        BCTree(Graph g);
+        BCTree(Graph& g);
 
         const ogdf::Graph& getAuxiliaryGraph() {
             //ogdf::Graph &ax = ogBCT.auxiliaryGraph();

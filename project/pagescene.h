@@ -27,7 +27,9 @@ class PageScene : public QGraphicsScene
 
 public:
 
-    PageScene(const BookEmbeddedGraph& g, const int p, MainWindow *w, QColor col, QLabel* pageNumber, QLabel* crossings, QPushButton* del, int width=250, int height=50);
+    PageScene(const BookEmbeddedGraph& g,
+              const int p, MainWindow *w, QColor col, QLabel* pageNumber,
+              QLabel* crossings, QPushButton* del, int width=250, int height=50);
     int width();
     MainWindow* window();
 

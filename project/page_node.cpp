@@ -23,17 +23,21 @@ QVariant PageNode::itemChange(GraphicsItemChange change, const QVariant & value)
         qreal distCovered = newPos.rx();
 
 
-        //???
+        //??
         if (distCovered < -index * interval - interval / 4) {
             newPos.setX(-index * interval - interval / 4);
         }else if (distCovered > (numNodes - index - 1) * interval + interval / 4) {
             newPos.setX((numNodes - index - 1) * interval + interval / 4);
         }
+        //???
 
         newPos.setY(0);
 
         return newPos;
     } else if (change == QGraphicsItem::ItemSelectedChange) {
+
+        //else, if the change of was just our node being selected
+
         if(value.toBool()) {
             emit this->was_selected(node,pageScene->pageNumber());
         }

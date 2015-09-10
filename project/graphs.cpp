@@ -27,6 +27,7 @@ void Graph::setDefaultNumbering() {
     forall_nodes(n,g) {
 
         n_to_i[n] = i;
+
         i_to_n[i] = n;
         i++;
 
@@ -37,6 +38,8 @@ void Graph::setDefaultNumbering() {
     forall_edges(e,g)
     {
         e_to_i[e] = i;
+
+
         i_to_e[i] = e;
         i++;
     }
@@ -493,7 +496,7 @@ void BookEmbeddedGraph::updatePermutation(int originalIndex, int finalPos) {
 
 /******************************************** BCTree Implementation ********************************************/
 
-BCTree::BCTree(Graph g) : originalGraph(g.toOGDF()),ogBCT(originalGraph,true),
+BCTree::BCTree(Graph& g) : originalGraph(g.toOGDF()),ogBCT(originalGraph,true),
 auxiliaryGraph(ogBCT.auxiliaryGraph()) {
 
 
@@ -542,6 +545,7 @@ const std::unordered_map<Edge,Edge> BCTree::generateEdgeMapping(){
     forall_edges(e,aux) {
 
         agE_to_mgE[e]= ogBCT.original(e);
+
 
     }
 

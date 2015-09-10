@@ -5,6 +5,7 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
                      //Graph(gr,true),
                      BookEmbeddedGraph(gr,true), wholeGraph(mainGraph), edgeMapping(eMapping),
                      nodeMapping(nMapping)
+                   //latestchange2
 
 {
     cout << "DEBUG: entering biconnected component constructor body" << endl;
@@ -31,24 +32,29 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
         Node corresponding = nodeMapping.at(v); //getting the corresponding node. if this fails,
                                                 // then nodes in g are other than the
 
-        int num = wholeGraph->getNumberOf(corresponding);
-        int num2= wholeGraph->getPosition(corresponding);
+        int num1 = wholeGraph->getPosition(corresponding);
+
+        int num = mainGraph->getNumberOf(corresponding);
+
+
         n_to_i[v]=num;
+
+
         i_to_n[num]=v;
 
 
     }
-    cout<<endl;
+
 
 
     Edge e;
     forall_edges(e,g){
 
         Edge corresponding;
-        corresponding= edgeMapping.at(e);
+        corresponding = edgeMapping.at(e);
         int num = wholeGraph->getNumberOf(corresponding);
-
         e_to_i[e]=num;
+
         i_to_e[num]=e;
 
     }

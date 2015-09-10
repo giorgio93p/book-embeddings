@@ -63,7 +63,7 @@ void MainWindow::drawBookEmbeddedGraph(){
     // and then paint each maingraph edge according to the colour assigned to the pageview it is in.
 
     colourCloset.returnAll(); // the returnAll method simply resets the closet to its intial state
-                              // that is, having all of its colours inside
+    // that is, having all of its colours inside
 
     //Remove previous page drawings
     for(QGraphicsView* view : pageViews){
@@ -95,9 +95,10 @@ void MainWindow::add_page_drawing(int page){
 
 
     BookEmbeddedGraph* graphToDraw=(wholeGraphMode)?mainGraph : currBC;
+    //selecting which graph to draw according to the mode.
 
-    if (!wholeGraphMode) return;
-
+    //if (!wholeGraphMode) return;
+    //haven't yet implemented the drawing of a Biconnected Component.
 
 
 
@@ -134,7 +135,9 @@ void MainWindow::add_page_drawing(int page){
 
 
 
-    PageScene* scene = new PageScene(*graphToDraw,page,this,colourCloset.getPaint(),page_number,crossings_of_page, del);//getting a new colour for the scene
+    PageScene* scene = new PageScene(*mainGraph,page,this,
+                                     colourCloset.getPaint(),//getting a new colour for the scene
+                                     page_number,crossings_of_page, del);
     view->setScene(scene);
     scene->setCrossings(mainGraph->getNcrossings(page));
     connect(scene,SIGNAL(remove_page(int)),this,SLOT(on_remove_page(int)));
@@ -175,15 +178,15 @@ void MainWindow::drawBCTree() {
 
 
     auxiliaryGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
-                                                                     //segfaults :(.
-                                                                     //we use it to make some
-                                                                    // settings in the attr member of graphs
+    //segfaults :(.
+    //we use it to make some
+    // settings in the attr member of graphs
 
 
 
     QGraphicsScene *gs =new AGScene(auxiliaryGraph,this,bCTView->width(),bCTView->height());
-                                                                    //AGScene: new class, custom made to
-                                                                    //show bctrees.
+    //AGScene: new class, custom made to
+    //show bctrees.
 
     bCTView->setScene(gs);                                           //final
     bCTView->fitInView((gs)->sceneRect());                           //things
@@ -208,11 +211,11 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
 
         this->drawBookEmbeddedGraph();
         this->drawBCTree(); //drawBCTree
-                            //added by kosms
-                            //made to draw the Biconnected Components Tree
-                            // and to split the maingraph into
-                            // its biconnected components and storing
-                            // them into the vector called biconnectedComponenets
+        //added by kosms
+        //made to draw the Biconnected Components Tree
+        // and to split the maingraph into
+        // its biconnected components and storing
+        // them into the vector called biconnectedComponenets
         emit number_of_nodes_changed(mainGraph->numberOfNodes());
         emit number_of_edges_changed(mainGraph->numberOfEdges());
         emit crossings_changed(std::vector<int>());
@@ -241,7 +244,7 @@ void MainWindow::on_actionAddPage_triggered(){
 void MainWindow::on_actionOpen_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),
-            tr("GraphModellingLanguage files (*.gml);;C++ Files (*.cpp *.h)"));
+                                                    tr("GraphModellingLanguage files (*.gml);;C++ Files (*.cpp *.h)"));
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
@@ -267,7 +270,7 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::on_actionSave_as_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Open File"), QString(),
-            tr("GraphModellingLanguage files (*.gml);;C++ Files (*.cpp *.h)"));
+                                                    tr("GraphModellingLanguage files (*.gml);;C++ Files (*.cpp *.h)"));
 
     if (!fileName.isEmpty()) {
         QFile file(fileName);
@@ -294,8 +297,8 @@ void MainWindow::on_edge_selected(Edge& e){
     int pgno =mainGraph->getPageNo(e);
     PageScene* pg = (PageScene*)pageViews[pgno]->scene();
     //pg->changeEdgeColour(e,Qt::black); //TODO: implement this shit
-                                         //this method must change the colour of an edge
-                                         //we can use it to show which edge is currently selected.
+    //this method must change the colour of an edge
+    //we can use it to show which edge is currently selected.
 
     GraphScene* gs = (GraphScene*)graphView->scene();
     gs->changeEdgeColourAndWidth(e,MY_COLOR,5);
@@ -307,8 +310,8 @@ void MainWindow::deselectEverythingInAllPagesBut(int pageNo) {
     for (int i=0; i<pageViews.size(); i++) {
 
         if (i==pageNo) continue; //if the page under examination
-                                //is the page of the selected edge
-                                //then we won't touch
+        //is the page of the selected edge
+        //then we won't touch
 
         PageScene* ps = (PageScene*) pageViews[i]->scene();
         ps->deselectAll();
@@ -332,7 +335,7 @@ void MainWindow::on_edge_deselected(Edge& e){
     PageScene* ps = (PageScene*)pageViews[pageNo]->scene();
 
     //ps->changeEdgeColour(e); //TODO: implement this shit:
-                             //changeEdgeColour(Edge e) must redraw edge e with the page colour
+    //changeEdgeColour(Edge e) must redraw edge e with the page colour
 
     GraphScene* gs = (GraphScene*)graphView->scene();
     gs->changeEdgeColourAndWidth(e,ps->getColour(),2);
@@ -345,6 +348,8 @@ void MainWindow::on_node_selected(Node& v, int onPage){
     deselectEverythingInAllPagesBut(onPage);
 
 
+
+
     edge_stats->setEnabled(false);
     node_stats->setEnabled(true);
     std::cout << "Node " << v->index() << " selected" << endl;
@@ -353,7 +358,15 @@ void MainWindow::on_node_selected(Node& v, int onPage){
     stats->setCurrentWidget(node_stats);
 
     GraphScene* gs = (GraphScene*)graphView->scene();
-    gs->changeNodeColourAndWidth(v,MY_COLOR,6);
+
+    if (wholeGraphMode) {
+        gs->changeNodeColourAndWidth(v,MY_COLOR,6);
+
+    } else {
+        int num = currBC->getNumberOf(v);
+        Node& n = mainGraph->getNode(num);
+        gs->changeNodeColourAndWidth(n,MY_COLOR,6);
+    }
 }
 
 void MainWindow::on_node_deselected(Node& v){
@@ -362,20 +375,33 @@ void MainWindow::on_node_deselected(Node& v){
     node_index_indicator->clear();
     std::cout << "Node " << v->index() << " deselected" << endl;
 
+
     GraphScene* gs = (GraphScene*)graphView->scene();
-    gs->changeNodeColourAndWidth(v);
+
+    if (wholeGraphMode) {
+        gs->changeNodeColourAndWidth(v);
+
+    } else {
+        int num = currBC->getNumberOf(v);
+        Node& n = mainGraph->getNode(num);
+        gs->changeNodeColourAndWidth(v);
+    }
+
 }
 
 void MainWindow::move_edge(Edge &e){
     int currPage = mainGraph->getPageNo(e);
     bool ok;
     int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
-                                         tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
+                                       tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
     if (!ok || newPage==currPage) return;
     commandHistory->activeStack()->push(new EdgeMoveCommand(e,currPage,newPage,&pageViews,mainGraph,(GraphScene*)graphView->scene(),total_crossings_indicator));
 }
 
 void MainWindow::on_remove_page(int page){
+
+
+
     Q_ASSERT(mainGraph->pageSize(page) == 0);
     commandHistory->activeStack()->push(new PageRemoveCommand(page, mainGraph, this));
 }
@@ -403,7 +429,7 @@ void MainWindow::on_actionRedraw_triggered(){
         pageViews.pop_back();
     }
     colourCloset.returnAll();//kosm: this is necessary in order
-                             //for our colouring mechanism to work.
+    //for our colouring mechanism to work.
 
     for(int p=0; p<mainGraph->getNpages(); p++){
         add_page_drawing(p);
@@ -432,7 +458,7 @@ void MainWindow::redrawPages() {
 
 
     colourCloset.returnAll(); // the returnAll method simply resets the closet to its intial state
-                              // that is, having all of its colours inside
+    // that is, having all of its colours inside
     //Draw pages
     for(int p=pageViews.size()-1; p>=0; p--){
         embedding_drawing->layout()->removeWidget(pageViews[p]);

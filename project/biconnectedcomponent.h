@@ -9,7 +9,7 @@ class BiconnectedComponent : public BookEmbeddedGraph
 {
 public:
     BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* mainGraph,
-                         std::unordered_map<Node,Node> nMapping, std::unordered_map<Edge,Edge> eMapping);
+                         std::unordered_map<Node, Node> nMapping, std::unordered_map<Edge, Edge> eMapping);
 
 
 

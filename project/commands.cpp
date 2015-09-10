@@ -14,6 +14,9 @@ EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<
 }
 
 void EdgeMoveCommand::moveEdge(bool reverse){
+
+
+
     graph->moveToPage(edge,reverse?from:to);
 
     PageScene* fromScene = (PageScene*)(views->at(reverse?to:from)->scene());

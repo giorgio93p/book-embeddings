@@ -10,10 +10,10 @@
 AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     originalGraph(mg),
     //pername sto original graph to mainGraph mesw pointer (ara deixnoun sto idio akrivws antikeimeno)
-    bCTreeObj((originalGraph)),
-    //ftiaxnoume to BCTreeObject, pou exei dimiourgei kai apothikevei mesa tou ena ogdf::Graph
+    bCTreeObj((*originalGraph)),
+    //ftiaxnoume to BCTreeObject, pou dimiourgei kai apothikevei mesa tou ena ogdf::Graph
     //me titlo Auxiliary Graph. Einai simantiko oti kai edw oti pername pointer, ara ousiastika
-    //to bctreeobj vlepei to idio antikeimeno pou vlepei kai to main window.
+    //to bctreeobj vlepei akrivws to idio maingraph antikeimeno pou vlepei kai to main window.
     g(bCTreeObj.getAuxiliaryGraph()),
     //edw dinoume timi sto g. To g tha einai to grafima pou deixnoume sto katw apo to main graph.
     //to legomeno auxiliarygraph (apoteleitai apo oles tis biconnectedcomponents tou maingraph
@@ -21,7 +21,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     //Einai typou const& ogdf::Graph. Einai const epeidh afto epistrefei to ogdf::BCTree::auxiliaryGraph()
 
     attr(g,ogdf::GraphAttributes::nodeGraphics | ogdf::GraphAttributes::edgeGraphics)
-    //arxikopoioume kanonika ta graph attributes, opws kanoume kai sto class Graph.
+  //arxikopoioume kanonika ta graph attributes, opws kanoume kai sto class Graph.
 
 {
 
@@ -41,7 +41,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     const std::unordered_map<Edge,Edge> agE_to_mgE = bCTreeObj.generateEdgeMapping();
     //agN_to_mgN : a(uxiliary)g(raph)N(ode)_to_m(ain)g(raph)N(ode)
     // agE_to_mgE: same but for edges.
-    //the generate{Node,Edge}Mapping methods create unordered_map's from
+    //the generate{Node,Edge}Mapping() methods create unordered_maps from
     //Nodes/edges in ag to nodes/edges in mg. They use the ogdf::BCTree::original(Node/Edge)
     //method. This takes a Node/Edge from ag (but not from a copy of it!! ) and returns
     //the corresponding node in the main graph.
@@ -64,6 +64,26 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     Node v;
     forall_nodes(v,g) {
         explored[v]=0;
+        Node w = agN_to_mgN.at(v);
+
+        bool found=false;
+
+
+        Node vv;
+
+        forall_nodes(vv,*mg) {
+            if (vv == w) found=true;
+        }
+
+
+        if ( found )
+            cout << "found" << endl;
+        else
+            cout << "notfound" << endl;
+
+
+        //int nn = mg->getNumberOf(w);
+
     }
     //initially, we set all nodes as unexplored.Now we shall proceed to initilize our data structures:
 
@@ -120,10 +140,13 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
             Node n;
             forall_nodes(n,*newBC) {
 
-                Node agNode = sgN_to_agN[n];
+                const Node& agNode = sgN_to_agN[n]; //returns a reference.
                 nMapping[n]= agN_to_mgN.at(agNode);
 
+
             }
+
+            int size = sizeof(Node);
 
             Edge e;
             forall_edges(e,*newBC) {
@@ -134,7 +157,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
             //at last, now we can create the biconnectedComponent object!
 
-           BiconnectedComponent *bc = new BiconnectedComponent(*newBC,mg,nMapping,eMapping);
+            BiconnectedComponent *bc = new BiconnectedComponent(*newBC,mg,nMapping,eMapping);
 
             // 2 last things:
             // 1.map each node of the new bc to the this bc (fill agN_to_bc)
