@@ -9,17 +9,17 @@ class EdgeMoveCommand : public QUndoCommand{
     Edge edge;
     int from;
     int to;
-    std::vector<QGraphicsView*>* views;
+    std::vector<PageView*>* views;
     GraphScene* graphScene;
     QLabel* crossingsIndicator;
     BookEmbeddedGraph* graph;
 
 public:
-    EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<QGraphicsView *> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings);
+    EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<PageView *> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings);
     void undo();
     void redo();
 private:
-    void moveEdge(bool);
+    void moveEdge(int,int);
 };
 
 class PageAddCommand : public QUndoCommand{
@@ -44,15 +44,18 @@ public:
 };
 
 class NodeMoveCommand : public QUndoCommand{
-    MainWindow* window;
+    int from;
+    int to;
     Node node;
+    BookEmbeddedGraph* graph;
+    std::vector<PageView *>* pageViews;
 
 public:
-    NodeMoveCommand(Node v, MainWindow* w);
+    NodeMoveCommand(Node& v, BookEmbeddedGraph*, int, std::vector<PageView *> *);
     void undo();
     void redo();
 private:
-    void move(int from, int to);
+    void move(int fromPosition, int toPosition);
 };
 
 #endif // COMMANDS_H

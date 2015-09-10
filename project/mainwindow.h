@@ -47,7 +47,7 @@
 
 #include "biconnectedcomponent.h"
 #include "auxiliarygraph.h"
-
+#include "pageview.h"
 #include "colourcloset.h"
 
 
@@ -66,7 +66,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
     //we use it to control the colours in pages
     //see [1]
 
-    std::vector<QGraphicsView*> pageViews;
+    std::vector<PageView*> pageViews;
     //this holds the views that show
     //each pagescene. A pagescene
     //simply displays a page.
@@ -89,10 +89,17 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
     //with the graph through mappings from each node of
     //theirs to the corresponding node in mainGraph.
 
+    /**
+     * @brief commandHistory commandHistory contains stacks of recently made changes. We use it to undo/redo actions performed on our graph.
+     * In case we decide to use one tab for each biconnected component, each biconnected component will have its own stack in the group.
+     *
+     */
     QUndoGroup* commandHistory;
 
-    //commandHistory is a stack of recently made changes.
-    //we use it to undo/redo actions performed on our graph,
+    //commandHistory contains stacks of recently made changes.
+    //we use it to undo/redo actions performed on our graph.
+    //In case we decide to use one tab for each biconnected component,
+    //each
 
 
     bool wholeGraphMode;
@@ -108,14 +115,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     bool openBookEmbeddedGraph(std::string filename);
 
+
     ~MainWindow() = default;
     //vector<Page> *pages;(
-    BookEmbeddedGraph* getMainGraph() const { return mainGraph;}
+
     BiconnectedComponent* getCurrBC() const { return currBC;}
 
-    void enableRedraw();
-
-    void redrawPages();
 
     void remove_page_drawing(int page);
     void add_page_drawing(int p);
@@ -128,6 +133,7 @@ public:
 private:
     void drawBCTree();
     void drawBookEmbeddedGraph();
+    void redrawPages();
 
     void findBiconnectedComponentsOfMainGraph();
 
@@ -139,8 +145,6 @@ public slots:
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
     void on_actionSave_as_triggered();
-    void on_actionRedraw_triggered();
-
 
     void on_edge_selected(Edge &);
     void on_edge_deselected(Edge &);
@@ -148,6 +152,10 @@ public slots:
     void on_node_deselected(Node &);
 
     void move_edge(Edge&);
+    void move_node(Node&, int newPosition);
+    void on_node_dragged(Node &v, int atPage, QPointF toPos);
+    void node_coordinates_changed(Node&,QPointF);
+
     void on_remove_page(int);
     void on_crossings_changed(std::vector<int>);
 

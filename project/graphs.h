@@ -189,9 +189,12 @@ class Graph  {
             return g;
         }
 
+        bool hasLayout() const;
         void buildLayout(const double xmin, const double ymin, const double xmax, const double ymax);
         double getXcoord(const Node &v) const;
         double getYcoord(const Node &v) const;
+        void setXcoord(Node &v, double x);
+        void setYcoord(Node &v, double y);
         double getBoxWidth(const Node &v) const;
         double getBoxHeight(const Node &v) const;
 
@@ -291,6 +294,11 @@ class BookEmbeddedGraph : public Graph {
         //std::vector<int> nodeOrderOnSpine;
         std::vector<Page> pages;
         std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
+        /*
+         * permutation is the inverse mapping of attr.label(Node).
+         * Both are used to store information about the sequence of nodes on pages.
+         * Do not confuse with node index, which is just a "name" for the node.
+        */
         std::vector<Node> permutation;
 
         int ncrossings;

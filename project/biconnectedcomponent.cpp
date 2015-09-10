@@ -32,7 +32,7 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
         Node corresponding = nodeMapping.at(v); //getting the corresponding node. if this fails,
                                                 // then nodes in g are other than the
 
-        int num1 = wholeGraph->getPosition(corresponding);
+
 
         int num = mainGraph->getNumberOf(corresponding);
 

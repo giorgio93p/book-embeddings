@@ -95,8 +95,17 @@ Node Graph::addNode(){
     return g.newNode();
 }
 
-void Graph::buildLayout(const double xmin, const double ymin, const double xmax, const double ymax){
+bool Graph::hasLayout() const{
+    Node v;
+    ogdf::Graph g = (use_g2) ? g2:g1;
+    forall_nodes(v,g){
+        if(getXcoord(v) != 0 || getYcoord(v) != 0) return true;
+    }
+    return false;
+}
 
+void Graph::buildLayout(const double xmin, const double ymin, const double xmax, const double ymax){
+    std::cout << "Building layout" << std::endl;
 
 
     ogdf::FMMMLayout drawer = ogdf::FMMMLayout();
@@ -126,6 +135,14 @@ double Graph::getXcoord(const Node& v) const{
 
 double Graph::getYcoord(const Node& v) const{
     return attr.y(v);
+}
+
+void Graph::setXcoord(Node &v, double x){
+    attr.x(v) = x;
+}
+
+void Graph::setYcoord(Node &v, double y){
+    attr.y(v) = y;
 }
 
 bool Graph::graphIsPlanar() const{
@@ -159,10 +176,13 @@ BookEmbeddedGraph::BookEmbeddedGraph(Graph* graph) : Graph(graph){
 
     //vertexOrder = NULL;
 
+    permutation = std::vector<Node>(numberOfNodes());
+
     Node n;
     int i=0;
     forall_nodes(n,g){
         attr.label(n) = std::to_string(i);
+        permutation[i] = n;
         i++;
     }
 
@@ -225,10 +245,14 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph& graph, bool weareusingreferenc
     attr.initAttributes(ogdf::GraphAttributes::nodeLabel | ogdf::GraphAttributes::edgeLabel);
     addPage();
 
+    permutation = std::vector<Node>(numberOfNodes());
+
     Node v;
+
     int i=0;
     forall_nodes(v,g){
         attr.label(v) = std::to_string(i);
+        permutation[i]=v;
         i++;
         //cout << "DEBUG: graph newBC has nodes";
     }
@@ -237,7 +261,6 @@ BookEmbeddedGraph::BookEmbeddedGraph(ogdf::Graph& graph, bool weareusingreferenc
 
     Edge e;
     forall_edges(e,g) addEdgeToPage(e,0);
-    permutation = std::vector<Node>(numberOfNodes());
 
     bucketsNeedToBeGenerated = true;
     crossings = std::unordered_map<Edge,std::unordered_set<Edge> >();
@@ -310,8 +333,6 @@ int BookEmbeddedGraph::getPageNo(const Edge &e) const{
 }
 
 int BookEmbeddedGraph::getPosition(const Node &v) const{
-
-
     return std::stoi(attr.label(v));
 }
 
@@ -325,6 +346,12 @@ void BookEmbeddedGraph::swap(Node &v1, Node &v2){
 }
 
 void BookEmbeddedGraph::moveTo(Node &v, const int position){
+    //for(Node n : permutation){
+    //    std::cout << n->index() << " ";
+    //}
+    //std::cout << std::endl;
+    //std::cout << "Move node " << v->index() << " from position " << getPosition(v) << " to position " << position << std::endl;
+
     if(getPosition(v) > position){
         for(int i=getPosition(v); i>position; i--){
             attr.label(permutation[i-1]) = std::to_string(i);
@@ -338,12 +365,15 @@ void BookEmbeddedGraph::moveTo(Node &v, const int position){
     }
     permutation[position] = v;
     attr.label(v) = std::to_string(position);
+
     //recalculate crossings?
 }
 
 Node BookEmbeddedGraph::nodeAt(int position) const{
-    return permutation[position];
-}
+    return permutation.at(position); //paidia xrisimopoiume to
+}                                    //to at, oxi to []
+                                     //to deftero den skaei otan den
+                                     //yparxei to stoixeio.
 
 
 void BookEmbeddedGraph::addEdgeToPage(Edge& e, const int pageNo){
@@ -434,7 +464,7 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
     if(! ogdf::GraphIO::readGML(attr,g,fileName)) return false;
 
     permutation.clear();
-    permutation.reserve(numberOfNodes());
+    permutation.resize(numberOfNodes());
     Node v;
     forall_nodes(v,g){
         permutation[getPosition(v)] = v;

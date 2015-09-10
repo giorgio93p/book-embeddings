@@ -2,7 +2,7 @@
 #include "pagescene.h"
 #include "graphscene.h"
 
-EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<QGraphicsView*> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings){
+EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<PageView*> *pageViews, BookEmbeddedGraph* g, GraphScene* gs, QLabel* crossings){
     setText("Move edge");
     edge = e;
     from = fromPage;
@@ -13,14 +13,12 @@ EdgeMoveCommand::EdgeMoveCommand(Edge &e, int fromPage, int toPage, std::vector<
     crossingsIndicator = crossings;
 }
 
-void EdgeMoveCommand::moveEdge(bool reverse){
 
+void EdgeMoveCommand::moveEdge(int fromPage, int toPage){
+    graph->moveToPage(edge,toPage);
 
-
-    graph->moveToPage(edge,reverse?from:to);
-
-    PageScene* fromScene = (PageScene*)(views->at(reverse?to:from)->scene());
-    PageScene* toScene = (PageScene*)(views->at(reverse?from:to)->scene());
+    PageScene* fromScene = views->at(fromPage)->scene();
+    PageScene* toScene = views->at(toPage)->scene();
 
     fromScene->removeEdge(edge);
     toScene->addEdge(edge);
@@ -34,11 +32,11 @@ void EdgeMoveCommand::moveEdge(bool reverse){
 }
 
 void EdgeMoveCommand::redo(){
-    moveEdge(false);
+    moveEdge(from, to);
 }
 
 void EdgeMoveCommand::undo(){
-    moveEdge(true);
+    moveEdge(to, from);
 }
 
 
@@ -78,20 +76,26 @@ void PageRemoveCommand::undo(){
 }
 
 
-NodeMoveCommand::NodeMoveCommand(Node v, MainWindow *w){
-    window = w;
+NodeMoveCommand::NodeMoveCommand(Node& v, BookEmbeddedGraph* g, int newIdx, std::vector<PageView *> *views){
     node = v;
+    from = g->getPosition(v);
+    to = newIdx;
+    graph = g;
+    pageViews = views;
     setText("Move node");
 }
 
 void NodeMoveCommand::redo(){
-
+    move(from,to);
 }
 
 void NodeMoveCommand::undo(){
-
+    move(to,from);
 }
 
-void NodeMoveCommand::move(int from, int to){
-
+void NodeMoveCommand::move(int fromPosition, int toPosition){
+    graph->moveTo(node,toPosition);
+    for(PageView* view : *pageViews){
+        view->scene()->redraw(graph);
+    }
 }

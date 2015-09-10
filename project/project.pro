@@ -16,30 +16,33 @@ SOURCES += main.cpp\
         mainwindow.cpp\
         graphscene.cpp \
     graphs.cpp \
-    embedding_edge.cpp \
     pagescene.cpp \
     agscene.cpp \
     colourcloset.cpp \
     biconnectedcomponent.cpp\
-    page_node.cpp \
     auxiliarygraph.cpp \
     agnode.cpp \
-    commands.cpp
+    commands.cpp \
+    pageview.cpp \
+    edge_graphics.cpp \
+    node_graphics.cpp \
+    graphview.cpp
 
 
 HEADERS  += mainwindow.h \
             graphscene.h \
     graphs.h \
-    embedding_edge.h \
     pagescene.h \
-    colors.h \
     agscene.h \
     colourcloset.h \
     biconnectedcomponent.h\
-    page_node.h \
     auxiliarygraph.h \
     agnode.h \
-    commands.h
+    commands.h \
+    pageview.h \
+    edge_graphics.h \
+    node_graphics.h \
+    graphview.h
 
 FORMS    += mainwindow.ui
 
@@ -60,3 +63,6 @@ win32 {
     LIBS += -L$$_PRO_FILE_PWD_/../OGDF/_release -lOGDF -lCOIN
     QMAKE_CXXFLAGS +=-pthread
 }
+
+RESOURCES += \
+    icons.qrc

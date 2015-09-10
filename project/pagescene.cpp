@@ -2,53 +2,135 @@
 #include "mainwindow.h"
 #include <iostream>
 #include <QGraphicsView>
-#include "embedding_edge.h"
-
-
-/*
- * This class used to be called "BookEmbeddedScene", but for obvious reasons it was renamed.
- * It is used as a scene that shows a single page.
- */
-
-//class MainWind
 
 
 
-PageScene::PageScene(const BookEmbeddedGraph& graph,
-                     const int p, MainWindow* w, QColor col, QLabel *pageNumber,
-                     QLabel *crossings, QPushButton *del,
-                     int width, int height) : m_width(width){
-
-    //latest change
+const qreal PageScene::margin = 10;
+const qreal PageScene::minIntervalBetweenNodes = 10;
+const qreal PageScene::bottomMargin = 30;
 
 
-    //set properties.
+PageScene::PageScene(const BookEmbeddedGraph *g, const int p, MainWindow* w, QColor col,
+                     QLabel *pageNumber, QLabel *crossings, QPushButton *del, int width, int height) {
 
+    //first we should store the given values to the corresponding member fields.
     colour = col;
     mainWindow = w;
-    page = p;
+    page = p; //page is the page number.
     pageNumberIndicator = pageNumber;
     crossingsIndicator = crossings;
     deletePageButton = del;
-
-
 
     deletePageButton->setEnabled(true);
     pageNumberIndicator->setNum(page);
 
     nodes = new std::unordered_map<Node,PageNode*>();
+    nodePositions.resize(g->numberOfNodes());
+    setSize(QSize(width,height));
+
 
     //prepare drawing tools
     QBrush redBrush(Qt::red);
     QPen blackPen(Qt::black);
     blackPen.setWidth(2);
 
+    int i=0;
+    Node v;
+    forall_nodes_embedded(v,*g){
+        PageNode* el = new PageNode(this, v, &nodePositions);
+        el->setPosition(i);
+        el->setParent(this);
+        addItem(el);
+        //std::cout << "nodePositions[" << i << "].x(): " << nodePositions[i].x() << std::endl;
+        //std::cout << "Node " << v->index() <<  " drawn at position " << i << " (" << el->scenePos().x() << "," << el->scenePos().y() << ")" << std::endl;
+        (*nodes)[v] = el;
+
+        connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+        connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
+        connect(el,SIGNAL(was_dragged(Node&,int,QPointF)),mainWindow,SLOT(on_node_dragged(Node&,int,QPointF)));
+        connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
+
+        i++;
+    }
+
+    //Paint Edges
+    edges = new std::unordered_map<Edge, PageEdge*>();
+
+    for (Edge e : g->edgesIn(page)) {
+        this->addEdge(e);
+    }
+    this->update();
+
+}
+
+
+
+
     //we have to distinguish between two cases:
-    //1. we are drawing a page of a biconnected component
 
-    bool wholeGraphMode = w->isWholeGraphModeOn();
+    /*
+    if (wholeGraphMode) { //1.wholeGraphMode is on
 
-    if (!wholeGraphMode) { //wholeGraphMode is off
+
+    else // case 2. we are drawing a page of a single biconnected component.
+    {
+        int i=0;
+        Node v;
+        forall_nodes_embedded(v,*g){
+            PageNode* el = new PageNode(this, v, &nodePositions);
+            el->setPosition(i);
+            el->set int i=0;
+        Node v;
+        forall_nodes_embedded(v,*g){
+            PageNode* el = new PageNode(this, v, &nodePositions);
+            el->setPosition(i);
+            el->setParent(this);
+            addItem(el);
+            //std::cout << "nodePositions[" << i << "].x(): " << nodePositions[i].x() << std::endl;
+            //std::cout << "Node " << v->index() <<  " drawn at position " << i << " (" << el->scenePos().x() << "," << el->scenePos().y() << ")" << std::endl;
+            (*nodes)[v] = el;
+
+            connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+            connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
+            connect(el,SIGNAL(was_dragged(Node&,int,QPointF)),mainWindow,SLOT(on_node_dragged(Node&,int,QPointF)));
+            connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
+
+            i++;
+        }
+
+        //Paint Edges
+        edges = new std::unordered_map<Edge, PageEdge*>();
+
+        for (Edge e : g->edgesIn(page)) {
+            this->addEdge(e);
+        }
+        this->update();
+
+    } Parent(this);
+            addItem(el);
+            //std::cout << "nodePositions[" << i << "].x(): " << nodePositions[i].x() << std::endl;
+            //std::cout << "Node " << v->index() <<  " drawn at position " << i << " (" << el->scenePos().x() << "," << el->scenePos().y() << ")" << std::endl;
+            (*nodes)[v] = el;
+
+            connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+            connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
+            connect(el,SIGNAL(was_dragged(Node&,int,QPointF)),mainWindow,SLOT(on_node_dragged(Node&,int,QPointF)));
+            connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
+
+            i++;
+        }
+
+        //Paint Edges
+        edges = new std::unordered_map<Edge, PageEdge*>();
+
+        for (Edge e : g->edgesIn(page)) {
+            this->addEdge(e);
+        }
+        this->update();
+    }
+
+
+
 
         BiconnectedComponent* currBC = w->getCurrBC();
         qreal interval=(2*width/currBC->numberOfNodes()); //space between two consequent vertices
@@ -99,12 +181,106 @@ PageScene::PageScene(const BookEmbeddedGraph& graph,
 
             this->addEdge(e);
         }
-
     }
-    else //whole graph mode is on!
+    else
     {
 
-        BookEmbeddedGraph* g = mainWindow->getMainGraph();
+
+}
+
+*/
+
+void PageScene::repaintEdge(const Edge e) {
+    (*edges)[e]->update();
+}
+
+void PageScene::addEdge(const Edge& e){
+    PageNode* source = (*nodes)[e->source()];
+    const QPointF sourceCenter = source->mapToScene(source->boundingRect().center());
+    PageNode* target = (*nodes)[e->target()];
+    const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
+
+    PageEdge * path = new PageEdge(sourceCenter, targetCenter, colour, e, vScalingFactor);
+    this->addItem(path);
+    path->setParent(this);
+
+    (*edges)[e]= path;
+    source->addIncidentEdge(path);
+    target->addIncidentEdge(path);
+
+    deletePageButton->setEnabled(false);
+
+    connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
+    connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
+    connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
+}
+
+void PageScene::removeEdge(const Edge &e){
+    PageNode* source = (*nodes)[e->source()];
+    PageNode* target = (*nodes)[e->target()];
+    source->removeIncidentEdge(edges->at(e));
+    target->removeIncidentEdge(edges->at(e));
+    this->removeItem(edges->at(e));
+    delete edges->at(e);
+    edges->erase(e);
+    if(edges->size() == 0) deletePageButton->setEnabled(true);
+}
+
+
+
+
+
+/*
+void PageScene::addEdge(const Edge& e){
+
+
+    bool wholeGraphMode = mainWindow->isWholeGraphModeOn();
+    BiconnectedComponent* currBC = mainWindow->getCurrBC();
+    BookEmbeddedGraph* mainGraph = mainWindow->getMainGraph();
+
+    //if (wholeGraphMode) {
+
+
+
+
+
+
+
+
+
+        //case1 we are drawing a page of the wholeGraph.
+        //do the usual stuff..
+
+        nodePositions.resize(g->numberOfNodes());
+        setSize(QSize(width,height));
+
+        int i=0;
+        Node v;
+        forall_nodes_embedded(v,*g){
+            PageNode* el = new PageNode(this, v, &nodePositions);
+            el->setPosition(i);
+            el->setParent(this);
+            addItem(el);
+            //std::cout << "nodePositions[" << i << "].x(): " << nodePositions[i].x() << std::endl;
+            //std::cout << "Node " << v->index() <<  " drawn at position " << i << " (" << el->scenePos().x() << "," << el->scenePos().y() << ")" << std::endl;
+            (*nodes)[v] = el;
+
+            connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+            connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
+            connect(el,SIGNAL(was_dragged(Node&,int,QPointF)),mainWindow,SLOT(on_node_dragged(Node&,int,QPointF)));
+            connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
+
+            i++;
+        }
+
+        //Paint Edges
+        //std::printf("%d is the number of edges here\n",m);
+        edges = new std::unordered_map<Edge, PageEdge*>();
+
+        for (Edge e : g->edgesIn(page)) {
+            this->addEdge(e);
+        }
+
 
         qreal interval=(2*width/g->numberOfNodes()); //space between two consequent vertices
 
@@ -120,6 +296,7 @@ PageScene::PageScene(const BookEmbeddedGraph& graph,
 
 
 
+<<<<<<< HEAD
             PageNode* el = new PageNode(this, v, i, g->numberOfNodes(), interval);
             el->setBrush(redBrush);
             el->setPen(blackPen);
@@ -149,24 +326,25 @@ PageScene::PageScene(const BookEmbeddedGraph& graph,
         for (Edge e : g->edgesIn(page)) {
             this->addEdge(e);
         }
+=======
+
+>>>>>>> 0b0a91174265dc7b9fc8d91c187761ecc6fabdb3
     }
-}
+    this->update();
+//=======
+    PageNode* source = (*nodes)[e->source()];
+    const QPointF sourceCenter = source->mapToScene(source->boundingRect().center());
+    PageNode* target = (*nodes)[e->target()];
+    const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
 
+    PageEdge * path = new PageEdge(sourceCenter, targetCenter, colour, e, vScalingFactor);
+    this->addItem(path);
+    path->setParent(this);
 
-
-void PageScene::repaintEdge(const Edge e) {
-    (*edges)[e]->update();
-}
-
-void PageScene::addEdge(const Edge& e){
-
-
-    bool wholeGraphMode = mainWindow->isWholeGraphModeOn();
-    BiconnectedComponent* currBC = mainWindow->getCurrBC();
-    BookEmbeddedGraph* mainGraph = mainWindow->getMainGraph();
-
-    if (wholeGraphMode) {//case1 we are drawing a page of the wholeGraph.
-        //do the usual stuff..
+    (*edges)[e]= path;
+    source->addIncidentEdge(path);
+    target->addIncidentEdge(path);
+/*>>>>>>> 0b0a91174265dc7b9fc8d91c187761ecc6fabdb3
 
 
         qreal x1 = std::min((*nodes)[e->source()]->boundingRect().center().x(),(*nodes)[e->target()]->boundingRect().center().x());
@@ -190,10 +368,31 @@ void PageScene::addEdge(const Edge& e){
         connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
         connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
 
+
+
+
+
     } else { //case2: we are drawing the pages of only 1 biconnected component.
 
         int num = currBC->getNumberOf(e);
-        const Edge& f = mainGraph->getEdgeConst(num);
+        Edge f = mainGraph->getEdge(num);
+        //got the corresponding edge of the main graph.
+        //now the new PageEdge item will have this edge.
+
+        PageNode* source = (*nodes)[f->source()];
+        const QPointF sourceCenter = source->mapToScene(source->boundingRect().center());
+        PageNode* target = (*nodes)[f->target()];
+        const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
+
+        PageEdge * path = new PageEdge(sourceCenter, targetCenter, colour, f, vScalingFactor);
+        this->addItem(path);
+        path->setParent(this);
+
+        (*edges)[e]= path;
+        source->addIncidentEdge(path);
+        target->addIncidentEdge(path);
+
+
 
         qreal x1 = std::min((*nodes)[e->source()]->boundingRect().center().x(),(*nodes)[e->target()]->boundingRect().center().x());
         qreal x2 = std::max((*nodes)[e->source()]->boundingRect().center().x(),(*nodes)[e->target()]->boundingRect().center().x());
@@ -218,12 +417,10 @@ void PageScene::addEdge(const Edge& e){
 
     }
 }
-void PageScene::removeEdge(const Edge &e){
-    this->removeItem(edges->at(e));
-    delete edges->at(e);
-    edges->erase(e);
-    if(edges->size() == 0) deletePageButton->setEnabled(true);
-}
+
+*/
+
+
 
 void PageScene::setPageNumber(int p){
     page = p;
@@ -234,16 +431,53 @@ void PageScene::setCrossings(int crossings){
     crossingsIndicator->setNum(crossings);
 }
 
-int PageScene::width() {
-    return m_width;
+void PageScene::setSize(QSize newSize) {
+    int n = nodePositions.size();
+    qreal interval=qMax((newSize.width()-2*margin)/n, minIntervalBetweenNodes); //space between two consequent vertices
+    qreal pos=margin+interval/2;
+    for(int i=0; i<n; i++){
+        nodePositions[i] = (QPointF(pos,0));
+        pos+=interval;
+    }
+
+    vScalingFactor = qMin((newSize.height()-bottomMargin)/(nodePositions.back().x()-nodePositions.front().x()),0.75);
+    //edited by kosmas
+    //std::cout << newSize.height()-30 << " / " << (nodePositions.back().x()-nodePositions.front().x()) << " = " << vScalingFactor << std::endl;
 }
 
-MainWindow* PageScene::window(){
-    return mainWindow;
+QRectF PageScene::redraw(BookEmbeddedGraph* g){
+    //Notify edges of new height
+    for ( auto it = edges->begin(); it != edges->end(); ++it ) {
+        PageEdge* curr = (PageEdge*)it->second;
+        curr->setVScalingFactor(vScalingFactor);
+    }
+
+    //Move nodes
+    Q_ASSERT(g->numberOfNodes()==nodes->size());
+    int i=0;
+    Node v;
+    forall_nodes_embedded(v,*g){
+        PageNode* nodeGraphic = (*nodes)[v];
+        //std::cout << "node " << v->index() << " from " << nodeGraphic->scenePos().x() << " to " << nodePositions[i].x() << std::endl;
+        nodeGraphic->setPosition(i);
+
+        i++;
+    }
+
+    this->update();
+
+    //return sceneRect, so that the view can adjust scrollbars
+    int n = nodePositions.size();
+    qreal interval= (nodePositions.back().x()-nodePositions.front().x())/(n-1); //space between two consequent vertices
+
+    QPointF topleft = QPointF(nodePositions.front().x()-interval/2-margin,-(nodePositions.back().x()-nodePositions.front().x())*vScalingFactor);
+    QPointF bottomRight = QPointF(nodePositions.back()) + QPointF(interval/2+margin,bottomMargin);
+    return QRectF(topleft,bottomRight);
 }
 
-
-
+void PageScene::moveNode(Node& v, QPointF toPos){
+    (*nodes)[v]->setPos(toPos);
+}
 
 void PageScene::deselectAll() {
 
@@ -257,4 +491,11 @@ void PageScene::deselectAll() {
         curr->setSelected(false);
     }
 
+}
+
+void PageScene::highlightNode(Node& v, bool enable){
+    nodes->at(v)->toggleHighlight(enable);
+}
+void PageScene::highlightEdge(Edge& v, bool enable){
+    edges->at(v)->toggleHighlight(enable);
 }
