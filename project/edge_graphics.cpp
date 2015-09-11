@@ -72,10 +72,37 @@ const qreal PageEdge::zValue = 0;
 const qreal PageEdge::dx = 3; //dx and dy are used to make clicking on edge simpler
 const qreal PageEdge::dy = 6; //essentialy, we use shape() to draw two ellipses -which define the clickable area- around painterPath
 
-
 void PageEdge::setVScalingFactor(const qreal &value){
     vScalingFactor = value;
 }
+
+void PageEdge::keyReleaseEvent(QKeyEvent *event){
+    switch(event->key()){
+    case Qt::Key_Escape:
+    case Qt::Key_Enter:
+        clearFocus();
+        setSelected(false);
+        break;
+    case Qt::Key_Up: emit move(edge,(int)MoveDirection::Up); break;
+    case Qt::Key_Down: emit move(edge,(int)MoveDirection::Down); break;
+    case Qt::Key_0: emit move(edge,0); break;
+    case Qt::Key_1: emit move(edge,1); break;
+    case Qt::Key_2: emit move(edge,2); break;
+    case Qt::Key_3: emit move(edge,3); break;
+    case Qt::Key_4: emit move(edge,4); break;
+    case Qt::Key_5: emit move(edge,5); break;
+    case Qt::Key_6: emit move(edge,6); break;
+    case Qt::Key_7: emit move(edge,7); break;
+    case Qt::Key_8: emit move(edge,8); break;
+    case Qt::Key_9: emit move(edge,9); break;
+    default:
+        QGraphicsItem::keyReleaseEvent(event);
+        return;
+    }
+    //setFocus();
+    //setSelected(true);
+}
+
 PageEdge::PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e, qreal vScaling) {
     pen = QPen(QBrush(col),defaultWidth);
     sourceCenter = sourceC;
@@ -85,6 +112,7 @@ PageEdge::PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e, 
     vScalingFactor = vScaling;
 
     setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlag(QGraphicsItem::ItemIsFocusable);
     setZValue(zValue);
 
     adjustPainterPath();

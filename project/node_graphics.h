@@ -17,6 +17,7 @@ class GraphNode : public QObject, public QGraphicsEllipseItem{
     static const qreal defaultHeight;
     static const qreal highlightScalingFactor;
     static const QColor highlightColor;
+    static const qreal coordinateChangeStep;
     static const qreal zValue;
     std::unordered_set<GraphEdge*> incidentEdges;
 public:
@@ -25,6 +26,8 @@ public:
     void toggleHighlight(bool enable);
     void addIncidentEdge(GraphEdge* e);
     void removeIncidentEdge(GraphEdge *e);
+protected:
+    void keyPressEvent(QKeyEvent *event);
 signals:
     void was_selected(Node&,int);
     void was_deselected(Node&);
@@ -65,6 +68,7 @@ public:
 protected:
         void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
         void mouseMoveEvent (QGraphicsSceneMouseEvent*);
+        void keyReleaseEvent(QKeyEvent *event);
 signals:
         void was_selected(Node&,int);
         void was_deselected(Node&);

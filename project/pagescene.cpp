@@ -212,7 +212,7 @@ void PageScene::addEdge(const Edge& e){
 
     connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
     connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
-    connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
+    connect(path,SIGNAL(move(Edge&,int)),mainWindow,SLOT(move_edge_request(Edge&,int)));
 }
 
 void PageScene::removeEdge(const Edge &e){

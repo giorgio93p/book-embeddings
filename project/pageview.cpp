@@ -7,6 +7,7 @@ PageView::PageView(BookEmbeddedGraph* g) : graph(g){
     isBeingResized = false;
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setDragMode(QGraphicsView::RubberBandDrag);
     //this->setCornerWidget();
 }
 

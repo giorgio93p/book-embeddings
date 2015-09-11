@@ -37,7 +37,7 @@ void GraphScene::addEdge(const Edge &e, const QColor col){
 
     connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
     connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
-    connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
+    connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge_request(Edge&)));
 }
 
 void GraphScene::removeEdge(const Edge &e){

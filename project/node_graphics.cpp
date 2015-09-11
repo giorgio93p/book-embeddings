@@ -11,13 +11,14 @@ const qreal GraphNode::defaultWidth = 6;
 const qreal GraphNode::defaultHeight = 6;
 const qreal GraphNode::highlightScalingFactor = 1.2;
 const QColor GraphNode::highlightColor = QColor(230,0,230);
+const qreal GraphNode::coordinateChangeStep = 12;
 const qreal GraphNode::zValue = 2;
 
 GraphNode::GraphNode(const Node& v){
     node = v;
     incidentEdges = std::unordered_set<GraphEdge*>();
 
-    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemIsFocusable);
     setRect(0,0,defaultWidth,defaultHeight);
 
     setBrush(defaultBrush);
@@ -38,6 +39,23 @@ void GraphNode::addIncidentEdge(GraphEdge *e){
 
 void GraphNode::removeIncidentEdge(GraphEdge *e){
     incidentEdges.erase(e);
+}
+
+void GraphNode::keyPressEvent(QKeyEvent *event){
+    switch(event->key()){
+    case Qt::Key_Escape:
+    case Qt::Key_Enter:
+        setSelected(false);
+        clearFocus();
+        break;
+    case Qt::Key_Left: setPos(pos()+QPointF(-coordinateChangeStep,0)); break;
+    case Qt::Key_Right: setPos(pos()+QPointF(coordinateChangeStep,0)); break;
+    case Qt::Key_Up: setPos(pos()+QPointF(0,-coordinateChangeStep)); break;
+    case Qt::Key_Down: setPos(pos()+QPointF(0,coordinateChangeStep)); break;
+    default:
+        QGraphicsItem::keyPressEvent(event);
+        return;
+    }
 }
 
 QVariant GraphNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
@@ -84,7 +102,7 @@ const QColor PageNode::highlightColor = QColor(230,0,230);
 const qreal PageNode::zValue = 2;
 
 PageNode::PageNode(PageScene *scene, const Node& v, std::vector<QPointF>* positions) : node(v), pageScene(scene), nodePositions(positions){
-    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
+    setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges | QGraphicsItem::ItemIsFocusable);
 
     nodeDragged = false;
     position = v->index();
@@ -152,6 +170,35 @@ void PageNode::resetPosition(){
 void PageNode::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
     nodeDragged = true;
     QGraphicsEllipseItem::mouseMoveEvent(event);
+}
+
+void PageNode::keyReleaseEvent(QKeyEvent *event){
+    switch(event->key()){
+    case Qt::Key_Escape:
+    case Qt::Key_Enter:
+        setSelected(false);
+        clearFocus();
+        QGraphicsItem::keyReleaseEvent(event);
+        return;
+    case Qt::Key_Left: emit move(node,position-1); break;
+    case Qt::Key_Right: emit move(node,position+1); break;
+    case Qt::Key_0: emit move(node,0); break;
+    case Qt::Key_1: emit move(node,1); break;
+    case Qt::Key_2: emit move(node,2); break;
+    case Qt::Key_3: emit move(node,3); break;
+    case Qt::Key_4: emit move(node,4); break;
+    case Qt::Key_5: emit move(node,5); break;
+    case Qt::Key_6: emit move(node,6); break;
+    case Qt::Key_7: emit move(node,7); break;
+    case Qt::Key_8: emit move(node,8); break;
+    case Qt::Key_9: emit move(node,9); break;
+    default:
+        QGraphicsItem::keyReleaseEvent(event);
+        return;
+    }
+    setFocus();
+    //setSelected(true);
+    QGraphicsItem::keyReleaseEvent(event);
 }
 
 PageScene* PageNode::scene() {

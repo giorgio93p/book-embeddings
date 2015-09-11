@@ -131,6 +131,8 @@ public:
 
 
 private:
+    void move_edge(Edge&, int newPage);
+
     void drawBCTree();
     void drawBookEmbeddedGraph();
     void redrawPages();
@@ -151,7 +153,7 @@ public slots:
     void on_node_selected(Node &, int);
     void on_node_deselected(Node &);
 
-    void move_edge(Edge&);
+    void move_edge_request(Edge &e, int direction = (int)PageEdge::MoveDirection::Unknown);
     void move_node(Node&, int newPosition);
     void on_node_dragged(Node &v, int atPage, QPointF toPos);
     void node_coordinates_changed(Node&,QPointF);
@@ -172,7 +174,6 @@ public slots:
                            // it corresponds to.
 
 signals:
-
     void number_of_nodes_changed(int i);
     void number_of_edges_changed(int i);
     void crossings_changed(std::vector<int>);

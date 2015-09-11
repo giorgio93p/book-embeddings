@@ -440,19 +440,32 @@ void MainWindow::on_node_deselected(Node& v){
     }
 }
 
-void MainWindow::move_edge(Edge &e){
+void MainWindow::move_edge_request(Edge &e, int direction){
     int currPage = mainGraph->getPageNo(e);
-    bool ok;
-    int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
-                                       tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
-    if (!ok || newPage==currPage) return;
-    commandHistory->activeStack()->push(new EdgeMoveCommand(e,currPage,newPage,&pageViews,mainGraph,graphView->scene(),total_crossings_indicator));
+    if(direction == (int)PageEdge::MoveDirection::Unknown){
+        bool ok;
+        int newPage = QInputDialog::getInt(this, tr("Move edge to page"),
+                                           tr("New page:"),currPage,0,mainGraph->getNpages()-1,1,&ok);
+        if (!ok || newPage==currPage) return;
+        move_edge(e,newPage);
+    } else if(direction == (int)PageEdge::MoveDirection::Up && currPage > 0){
+        move_edge(e,currPage - 1);
+    } else if(direction == (int)PageEdge::MoveDirection::Down && currPage < mainGraph->getNpages()-1){
+        move_edge(e,currPage + 1);
+    } else if(direction >= 0 && direction <= mainGraph->getNpages()-1 && direction != currPage){
+        move_edge(e,direction);
+    }
+}
+
+void MainWindow::move_edge(Edge& e, int newPage){
+    commandHistory->activeStack()->push(new EdgeMoveCommand(e,mainGraph->getPageNo(e),newPage,&pageViews,mainGraph,graphView->scene(),total_crossings_indicator));
 }
 
 void MainWindow::move_node(Node &v, int newPosition){
-    Q_ASSERT(mainGraph->getPosition(v) != newPosition);
+    if(newPosition < 0 || newPosition >= mainGraph->numberOfNodes() || mainGraph->getPosition(v) == newPosition) return;
     deselectEverythingInAllPagesBut(-1);
     commandHistory->activeStack()->push(new NodeMoveCommand(v,mainGraph, newPosition, &pageViews));
+    on_node_selected(v,-1);
 }
 
 void MainWindow::on_node_dragged(Node&v, int atPage, QPointF toPos){

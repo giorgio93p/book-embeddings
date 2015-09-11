@@ -66,14 +66,26 @@ public:
         void toggleHighlight(bool enable);
         void setVScalingFactor(const qreal &value);
 
+        /**
+         * @brief The MoveDirection enum is used by MainWindow when we try to move an edge from a page to another.
+         *
+         * Up means that we want to move it to the previous page
+         * Down means that we want to move it to the next page
+         * Unknown causes the MainWindow to try and specify which edge we are trying to move
+         *
+         * It is important that their codes are negative integers, so that we can use non-negative integers for actual page numbers.
+         */
+        enum struct MoveDirection : int {Unknown = -1, Up = -2, Down = -3};
+
 public slots:
-        void on_move_request(){emit move(edge);}
+        void on_move_request(){emit move(edge,(int)MoveDirection::Unknown);}
 protected:
+        void keyReleaseEvent(QKeyEvent * event);
 signals:
         void was_selected(Edge&);
         void was_deselected(Edge&);
 
-        void move(Edge&);
+        void move(Edge&,int);
 private:
         void adjustPainterPath();
 };
