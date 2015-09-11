@@ -6,353 +6,365 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>795</width>
-    <height>790</height>
+    <width>920</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QScrollArea" name="scrollArea">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>0</y>
-      <width>461</width>
-      <height>751</height>
-     </rect>
-    </property>
-    <property name="widgetResizable">
-     <bool>true</bool>
-    </property>
-    <widget class="QWidget" name="scrollAreaWidgetContents">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>459</width>
-       <height>749</height>
-      </rect>
-     </property>
-     <widget class="QGraphicsView" name="graphicsView">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>441</width>
-        <height>191</height>
-       </rect>
-      </property>
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="GraphView" name="graphView">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget_2">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="title">
+          <string>Tab 1</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QGraphicsView" name="bCTView">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_6">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="title">
+          <string>Tab 2</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QGraphicsView" name="bCView">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="stats">
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="graph_stats">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <attribute name="title">
+          <string>Graph</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="1" column="0">
+           <widget class="QLabel" name="total_crossings_label">
+            <property name="text">
+             <string>Crossings:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="total_crossings_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="number_of_pages_label">
+            <property name="text">
+             <string>Number of pages:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="number_of_pages_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="number_of_nodes_label">
+            <property name="text">
+             <string>Number of nodes:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="number_of_nodes_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="number_of_edges_label">
+            <property name="text">
+             <string>Number of edges:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="number_of_edges_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="planarity_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="planarity_label">
+            <property name="text">
+             <string>Is Planar?</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="node_stats">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="accessibleName">
+          <string/>
+         </property>
+         <attribute name="title">
+          <string>Node</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="3" column="0">
+           <widget class="QLabel" name="node_index_label">
+            <property name="text">
+             <string>Index:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="node_index_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="node_deg_label">
+            <property name="text">
+             <string>Degree:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="node_deg_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="edge_stats">
+         <attribute name="title">
+          <string>Edge</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="2" column="0">
+           <widget class="QLabel" name="edge_source_label">
+            <property name="text">
+             <string>Source:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="edge_source_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="edge_target_label">
+            <property name="text">
+             <string>Target:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="edge_target_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="edge_crossings_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="edge_crossings_label">
+            <property name="text">
+             <string>Crossings:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="edge_page_label">
+            <property name="text">
+             <string>Page:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="edge_page_indicator">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>4</horstretch>
-        <verstretch>4</verstretch>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-     </widget>
-     <widget class="QGraphicsView" name="graphicsView_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>220</y>
-        <width>441</width>
-        <height>161</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QGraphicsView" name="graphicsView_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>410</y>
-        <width>441</width>
-        <height>151</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QGraphicsView" name="graphicsView_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>570</y>
-        <width>441</width>
-        <height>141</height>
-       </rect>
-      </property>
-      <property name="mouseTracking">
+      <property name="widgetResizable">
        <bool>true</bool>
       </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>580</y>
-      <width>301</width>
-      <height>131</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Tab 1</string>
-     </attribute>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>10</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Crossings:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>40</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Number of pages:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>70</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#changes:</string>
-      </property>
-     </widget>
-     <widget class="QTextBrowser" name="textBrowser">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>10</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QTextBrowser" name="textBrowser_2">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>40</y>
-        <width>51</width>
-        <height>16</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Tab 2</string>
-     </attribute>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>251</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Graph Properties:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#Faces:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#nodes:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>70</y>
-        <width>47</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>#edges:</string>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>301</width>
-      <height>561</height>
-     </rect>
-    </property>
-    <widget class="QGraphicsView" name="GraphView">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>10</y>
-       <width>311</width>
-       <height>231</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTabWidget" name="tabWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>260</y>
-       <width>301</width>
-       <height>291</height>
-      </rect>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab_3">
-      <attribute name="title">
-       <string>Tab 1</string>
-      </attribute>
-      <widget class="QGraphicsView" name="graphicsView_5">
+      <widget class="QWidget" name="embedding_drawing">
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>10</y>
-         <width>291</width>
-         <height>241</height>
+         <y>0</y>
+         <width>614</width>
+         <height>613</height>
         </rect>
        </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="tab_4">
-      <attribute name="title">
-       <string>Tab 2</string>
-      </attribute>
-      <widget class="QGraphicsView" name="graphicsView_6">
-       <property name="geometry">
-        <rect>
-         <x>-5</x>
-         <y>11</y>
-         <width>281</width>
-         <height>231</height>
-        </rect>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
       </widget>
      </widget>
-    </widget>
-   </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>795</width>
+     <width>920</width>
      <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
-    <addaction name="actionNew"/>
-    <addaction name="actionOpen_2"/>
+    <addaction name="actionOpen"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
-    <addaction name="actionExport"/>
-    <addaction name="separator"/>
     <addaction name="actionExit"/>
-    <addaction name="separator"/>
-    <addaction name="actionPrint"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
-    <addaction name="actionUndo"/>
-    <addaction name="actionRedo"/>
-    <addaction name="separator"/>
-    <addaction name="actionDelete"/>
-    <addaction name="separator"/>
-    <addaction name="actionSelecte"/>
-    <addaction name="actionUnselect_All"/>
-    <addaction name="separator"/>
-    <addaction name="actionFind"/>
+    <addaction name="actionAddPage"/>
+    <addaction name="actionDeletePage"/>
     <addaction name="separator"/>
     <addaction name="actionProperties"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
-    <widget class="QMenu" name="menuMode">
-     <property name="title">
-      <string>Mode</string>
-     </property>
-     <addaction name="actionEdit_Mode"/>
-     <addaction name="actionNavigation_Mode"/>
-    </widget>
-    <addaction name="actionZoom_In"/>
-    <addaction name="actionZoom_Out"/>
-    <addaction name="actionReset_Zoom"/>
-    <addaction name="separator"/>
     <addaction name="actionFit_Content"/>
     <addaction name="separator"/>
-    <addaction name="menuMode"/>
-    <addaction name="separator"/>
-    <addaction name="actionFull_Screen"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
-     <string>Options</string>
+     <string>&amp;Options</string>
     </property>
     <widget class="QMenu" name="menuAlgorithms">
      <property name="title">
-      <string>Algorithms</string>
+      <string>&amp;Algorithms</string>
      </property>
      <addaction name="actionPlanarity"/>
     </widget>
@@ -361,24 +373,17 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
     <addaction name="actionAnalyze_Graph"/>
     <addaction name="separator"/>
     <addaction name="actionColorize_Edges"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionYou_dont_need_help"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuOptions"/>
    <addaction name="menuTools"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -394,19 +399,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="separator"/>
-   <addaction name="actionZoom_In"/>
-   <addaction name="actionZoom_Out"/>
-   <addaction name="actionReset_Zoom"/>
+   <addaction name="actionAddPage"/>
    <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/new.png</normaloff>../icons/new.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/new</normaloff>:/new</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -414,42 +416,47 @@
    <property name="whatsThis">
     <string/>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Folder Open.png</normaloff>../icons/Folder Open.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/open-folder</normaloff>:/open-folder</iconset>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string>&amp;Open</string>
    </property>
-  </action>
-  <action name="actionOpen_2">
-   <property name="text">
-    <string>Open</string>
-   </property>
-   <property name="toolTip">
-    <string>Open a Graph.gml</string>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/save.png</normaloff>../icons/save.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/save</normaloff>:/save</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
    <property name="toolTip">
-    <string> Save the changes</string>
+    <string>Save the changes</string>
    </property>
-   <property name="statusTip">
-    <string>toolTip</string>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionSave_as">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/save</normaloff>:/save</iconset>
+   </property>
    <property name="text">
-    <string>Save as</string>
+    <string>Save &amp;as</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionExport">
@@ -458,50 +465,87 @@
    </property>
   </action>
   <action name="actionExit">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/exit</normaloff>:/exit</iconset>
+   </property>
    <property name="text">
-    <string>Print</string>
+    <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/previous</normaloff>:/previous</iconset>
+   </property>
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/next</normaloff>:/next</iconset>
+   </property>
    <property name="text">
     <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y, Ctrl+Shift+Z</string>
    </property>
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Avosoft-Warm-Toolbar-Cut.ico</normaloff>../icons/Avosoft-Warm-Toolbar-Cut.ico</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/cut</normaloff>:/cut</iconset>
    </property>
    <property name="text">
     <string>Cut</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Copy.png</normaloff>../icons/Copy.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/copy</normaloff>:/copy</iconset>
    </property>
    <property name="text">
     <string>Copy</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/136837629872716929332x32-paste_from_clipboard-4-md.png</normaloff>../icons/136837629872716929332x32-paste_from_clipboard-4-md.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/paste</normaloff>:/paste</iconset>
    </property>
    <property name="text">
     <string>Paste</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
   </action>
-  <action name="actionDelete">
+  <action name="actionDeletePage">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/remove</normaloff>:/remove</iconset>
+   </property>
    <property name="text">
-    <string>Delete</string>
+    <string>&amp;Delete Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
   <action name="actionSelecte">
@@ -521,39 +565,48 @@
   </action>
   <action name="actionProperties">
    <property name="text">
-    <string>Properties</string>
+    <string>&amp;Properties</string>
    </property>
   </action>
   <action name="actionZoom_In">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Zoom-In-icon.png</normaloff>../icons/Zoom-In-icon.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/zoom-in</normaloff>:/zoom-in</iconset>
    </property>
    <property name="text">
-    <string>Zoom In</string>
+    <string>Zoom &amp;In</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
    </property>
   </action>
   <action name="actionZoom_Out">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/Zoom_Out-01.png</normaloff>../icons/Zoom_Out-01.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/zoom-out</normaloff>:/zoom-out</iconset>
    </property>
    <property name="text">
-    <string>Zoom Out</string>
+    <string>Zoom &amp;Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
   <action name="actionReset_Zoom">
    <property name="icon">
-    <iconset>
-     <normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</normaloff>../icons/120px-Gnome-zoom-fit-best.svg.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/zoom-fit</normaloff>:/zoom-fit</iconset>
    </property>
    <property name="text">
-    <string>Reset Zoom</string>
+    <string>Reset &amp;Zoom</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
    </property>
   </action>
   <action name="actionFit_Content">
    <property name="text">
-    <string>Fit Content</string>
+    <string>&amp;Fit Content</string>
    </property>
   </action>
   <action name="actionEdit_Mode">
@@ -578,22 +631,17 @@
   </action>
   <action name="actionAnalyze_Graph">
    <property name="text">
-    <string>Analyze Graph</string>
+    <string>&amp;Analyze Graph</string>
    </property>
   </action>
   <action name="actionColorize_Edges">
    <property name="text">
-    <string>Colorize Edges</string>
+    <string>&amp;Colorize Edges</string>
    </property>
   </action>
   <action name="actionLayouts">
    <property name="text">
-    <string>Layout</string>
-   </property>
-  </action>
-  <action name="actionNew_2">
-   <property name="text">
-    <string>New</string>
+    <string>&amp;Layout</string>
    </property>
   </action>
   <action name="actionYou_dont_need_help">
@@ -603,11 +651,56 @@
   </action>
   <action name="actionPrint">
    <property name="text">
-    <string>Exit</string>
+    <string>&amp;Print</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionAddPage">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/add</normaloff>:/add</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Add Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionRedraw">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/refresh</normaloff>:/refresh</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Redraw</string>
+   </property>
+   <property name="toolTip">
+    <string>Redraw</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>GraphView</class>
+   <extends>QGraphicsView</extends>
+   <header>graphview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>menubar</sender>
@@ -622,22 +715,6 @@
     <hint type="destinationlabel">
      <x>52</x>
      <y>5</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionExit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>397</x>
-     <y>394</y>
     </hint>
    </hints>
   </connection>

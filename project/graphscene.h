@@ -1,52 +1,37 @@
-
 #ifndef GRAPHSCENE_H
 #define GRAPHSCENE_H
-using namespace std;
+
+#include <vector>
+#include <QColor>
 #include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
-#include <vector>
 #include <QGraphicsPathItem>
 #include <QMouseEvent>
 #include "graphs.h"
-
-
-#define LEN 250
-
-class Colors {
-    vector<QColor> pageColors;
-
-  public:
-    Colors();
-    QColor& operator[](int i);
-};
-
-typedef  pair<int,int> IntPair;
+#include "edge_graphics.h"
+#include "node_graphics.h"
+class MainWindow;
 
 class GraphScene : public QGraphicsScene
 {
+    Q_OBJECT
 public:
-    GraphScene(int nn, int mm, std::vector< std::pair< int,int > > edgs, std::vector<int> permutation);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
+    GraphScene(BookEmbeddedGraph *g, MainWindow* w, const double width=250.0, const double height=50.0);
+    //void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) Q_DECL_OVERRIDE;
 
+    void addEdgeInitial(const Edge &e, const int page);
+    void addEdge(const Edge &e, const QColor);
+    void removeEdge(const Edge &e);
 
-
+    void addNode(const Node &, QPointF position);
+    void removeNode(const Node &v);
+    void highlightNode(const Node &v, bool enable);
+    void deselectAll();
+    void highlightEdge(const Edge &e, bool enable);
 private:
-    std::vector<QGraphicsEllipseItem*> nodes;
-    vector< IntPair > *edges;
-    int n;
-    int m;
-
-
-
-
+    std::unordered_map<Node, GraphNode*> *nodes;
+    std::unordered_map<Edge, GraphEdge*> *edges;
+    MainWindow* mainWindow;
 };
-
-class SimpleGraphScene : public QGraphicsScene{
-    std::vector<QGraphicsEllipseItem*> nodes;
-
-  public:
-    void drawGraph(Graph g);
-};
-
 
 #endif // GRAPHSCENE_H

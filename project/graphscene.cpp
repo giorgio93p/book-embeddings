@@ -1,78 +1,85 @@
 #include "graphscene.h"
+#include "mainwindow.h"
+
 #include <iostream>
-using namespace std;
 
-Colors::Colors(){
-    pageColors = {Qt::red,Qt::green,Qt::blue,Qt::cyan,Qt::magenta,Qt::yellow,Qt::gray};
-}
+GraphScene::GraphScene(BookEmbeddedGraph* g,MainWindow* w, const double width, const double height){
+    //Paint Nodes
+    nodes = new std::unordered_map<Node,GraphNode*>();
+    mainWindow=w;
 
-QColor& Colors::operator[](int i){
-    return pageColors[i];
-}
-
-GraphScene::GraphScene(int nn, int mm, vector< pair<int,int> > edgs,vector<int> permutation)  :
-    n(nn),m(mm)
-{
-    int i;
-    nodes.resize(nn);
-    edges = new vector<IntPair>(edgs);
-    for (i=0;i<n;i++) {
-        QBrush redBrush(Qt::red);
-        QPen blackPen(Qt::black);
-        blackPen.setWidth(2);
-
-        //nodes.push_back(this->addEllipse(-LEN+i*(2*LEN/n),0,12,12,blackPen,redBrush));
-        QGraphicsEllipseItem* el = this->addEllipse(-LEN+i*(2*LEN/n),0,12,12,blackPen,redBrush);
-
-        //nodes[i]->setMovable();
-        el->setFlag(QGraphicsItem::ItemIsSelectable, true);
-        nodes[i]=el;
-
+    Node v;
+    forall_nodes(v,*g){
+        addNode(v,QPointF(g->getXcoord(v),g->getYcoord(v)));
     }
 
-    printf("%d is the number of edges here\n",m);
+    //Paint Edges
+    edges = new std::unordered_map<Edge, GraphEdge*>();
 
-    for (i=0; i<mm;i++) {
-
-        //QColor c=Qt::red;
-
-        QPen blackPen(Qt::black);
-        blackPen.setWidth(2);
-
-        qreal interval=(2*LEN/nn); //space between two consequent vertices
-
-
-        qreal x1 = 6 + ((qreal)edges->at(i).first) * interval-LEN;
-        qreal x2 = 6 + ((qreal)edges->at(i).second) * interval-LEN;
-
-
-        double vscalingfactor = 0.7;
-        double height = ((x2-x1)/2)*vscalingfactor;
-        QPainterPath* edg = new QPainterPath();
-        edg->moveTo(x2,0);
-        edg->arcTo(x1,-height,(x2-x1),2*height,0,180);
-
-        blackPen.setColor(Qt::black);
-
-
-        QGraphicsItem * path = this->addPath(*edg,blackPen);
-        path->setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-
-
-
+    Edge e;
+    forall_edges(e,*g) {
+        addEdge(e,mainWindow->getPageColour(g->getPageNo(e)));
     }
-
-
-
 }
 
-void GraphScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
-{
+void GraphScene::addEdge(const Edge &e, const QColor col){
+    GraphNode* source = (*nodes)[e->source()];
+    const QPointF sourceCenter = source->mapToScene(source->boundingRect().center());
+    GraphNode* target = (*nodes)[e->target()];
+    const QPointF targetCenter = target->mapToScene(target->boundingRect().center());
 
-    this->addText("καλημέρα !!!");
+    GraphEdge * path = new GraphEdge(sourceCenter,targetCenter,col,e);
+    this->addItem(path);
+    (*edges)[e] = path;
 
-    //this->repaint();
+    source->addIncidentEdge(path);
+    target->addIncidentEdge(path);
+
+    connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
+    connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
+    connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge(Edge&)));
+}
+
+void GraphScene::removeEdge(const Edge &e){
+    this->removeItem(edges->at(e));
+    delete edges->at(e);
+}
+
+void GraphScene::addNode(const Node& v, QPointF position){
+    //std::cout << g.getPosition(v) << std::endl;
+    GraphNode* el = new GraphNode(v);
+    this->addItem(el);
+    el->setPos(position);
+    (*nodes)[v] = el;
+    connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+    connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
+    connect(el,SIGNAL(coordinates_changed(Node&,QPointF)),mainWindow,SLOT(node_coordinates_changed(Node&,QPointF)));
+}
+
+void GraphScene::removeNode(const Node& v){
+    this->removeItem(nodes->at(v));
+    delete nodes->at(v);
+}
+
+void GraphScene::highlightNode(const Node& v, bool enable){
+    nodes->at(v)->toggleHighlight(enable);
+}
+
+void GraphScene::highlightEdge(const Edge& e, bool enable){
+    edges->at(e)->toggleHighlight(enable);
+}
+
+void GraphScene::deselectAll() {
+
+    for ( auto it = edges->begin(); it != edges->end(); ++it ) {
+        QGraphicsItem* curr = (QGraphicsItem*)it->second;
+        curr->setSelected(false);
+    }
+
+    for ( auto it = nodes->begin(); it != nodes->end(); ++it ) {
+        QGraphicsItem* curr = (QGraphicsItem*)it->second;
+        curr->setSelected(false);
+    }
 
 }
 

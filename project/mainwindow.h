@@ -1,50 +1,182 @@
+/*
+ *
+ * Main window class. This is the class of our mainwindow object, and it
+ * derives from the QMainWindow class AND from the Ui::MainWindow class.
+ * This is a bit complicated:we load the ui, so  deriving from Ui::MainWindow is the way
+ * we connect our application to our form.
+ * (The form is the document that describes every change we have made
+ * with qtdesigner, and it is named 'mainwindow.ui')
+
+
+ * This is the "control center" of our application.
+ * In the constructor we load the interface we have designed
+ * with QtDesigner, using the setupUi method. Now we can access each object
+ * we have added to the designer by its name, as if it was a field of the
+ * mainwindow class. That's all about the designer, we don't need to know
+ * much more about that.
+
+
+ *
+ *
+ *
+ */
+
+
+
+
+
+
+
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QGridLayout>
 #include "ui_mainwindow.h"
 #include "graphscene.h"
-//#include "graphs.h"
-#include <ogdf/basic/GraphAttributes.h>
-#include <ogdf/basic/Graph.h>
-#include <ogdf/fileformats/GraphIO.h>
-
-
+#include "graphs.h"
+#include <vector>
+#include <QMainWindow>
+#include <QGridLayout>
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
+
+#include <QUndoGroup>
+#include <ogdf/internal/planarity/ConnectedSubgraph.h>
+
+#include "biconnectedcomponent.h"
+#include "auxiliarygraph.h"
+#include "pageview.h"
+#include "colourcloset.h"
+
+
+class PageScene; //forward declaration
+
+
+
+
+
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
 
+    ColourCloset colourCloset;
+    //this holds a number of available colors.
+    //we use it to control the colours in pages
+    //see [1]
+
+    std::vector<PageView*> pageViews;
+    //this holds the views that show
+    //each pagescene. A pagescene
+    //simply displays a page.
+
+
+    BookEmbeddedGraph* mainGraph;
+    //a pointer to the mainGraph object.
+    //this is the graph we read from the gml
+    //file, along with the information about the
+    //pages, and more.
+    std::string currentFile;
+    //full name of the file we have opened.
+    //might be useful, might not.
+    AuxiliaryGraph* auxiliaryGraph;
+    //this contains a vector of graphs,
+    //or to be more precise, a vector BiconnectedComponent
+    //objects. These derive from the Graph class, and are
+    //the biconnected components of mainGraph. They are
+    //completely independent, and they can 'communicate'
+    //with the graph through mappings from each node of
+    //theirs to the corresponding node in mainGraph.
+
+    /**
+     * @brief commandHistory commandHistory contains stacks of recently made changes. We use it to undo/redo actions performed on our graph.
+     * In case we decide to use one tab for each biconnected component, each biconnected component will have its own stack in the group.
+     *
+     */
+    QUndoGroup* commandHistory;
+
+    //commandHistory contains stacks of recently made changes.
+    //we use it to undo/redo actions performed on our graph.
+    //In case we decide to use one tab for each biconnected component,
+    //each
+
+
+    bool wholeGraphMode;
+    //this flag indicates if our pages are displaying the whole graph
+    //or just a biconnectedComponent of it.
+
+    BiconnectedComponent* currBC;
+
+    //this is the biconnected component under examination, if
+    //of course wholeGraphMode is false.
+
 public:
     explicit MainWindow(QWidget *parent = 0);
-    void openGraph(char* filename);
-    void drawGraph();
+    bool openBookEmbeddedGraph(std::string filename);
 
-    ~MainWindow();
-    //vector<Page> *pages;
 
-public slots:
+    ~MainWindow() = default;
+    //vector<Page> *pages;(
 
-    void on_actionOpen_triggered();
-    inline void on_actionOpen_2_triggered() {on_actionOpen_triggered();};
+    BiconnectedComponent* getCurrBC() const { return currBC;}
+
+
+    void remove_page_drawing(int page);
+    void add_page_drawing(int p);
+    bool isWholeGraphModeOn() {
+        return wholeGraphMode;
+    }
+    QColor getPageColour(int pageno);
 
 
 private:
+    void drawBCTree();
+    void drawBookEmbeddedGraph();
+    void redrawPages();
 
-    ogdf::Graph mainGraph;
+    void findBiconnectedComponentsOfMainGraph();
 
-    vector<GraphScene*> scene ;
-    //BookEmbeddedGraph* begraph;
-    //Graph* graph;
 
+    void deselectEverythingInAllPagesBut(int page = -1);
+
+public slots:
+    void on_actionAddPage_triggered();
+    void on_actionOpen_triggered();
+    void on_actionSave_triggered();
+    void on_actionSave_as_triggered();
+
+    void on_edge_selected(Edge &);
+    void on_edge_deselected(Edge &);
+    void on_node_selected(Node &, int);
+    void on_node_deselected(Node &);
+
+    void move_edge(Edge&);
+    void move_node(Node&, int newPosition);
+    void on_node_dragged(Node &v, int atPage, QPointF toPos);
+    void node_coordinates_changed(Node&,QPointF);
+
+    void on_remove_page(int);
+    void on_crossings_changed(std::vector<int>);
+
+    void loadBC(BiconnectedComponent*); //this should locate the bc given node is in and
+                           //do stuff.
+                           // node n is a part of bctree graph.
+                           // possibly we can find an ogdf::bctree method
+                           // that gives us the original graph node.
+                           // then we have to map the original graph node to
+                           // the bookembedding it belongs to.
+                           // in order to do that, we have to search in the mapping table
+                           // of every bcomponent. This takes time, so we should also
+                            // have a mappning from each node to the BiconnectedComponent that
+                           // it corresponds to.
+
+signals:
+
+    void number_of_nodes_changed(int i);
+    void number_of_edges_changed(int i);
+    void crossings_changed(std::vector<int>);
+    void planarity_changed(QString);
 };
 
-
-
-
-
-#endif // MAINWINDOW_H
+#endif
