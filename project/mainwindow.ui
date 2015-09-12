@@ -355,8 +355,9 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="actionFit_Content"/>
+    <addaction name="actionUnselect_All"/>
     <addaction name="separator"/>
+    <addaction name="actionFit_Content"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">

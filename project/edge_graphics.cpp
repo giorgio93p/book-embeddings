@@ -16,16 +16,22 @@ GraphEdge::GraphEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e
     highlighted = false;
     sourceCenter = sourceC;
     targetCenter = targetC;
+    ctrl_pressed = false;
 
     setFlag(QGraphicsItem::ItemIsSelectable);
     setLine(QLineF(sourceCenter,targetCenter));
     setZValue(zValue);
 }
 
-QVariant GraphEdge::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value){
+void GraphEdge::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    if(event->modifiers() & Qt::ControlModifier) ctrl_pressed = true;
+    else ctrl_pressed = false;
+}
+
+QVariant GraphEdge::itemChange(GraphicsItemChange change, const QVariant & value) {
     if (change == QGraphicsItem::ItemSelectedChange) {
         if(value.toBool()) {
-            emit was_selected(edge);
+            emit was_selected(edge,ctrl_pressed);
         }
         else
         {
@@ -69,8 +75,25 @@ void GraphEdge::adjust(Node &v, QPointF newPosition){
 const qreal PageEdge::defaultWidth = 2;
 const QPen PageEdge::highlightPen = QPen(QBrush(QColor(230,0,230)),4);
 const qreal PageEdge::zValue = 0;
-const qreal PageEdge::dx = 3; //dx and dy are used to make clicking on edge simpler
-const qreal PageEdge::dy = 6; //essentialy, we use shape() to draw two ellipses -which define the clickable area- around painterPath
+const qreal PageEdge::dx = 6; //dx and dy are used to make clicking on edge simpler
+const qreal PageEdge::dy = 8; //essentialy, we use shape() to draw two ellipses -which define the clickable area- around painterPath
+
+PageEdge::PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e, qreal vScaling) {
+    pen = QPen(QBrush(col),defaultWidth);
+    sourceCenter = sourceC;
+    targetCenter = targetC;
+    edge = e;
+    highlighted = false;
+    vScalingFactor = vScaling;
+    ctrl_pressed = false;
+
+    setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlag(QGraphicsItem::ItemIsFocusable);
+    setZValue(zValue);
+
+    adjustPainterPath();
+    //std::cout << "Drawing edge " << (*e)->source() << "," << (*e)->target() << std::endl;
+}
 
 void PageEdge::setVScalingFactor(const qreal &value){
     vScalingFactor = value;
@@ -83,8 +106,12 @@ void PageEdge::keyReleaseEvent(QKeyEvent *event){
         clearFocus();
         setSelected(false);
         break;
-    case Qt::Key_Up: emit move(edge,(int)MoveDirection::Up); break;
-    case Qt::Key_Down: emit move(edge,(int)MoveDirection::Down); break;
+    case Qt::Key_Up:
+    case Qt::Key_PageUp:
+        emit move(edge,(int)MoveDirection::Up); break;
+    case Qt::Key_Down:
+    case Qt::Key_PageDown:
+        emit move(edge,(int)MoveDirection::Down); break;
     case Qt::Key_0: emit move(edge,0); break;
     case Qt::Key_1: emit move(edge,1); break;
     case Qt::Key_2: emit move(edge,2); break;
@@ -101,22 +128,6 @@ void PageEdge::keyReleaseEvent(QKeyEvent *event){
     }
     //setFocus();
     //setSelected(true);
-}
-
-PageEdge::PageEdge(QPointF sourceC, QPointF targetC, QColor col, const Edge &e, qreal vScaling) {
-    pen = QPen(QBrush(col),defaultWidth);
-    sourceCenter = sourceC;
-    targetCenter = targetC;
-    edge = e;
-    highlighted = false;
-    vScalingFactor = vScaling;
-
-    setFlag(QGraphicsItem::ItemIsSelectable);
-    setFlag(QGraphicsItem::ItemIsFocusable);
-    setZValue(zValue);
-
-    adjustPainterPath();
-    //std::cout << "Drawing edge " << (*e)->source() << "," << (*e)->target() << std::endl;
 }
 
 void PageEdge::adjust(Node& v, QPointF newPosition){
@@ -169,10 +180,15 @@ QPainterPath PageEdge::shape() const{
     return shape;
 }
 
+void PageEdge::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    if(event->modifiers() & Qt::ControlModifier) ctrl_pressed = true;
+    else ctrl_pressed = false;
+}
+
 QVariant PageEdge::itemChange(GraphicsItemChange change, const QVariant & value) {
     if (change == QGraphicsItem::ItemSelectedChange) {
         if(value.toBool()) {
-            emit was_selected(edge);
+            emit was_selected(edge,ctrl_pressed);
         }
         else
         {

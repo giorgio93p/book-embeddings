@@ -139,8 +139,8 @@ private:
 
     void findBiconnectedComponentsOfMainGraph();
 
-
-    void deselectEverythingBut(Edge *e = NULL, Node *v = NULL);
+    void deselectAllEdgesBut(Edge *e = NULL);
+    void deselectAllNodesBut(Node *v = NULL);
 
 public slots:
     void on_actionAddPage_triggered();

@@ -18,6 +18,10 @@ class GraphEdge : public QObject, public QGraphicsLineItem{
     bool highlighted;
     QPointF sourceCenter;
     QPointF targetCenter;
+    /**
+     * @brief ctrl_pressed records when the control key is pressed, so that we can successfully select multiple edges
+     */
+    bool ctrl_pressed;
 
     static const qreal defaultWidth;
     static const QPen highlightPen;
@@ -31,9 +35,11 @@ public:
 public slots:
     void on_move_request(){emit move(edge);}
 signals:
-    void was_selected(Edge&);
+    void was_selected(Edge&,bool);
     void was_deselected(Edge&);
     void move(Edge&);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 };
 
 class PageEdge : public QObject, public QGraphicsItem
@@ -47,6 +53,10 @@ class PageEdge : public QObject, public QGraphicsItem
     Edge edge;
     bool highlighted;
     qreal vScalingFactor;
+    /**
+     * @brief ctrl_pressed records when the control key is pressed, so that we can successfully select multiple edges
+     */
+    bool ctrl_pressed;
 
     static const qreal defaultWidth;
     static const qreal dx;
@@ -80,9 +90,10 @@ public:
 public slots:
         void on_move_request(){emit move(edge,(int)MoveDirection::Unknown);}
 protected:
+        void mousePressEvent(QGraphicsSceneMouseEvent * event);
         void keyReleaseEvent(QKeyEvent * event);
 signals:
-        void was_selected(Edge&);
+        void was_selected(Edge&,bool);
         void was_deselected(Edge&);
 
         void move(Edge&,int);

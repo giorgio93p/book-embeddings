@@ -34,11 +34,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(crossings_changed(std::vector<int>)), this, SLOT(on_crossings_changed(std::vector<int>)));
     connect(this, SIGNAL(planarity_changed(QString)), planarity_indicator, SLOT(setText(QString)));
 
+
     //embedding_drawing->setScaledContents(true);
 
     actionSave_as->setEnabled(false);
     actionSave->setEnabled(false);
     actionAddPage->setEnabled(false);
+    actionUnselect_All->setEnabled(false);
+
+    connect(actionUnselect_All,SIGNAL(triggered(bool)),this,SLOT(deselect_all()));
 
     pageViews = std::vector<PageView*>();
 
@@ -318,7 +322,9 @@ void MainWindow::on_actionSave_as_triggered()
 
 void MainWindow::on_edge_selected(Edge& e, bool keepPreviousSelections){
 
-    if(!keepPreviousSelections) deselectEverythingBut(&e);
+    if(!keepPreviousSelections) deselectAllEdgesBut(&e);
+    deselectAllNodesBut();
+    actionUnselect_All->setEnabled(true);
 
     edge_stats->setEnabled(true);
     //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") selected" << endl;
@@ -337,24 +343,40 @@ void MainWindow::on_edge_selected(Edge& e, bool keepPreviousSelections){
     gs->highlightEdge(e,true);
 }
 
-void MainWindow::deselectEverythingBut(Edge *e, Node *v) {
-    int pageNo = e ? mainGraph->getPageNo(*e) : -1;
+void MainWindow::deselectAllNodesBut(Node *v) {
     for (int i=0; i<pageViews.size(); i++) {
-
         PageScene* ps = pageViews[i]->scene();
-        if (i==pageNo) ps->deselectAllBut(v,e); //if the page under examination is the page of the selected edge
-        else ps->deselectAllBut(v);
-
+        ps->deselectAllNodesBut(v);
     }
 
-    graphView->scene()->deselectAll();
+    graphView->scene()->deselectAllNodesBut(v);
+}
+
+void MainWindow::deselectAllEdgesBut(Edge *e) {
+    int pageNo = e ? mainGraph->getPageNo(*e) : -1;
+    for (int i=0; i<pageViews.size(); i++) {
+        PageScene* ps = pageViews[i]->scene();
+        if (i==pageNo){
+             //if the page under examination is the page of the selected edge
+            ps->deselectAllEdgesBut(e);
+        }
+        else{
+            ps->deselectAllEdgesBut();
+        }
+    }
+
+    graphView->scene()->deselectAllEdgesBut(e);
 }
 
 void MainWindow::deselect_all(){
-    deselectEverythingBut();
+    actionUnselect_All->setEnabled(false);
+    deselectAllNodesBut();
+    deselectAllEdgesBut();
 }
 
 void MainWindow::on_edge_deselected(Edge& e){
+    actionUnselect_All->setEnabled(false);
+
     edge_stats->setEnabled(false);
     //edge_crossings_indicator->clear();
     edge_source_indicator->clear();
@@ -372,7 +394,9 @@ void MainWindow::on_edge_deselected(Edge& e){
 
 void MainWindow::on_node_selected(Node& v, bool keepPreviousSelections){
 
-    if(!keepPreviousSelections)deselectEverythingBut(NULL,&v);
+    if(!keepPreviousSelections)deselectAllNodesBut(&v);
+    deselectAllEdgesBut();
+    actionUnselect_All->setEnabled(true);
 
     node_stats->setEnabled(true);
     //std::cout << "Node " << v->index() << " selected" << endl;
@@ -399,7 +423,7 @@ void MainWindow::on_node_selected(Node& v, bool keepPreviousSelections){
 
 void MainWindow::on_node_deselected(Node& v){
     //slot that is called when a node is deselected.
-
+    actionUnselect_All->setEnabled(false);
 
     node_stats->setEnabled(false);
     node_deg_indicator->clear();

@@ -8,6 +8,8 @@ GraphScene::GraphScene(BookEmbeddedGraph* g,MainWindow* w, const double width, c
     nodes = new std::unordered_map<Node,GraphNode*>();
     mainWindow=w;
 
+    connect(this,SIGNAL(deselect_all()),mainWindow,SLOT(deselect_all()));
+
     Node v;
     forall_nodes(v,*g){
         addNode(v,QPointF(g->getXcoord(v),g->getYcoord(v)));
@@ -35,7 +37,7 @@ void GraphScene::addEdge(const Edge &e, const QColor col){
     source->addIncidentEdge(path);
     target->addIncidentEdge(path);
 
-    connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
+    connect(path,SIGNAL(was_selected(Edge&,bool)),mainWindow,SLOT(on_edge_selected(Edge&,bool)));
     connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
     connect(path,SIGNAL(move(Edge&)),mainWindow,SLOT(move_edge_request(Edge&)));
 }
@@ -69,17 +71,33 @@ void GraphScene::highlightEdge(const Edge& e, bool enable){
     edges->at(e)->toggleHighlight(enable);
 }
 
-void GraphScene::deselectAll() {
+
+void GraphScene::deselectAllEdgesBut(Edge* e) {
 
     for ( auto it = edges->begin(); it != edges->end(); ++it ) {
-        QGraphicsItem* curr = (QGraphicsItem*)it->second;
-        curr->setSelected(false);
-    }
-
-    for ( auto it = nodes->begin(); it != nodes->end(); ++it ) {
+        if(&(it->first) == e) continue;
         QGraphicsItem* curr = (QGraphicsItem*)it->second;
         curr->setSelected(false);
     }
 
 }
 
+void GraphScene::deselectAllNodesBut(Node* v) {
+
+    for ( auto it = nodes->begin(); it != nodes->end(); ++it ) {
+        if(&(it->first) == v) continue;
+        QGraphicsItem* curr = (QGraphicsItem*)it->second;
+        curr->setSelected(false);
+    }
+
+}
+
+void GraphScene::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    const bool clickedAtVoid = itemAt(event->scenePos(),this->views().at(0)->transform()) == 0; //clickedAtVoid checks if there are any items at the point clicked
+                                                      //the second argument of itemAt is required by Qt and "needs to be provided if the scene contains items that ignore transformations"
+    if(clickedAtVoid && !(event->modifiers() & Qt::ControlModifier)){ //if clicked at void with control key not pressed
+        emit deselect_all();
+    }
+
+    QGraphicsScene::mousePressEvent(event);
+}

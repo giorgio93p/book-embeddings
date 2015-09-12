@@ -28,6 +28,7 @@ PageScene::PageScene(const BookEmbeddedGraph *g, const int p, MainWindow* w, QCo
     nodePositions.resize(g->numberOfNodes());
     setSize(QSize(width,height));
 
+    connect(this,SIGNAL(deselect_all()),mainWindow,SLOT(deselect_all()));
 
     //prepare drawing tools
     QBrush redBrush(Qt::red);
@@ -210,7 +211,7 @@ void PageScene::addEdge(const Edge& e){
 
     deletePageButton->setEnabled(false);
 
-    connect(path,SIGNAL(was_selected(Edge&)),mainWindow,SLOT(on_edge_selected(Edge&)));
+    connect(path,SIGNAL(was_selected(Edge&,bool)),mainWindow,SLOT(on_edge_selected(Edge&,bool)));
     connect(path,SIGNAL(was_deselected(Edge&)),mainWindow,SLOT(on_edge_deselected(Edge&)));
     connect(path,SIGNAL(move(Edge&,int)),mainWindow,SLOT(move_edge_request(Edge&,int)));
 }
@@ -431,6 +432,16 @@ void PageScene::setCrossings(int crossings){
     crossingsIndicator->setNum(crossings);
 }
 
+void PageScene::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    const bool clickedAtVoid = itemAt(event->scenePos(),this->views().at(0)->transform()) == 0; //clickedAtVoid checks if there are any items at the point clicked
+                                                      //the second argument of itemAt is required by Qt and "needs to be provided if the scene contains items that ignore transformations"
+    if(clickedAtVoid && !(event->modifiers() & Qt::ControlModifier)){ //if clicked at void with control key not pressed
+        emit deselect_all();
+    }
+
+    QGraphicsScene::mousePressEvent(event);
+}
+
 void PageScene::setSize(QSize newSize) {
     int n = nodePositions.size();
     qreal interval=qMax((newSize.width()-2*margin)/n, minIntervalBetweenNodes); //space between two consequent vertices
@@ -479,13 +490,17 @@ void PageScene::moveNode(Node& v, QPointF toPos){
     (*nodes)[v]->setPos(toPos);
 }
 
-void PageScene::deselectAllBut(Node* v, Edge* e) {
+void PageScene::deselectAllEdgesBut(Edge* e) {
 
     for ( auto it = edges->begin(); it != edges->end(); ++it ) {
         if(&(it->first) == e) continue;
         QGraphicsItem* curr = (QGraphicsItem*)it->second;
         curr->setSelected(false);
     }
+
+}
+
+void PageScene::deselectAllNodesBut(Node* v) {
 
     for ( auto it = nodes->begin(); it != nodes->end(); ++it ) {
         if(&(it->first) == v) continue;

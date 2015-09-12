@@ -58,7 +58,8 @@ public:
     int width();
     MainWindow* window();
 
-    void deselectAllBut(Node *v = NULL, Edge *e = NULL);
+    void deselectAllEdgesBut(Edge *e = NULL);
+    void deselectAllNodesBut(Node *v = NULL);
 
     void addEdge(const Edge &e);
     void removeEdge(const Edge &e);
@@ -81,12 +82,15 @@ public:
     void moveNode(Node &v, QPointF toPos);
     void highlightNode(Node &v, bool enable);
     void highlightEdge(Edge &v, bool enable);
-
 public slots:
     void on_remove_page_request(){emit remove_page(page);}
     void setCrossings(int crossings);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
 signals:
     void remove_page(int);
+    void deselect_all();
 };
 
 

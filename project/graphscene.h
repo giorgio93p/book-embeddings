@@ -26,12 +26,17 @@ public:
     void addNode(const Node &, QPointF position);
     void removeNode(const Node &v);
     void highlightNode(const Node &v, bool enable);
-    void deselectAll();
+    void deselectAllNodesBut(Node *v);
+    void deselectAllEdgesBut(Edge *e);
     void highlightEdge(const Edge &e, bool enable);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 private:
     std::unordered_map<Node, GraphNode*> *nodes;
     std::unordered_map<Edge, GraphEdge*> *edges;
     MainWindow* mainWindow;
+signals:
+    void deselect_all();
 };
 
 #endif // GRAPHSCENE_H
