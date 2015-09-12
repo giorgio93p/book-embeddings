@@ -140,7 +140,7 @@ private:
     void findBiconnectedComponentsOfMainGraph();
 
 
-    void deselectEverythingInAllPagesBut(int page = -1);
+    void deselectEverythingBut(Edge *e = NULL, Node *v = NULL);
 
 public slots:
     void on_actionAddPage_triggered();
@@ -148,10 +148,11 @@ public slots:
     void on_actionSave_triggered();
     void on_actionSave_as_triggered();
 
-    void on_edge_selected(Edge &);
+    void on_edge_selected(Edge &, bool keepPreviousSelections = false);
     void on_edge_deselected(Edge &);
-    void on_node_selected(Node &, int);
+    void on_node_selected(Node &, bool keepPreviousSelections = false);
     void on_node_deselected(Node &);
+    void deselect_all();
 
     void move_edge_request(Edge &e, int direction = (int)PageEdge::MoveDirection::Unknown);
     void move_node(Node&, int newPosition);

@@ -29,7 +29,7 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event);
 signals:
-    void was_selected(Node&,int);
+    void was_selected(Node&);
     void was_deselected(Node&);
     void coordinates_changed(Node&,QPointF);
 private:
@@ -70,7 +70,7 @@ protected:
         void mouseMoveEvent (QGraphicsSceneMouseEvent*);
         void keyReleaseEvent(QKeyEvent *event);
 signals:
-        void was_selected(Node&,int);
+        void was_selected(Node&);
         void was_deselected(Node&);
         void was_dragged(Node&,int atPage, QPointF toPos);
         void move(Node&,int atPage);

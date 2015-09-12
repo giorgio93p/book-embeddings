@@ -51,7 +51,7 @@ void GraphScene::addNode(const Node& v, QPointF position){
     this->addItem(el);
     el->setPos(position);
     (*nodes)[v] = el;
-    connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+    connect(el,SIGNAL(was_selected(Node&)),mainWindow,SLOT(on_node_selected(Node&)));
     connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
     connect(el,SIGNAL(coordinates_changed(Node&,QPointF)),mainWindow,SLOT(node_coordinates_changed(Node&,QPointF)));
 }

@@ -66,7 +66,7 @@ QVariant GraphNode::itemChange(QGraphicsItem::GraphicsItemChange change, const Q
     }
     if (change == QGraphicsItem::ItemSelectedChange) {
         if(value.toBool()) {
-            emit this->was_selected(node,-1);
+            emit this->was_selected(node);
         }else{
             emit this->was_deselected(node);
         }
@@ -143,7 +143,7 @@ QVariant PageNode::itemChange(GraphicsItemChange change, const QVariant & value)
         return newPos;
     } else if (change == QGraphicsItem::ItemSelectedChange) {
         if(value.toBool()) {
-            emit this->was_selected(node,pageScene->pageNumber());
+            emit this->was_selected(node);
         }else{
             emit this->was_deselected(node);
         }
@@ -197,7 +197,7 @@ void PageNode::keyReleaseEvent(QKeyEvent *event){
         return;
     }
     setFocus();
-    //setSelected(true);
+    setSelected(true);
     QGraphicsItem::keyReleaseEvent(event);
 }
 

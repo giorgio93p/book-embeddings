@@ -58,7 +58,7 @@ public:
     int width();
     MainWindow* window();
 
-    void deselectAll();
+    void deselectAllBut(Node *v = NULL, Edge *e = NULL);
 
     void addEdge(const Edge &e);
     void removeEdge(const Edge &e);

@@ -316,15 +316,13 @@ void MainWindow::on_actionSave_as_triggered()
     }
 }
 
-void MainWindow::on_edge_selected(Edge& e){
+void MainWindow::on_edge_selected(Edge& e, bool keepPreviousSelections){
 
-
-
-    deselectEverythingInAllPagesBut(mainGraph->getPageNo(e));
+    if(!keepPreviousSelections) deselectEverythingBut(&e);
 
     edge_stats->setEnabled(true);
     //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") selected" << endl;
-    //edge_crossings_indicator->setNum(mainGraph->getNcrossings(e));
+    edge_crossings_indicator->setNum(mainGraph->getNcrossings(e));
     edge_source_indicator->setNum(e->source()->index());
     edge_target_indicator->setNum(e->target()->index());
     edge_page_indicator->setNum(mainGraph->getPageNo(e));
@@ -339,23 +337,22 @@ void MainWindow::on_edge_selected(Edge& e){
     gs->highlightEdge(e,true);
 }
 
-void MainWindow::deselectEverythingInAllPagesBut(int pageNo) {
-
-
+void MainWindow::deselectEverythingBut(Edge *e, Node *v) {
+    int pageNo = e ? mainGraph->getPageNo(*e) : -1;
     for (int i=0; i<pageViews.size(); i++) {
 
-        if (i==pageNo) continue; //if the page under examination
-        //is the page of the selected edge
-        //then we won't touch
-
         PageScene* ps = pageViews[i]->scene();
-        ps->deselectAll();
+        if (i==pageNo) ps->deselectAllBut(v,e); //if the page under examination is the page of the selected edge
+        else ps->deselectAllBut(v);
+
     }
 
     graphView->scene()->deselectAll();
 }
 
-
+void MainWindow::deselect_all(){
+    deselectEverythingBut();
+}
 
 void MainWindow::on_edge_deselected(Edge& e){
     edge_stats->setEnabled(false);
@@ -364,22 +361,18 @@ void MainWindow::on_edge_deselected(Edge& e){
     edge_target_indicator->clear();
     edge_page_indicator->clear();
 
-
-
     int pageNo = mainGraph->getPageNo(e);
     PageScene* ps = pageViews[pageNo]->scene();
     ps->highlightEdge(e,false);
-
 
     GraphScene* gs = graphView->scene();
     gs->highlightEdge(e,false);
     //std::cout << "Edge (" << e->source()->index() << "," << e->target()->index() << ") deselected" << endl;
 }
 
-void MainWindow::on_node_selected(Node& v, int onPage){
+void MainWindow::on_node_selected(Node& v, bool keepPreviousSelections){
 
-    deselectEverythingInAllPagesBut(onPage);
-
+    if(!keepPreviousSelections)deselectEverythingBut(NULL,&v);
 
     node_stats->setEnabled(true);
     //std::cout << "Node " << v->index() << " selected" << endl;
@@ -463,9 +456,8 @@ void MainWindow::move_edge(Edge& e, int newPage){
 
 void MainWindow::move_node(Node &v, int newPosition){
     if(newPosition < 0 || newPosition >= mainGraph->numberOfNodes() || mainGraph->getPosition(v) == newPosition) return;
-    deselectEverythingInAllPagesBut(-1);
     commandHistory->activeStack()->push(new NodeMoveCommand(v,mainGraph, newPosition, &pageViews));
-    on_node_selected(v,-1);
+    //deselectEverythingBut(v); //TODO: check if we need to enable this line
 }
 
 void MainWindow::on_node_dragged(Node&v, int atPage, QPointF toPos){

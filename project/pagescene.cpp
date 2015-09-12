@@ -45,7 +45,7 @@ PageScene::PageScene(const BookEmbeddedGraph *g, const int p, MainWindow* w, QCo
         //std::cout << "Node " << v->index() <<  " drawn at position " << i << " (" << el->scenePos().x() << "," << el->scenePos().y() << ")" << std::endl;
         (*nodes)[v] = el;
 
-        connect(el,SIGNAL(was_selected(Node&,int)),mainWindow,SLOT(on_node_selected(Node&,int)));
+        connect(el,SIGNAL(was_selected(Node&)),mainWindow,SLOT(on_node_selected(Node&)));
         connect(el,SIGNAL(was_deselected(Node&)),mainWindow,SLOT(on_node_deselected(Node&)));
         connect(el,SIGNAL(was_dragged(Node&,int,QPointF)),mainWindow,SLOT(on_node_dragged(Node&,int,QPointF)));
         connect(el,SIGNAL(move(Node&,int)),mainWindow,SLOT(move_node(Node&,int)));
@@ -479,14 +479,16 @@ void PageScene::moveNode(Node& v, QPointF toPos){
     (*nodes)[v]->setPos(toPos);
 }
 
-void PageScene::deselectAll() {
+void PageScene::deselectAllBut(Node* v, Edge* e) {
 
     for ( auto it = edges->begin(); it != edges->end(); ++it ) {
+        if(&(it->first) == e) continue;
         QGraphicsItem* curr = (QGraphicsItem*)it->second;
         curr->setSelected(false);
     }
 
     for ( auto it = nodes->begin(); it != nodes->end(); ++it ) {
+        if(&(it->first) == v) continue;
         QGraphicsItem* curr = (QGraphicsItem*)it->second;
         curr->setSelected(false);
     }
