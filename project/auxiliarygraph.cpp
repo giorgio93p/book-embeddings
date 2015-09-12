@@ -5,6 +5,11 @@
 #include <ogdf/energybased/SpringEmbedderFR.h>
 #include <ogdf/energybased/FMMMLayout.h>
 
+/*
+ * 15.55 11/9/15 (14 years since 911!!)
+ * added mgN_to_bc, mgE_to_bc.
+ */
+
 
 
 AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
@@ -32,8 +37,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     // so that we can associate a node clicked on a biconnected component with
     // the corresponding node in the main graph. That way, we can automatically
     // update the main graph each time a biconnected component of a graph changes.
-    // One important necessity is to create mappings from the mainGraph to each biconnected component
-    // too, soon to be done.  (TODO!!)
+
 
     attr.setDirected(false);
 
@@ -94,6 +98,12 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
     //the cut nodes exist more than one times in g. One on their own, as lonely vertices, and also in all the
     //biconnected components they exist in.
 
+    std::unordered_map<Node,BiconnectedComponent*> mgN_to_bc; //main graph to nodes to corresponding bc
+    std::unordered_map<Edge,BiconnectedComponent*> mgE_to_bc; //main grap h to edges to corresponding bc
+    //the above will be used to set the mgN_to_bc, mgE_to_bc maps of the mainGraph. This will enable us
+    //to make changes in the main graph and update the biconnected components appropriately.
+
+
     forall_nodes(v,g) {
         if (explored[v]==0) { //check if the vertex belongs to an already extracted subgraph
 
@@ -125,7 +135,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
             }
 
             if (newBC->numberOfNodes()== mg->numberOfNodes()) { //in case this is the whole graph
-                mg->setAsBiconnected(); //TODO: CREATE FUN
+                mg->setAsBiconnected();                         //set isBiconnected flag of the graph to true.
                 break;
 
             }
@@ -165,19 +175,30 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
             BiconnectedComponent *bc = new BiconnectedComponent(*newBC,mg,nMapping,eMapping);
 
-            // 2 last things:
-            // 1.map each node of the new bc to the this bc (fill agN_to_bc)
-            // 2.set all the vertices in the extracted subgraph as explored
+            // 5 last things:
+            // 1.fill the mgE_to_bc map (i.e. map each edge of the maingraph
+            // that corresponds to an edge of newBC to bc)
+            // 2.fill the mgN_to_bc map
+            // 3.map each node of the new bc to the this bc (fill agN_to_bc)
+            // 4.set all the corresponding nodes to the ag as non-cut nodes.
+            // 5.set all the vertices in the extracted subgraph as explored
+
+            forall_edges(e,*newBC) {
+                mgE_to_bc[eMapping.at(e)]=bc; // 1st thing.
+            }
 
             forall_nodes (n,*newBC) {
                 Node correspondingNode = sgN_to_agN[n];
 
 
+                mgN_to_bc[nMapping.at(n)] = bc; //2nd thing
 
                 //setting the maps
-                agN_to_bc[correspondingNode]=bc;
-                is_cut_node[correspondingNode]=false;
+                agN_to_bc[correspondingNode]=bc;  //3d thing
+                is_cut_node[correspondingNode]=false; //4th thing
 
+
+                //5th thing below.
 
                 //setting the vertex as explored, with error-handling!!
                 std::unordered_map<Node,int>::const_iterator got = explored.find(correspondingNode);
@@ -195,12 +216,17 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
             }
 
 
+
+
             bCs.push_back(bc);   //storing the results
 
             if (bCs.size() == 1) mg->setAsBiconnected(); //if this condition holds true
                                                          //that means that our graph
                                                          //has one biconnected component
                                                          //and a number of lonely vertices.
+
+
+
 
             subGraphs.push_back(newBC);// in the vectors
 
@@ -209,6 +235,7 @@ AuxiliaryGraph::AuxiliaryGraph(BookEmbeddedGraph* mg):
 
     }
 
+    mg->set_mg_to_bc_maps(mgN_to_bc,mgE_to_bc);  //storing the maps to mg.
 
 
     subGraphs.shrink_to_fit();

@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
     setupUi(this);
+
     setWindowTitle(WINDOW_TITLE);
     connect(actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
@@ -194,6 +195,7 @@ void MainWindow::drawBCTree() {
     auxiliaryGraph = new AuxiliaryGraph(mainGraph);
     delete bCTView->scene();    //deleting previous scene if any
 
+    /*
     if (mainGraph->getIsBiconnected()) {
         //the main graph is already biconnected, so we won't use the auxiliary graph at all
         delete auxiliaryGraph;
@@ -209,15 +211,11 @@ void MainWindow::drawBCTree() {
         return;                                         //done.
 
     }
+    */
 
 
 
-
-    auxiliaryGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height()); //building layout: this is where the program
-    //segfaults :(.
-    //we use it to make some
-    // settings in the attr member of graphs
-
+    auxiliaryGraph->buildLayout(0.0,0.0,bCTView->width(),bCTView->height());
 
 
     QGraphicsScene *gs =new AGScene(auxiliaryGraph,this,bCTView->width(),bCTView->height());
@@ -233,6 +231,7 @@ void MainWindow::drawBCTree() {
 }
 
 bool MainWindow::openBookEmbeddedGraph(std::string filename){
+
     wholeGraphMode=true;
     BookEmbeddedGraph* temp = new BookEmbeddedGraph();
     if (temp->readGML(filename)){
@@ -241,7 +240,7 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         }
         commandHistory->addStack(new QUndoStack(commandHistory));//move this operation to drawBCTree() when we can work independently across Biconnected Components
         currentFile = filename;
-        //delete mainGraph;
+        //delete mainGraph; //todo: check (9/11)
         mainGraph = temp;
 
 
@@ -259,7 +258,7 @@ bool MainWindow::openBookEmbeddedGraph(std::string filename){
         stats->setCurrentWidget(graph_stats);
         return true;
     } else {
-        //delete temp;
+        //delete temp; //todo
         return false;
     }
 }

@@ -26,13 +26,14 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
     std::unordered_map<int,Edge> i_to_e;
 
 
+
+
     forall_nodes(v,g) {
 
+        //setting the node numbering so according to the number in the original graph.
 
         Node corresponding = nodeMapping.at(v); //getting the corresponding node. if this fails,
                                                 // then nodes in g are other than the
-
-
 
         int num = mainGraph->getNumberOf(corresponding);
 
@@ -44,6 +45,8 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
 
 
     }
+
+
 
 
 
@@ -61,7 +64,32 @@ BiconnectedComponent::BiconnectedComponent(ogdf::Graph& gr, BookEmbeddedGraph* m
 
 
 
+
+
+
     setNumbering(e_to_i,n_to_i,i_to_n,i_to_e);
+
+    //TODO: create permutation table according to wholegraph.
+
+    /*
+     * IDEA
+     *     //create permutation table according to wholegraph.
+
+
+     * permutation.clear();
+     * permutation.reserve(numberOfNodes());
+     * for (i=0; i<wholeGraph->numberofnodes();i++)
+     * {
+     * if (wholeGraph->nodeInBc(wholeGraph->permutation.at(i))) {
+     *          permutation.push_back(permutation.at(i);
+     *          permutationMapping[i]=permutation.size()-1; //index of last inserted element
+     * }
+     *
+     *
+     *
+     *
+     */
+
 
 
 

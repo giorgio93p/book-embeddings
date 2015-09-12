@@ -1,6 +1,7 @@
 #include "graphs.h"
 #include <ogdf/energybased/SpringEmbedderFR.h>
 #include <ogdf/energybased/FMMMLayout.h>
+#include "biconnectedcomponent.h" //TODO: check later
 
 Graph::Graph():g2(g1)
 {
@@ -27,7 +28,6 @@ void Graph::setDefaultNumbering() {
     forall_nodes(n,g) {
 
         n_to_i[n] = i;
-
         i_to_n[i] = n;
         i++;
 
@@ -38,8 +38,6 @@ void Graph::setDefaultNumbering() {
     forall_edges(e,g)
     {
         e_to_i[e] = i;
-
-
         i_to_e[i] = e;
         i++;
     }
@@ -377,8 +375,19 @@ Node BookEmbeddedGraph::nodeAt(int position) const{
 
 
 void BookEmbeddedGraph::addEdgeToPage(Edge& e, const int pageNo){
+
+
+
     attr.label(e) = std::to_string(pageNo);
     pages[pageNo].insert(e);
+/*
+    if (!getIsBiconnected()) {
+        BiconnectedComponent* bc = mgE_to_bc.at(e);
+        int num = getNumberOf(e);
+        Edge corresponding = bc->getEdge(num);
+        bc->addEdgeToPage(corresponding,pageNo);
+    }
+*/
 }
 
 void BookEmbeddedGraph::generateBuckets(){
@@ -458,14 +467,20 @@ void BookEmbeddedGraph::calculateCrossings(const std::vector<int> pagesChanged){
 }
 
 bool BookEmbeddedGraph::readGML(std::string &fileName){
+
     ogdf::Graph& g = (use_g2) ? g2:g1;
 
+
+    isBiconnected=false;
 
     if(! ogdf::GraphIO::readGML(attr,g,fileName)) return false;
 
     permutation.clear();
     permutation.resize(numberOfNodes());
+
+
     Node v;
+
     forall_nodes(v,g){
         permutation[getPosition(v)] = v;
     }
@@ -477,11 +492,13 @@ bool BookEmbeddedGraph::readGML(std::string &fileName){
         pages[getPageNo(e)].insert(e);
     }
 
+
     bucketsNeedToBeGenerated=true;
     ncrossings=0;
     calculateCrossings();
 
     setDefaultNumbering();
+
     return true;
 }
 
@@ -494,6 +511,7 @@ void BookEmbeddedGraph::updatePermutation(int originalIndex, int finalPos) {
             //attr.label(permutation[i + 1]) = attr.label(permutation[i]);
             permutation[i] = permutation[i + 1];
             attr.label(permutation[i]) = std::to_string(i);
+
 
         }
 

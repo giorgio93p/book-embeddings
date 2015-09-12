@@ -46,6 +46,16 @@ class BiconnectedComponent;
  * to the constructor.
  *
  *
+ * Also I added 4 unordered_maps. They serve as a means of indexing
+ * nodes and edges. Now we can get a Node/Edge by its index, or its
+ * index by giving that Node/Edge ..
+ * This means of indexing is also useful because it provides us
+ * another way of mapping biconnected components' nodes to the main
+ * graph nodes.
+ *
+ * Speaking of biconnected components, i created a subclass of BookEmbeddedGraph,
+ * class BiconnectedComponent.
+ *
  */
 
 
@@ -54,301 +64,319 @@ class Graph  {
 
 
 
-    protected:
-        ogdf::Graph g1;
-        ogdf::Graph& g2; //this is a reference to an ogdf graph!
-        ogdf::GraphAttributes attr;
-        bool use_g2; //this is set to true when we use a reference
-        //to an ogdf graph instead of a graphz
-    private:
-        std::unordered_map<Edge,int> e_to_int;
-        std::unordered_map<Node,int> n_to_int;
-        std::unordered_map<int,Node> int_to_n;
-        std::unordered_map<int,Edge> int_to_e;
-        bool listshavebeenset; //this is to ensure that the above lists are
-                               //given their values only once.
-                               //we could have used the const keyword, but
-                               //this would create a number of problems,
-                               //because we want the capability of initializing
-                               //outside the constructor of class Graph.
+protected:
+    ogdf::Graph g1;
+    ogdf::Graph& g2; //this is a reference to an ogdf graph!
+    ogdf::GraphAttributes attr;
+    bool use_g2; //this is set to true when we use a reference
+    //to an ogdf graph instead of a graphz
+protected:
+    std::unordered_map<Edge,int> e_to_int;
+    std::unordered_map<Node,int> n_to_int;
+    std::unordered_map<int,Node> int_to_n;
+    std::unordered_map<int,Edge> int_to_e;
+    bool listshavebeenset;
+    //this is to ensure that the above lists are
+    //given their values only once.
+    //we could have used the const keyword, but
+    //this would create a number of problems,
+    //because we want the capability of initializing
+    //outside the constructor of class Graph.
+
+    std::unordered_map<Node,BiconnectedComponent*> mgN_to_bc; //maps from main graph nodes to their bc
+    std::unordered_map<Edge,BiconnectedComponent*> mgE_to_bc; //same with edges.
+    bool isBiconnected=false;
+    //the above shall serve as a flag that, among other things, will determine whether
+    //this graph is the original graph or a biconnected comp of it.
+    //it is to false at the constructor of Graph, and it is set to true in two cases:
+    //a. in the constructor of class BiconnectedComponent (which derives from graph)
+    //b. in the analysis made during the creation of our AuxiliaryGraph object.
 
 
 
-        std::unordered_map<Edge,BiconnectedComponent*> mgE_to_bc; //main graph nodes to their bc
-        bool isBiconnected=false;
-        //the above shall serve as a flag that, among other things, will determine whether
-        //this graph is the original graph or a biconnected comp of it.
-        //it is to false at the constructor of Graph, and it is set to true in two cases:
-        //a. in the constructor of class BiconnectedComponent (which derives from graph)
-        //b. in the analysis made during the creation of our AuxiliaryGraph object.
 
+public:
+    Graph();
+    Graph(ogdf::Graph graph);
+    Graph(Graph*);
+    Graph(ogdf::Graph& graph,bool weareusingreference);
 
+    //the second arguement allows us to choose
+    //if the graph will create the four unordered_maps
+    // automatically. This allows the user to use the method
+    // setNumbering to use custom numbering for the nodes and
+    // edges
 
-
-    public:
-        Graph();
-        Graph(ogdf::Graph graph);
-        Graph(Graph*);
-        Graph(ogdf::Graph& graph,bool weareusingreference);
-
-        //the second arguement allows us to choose
-        //if the graph will create the four unordered_maps
-        // automatically. This allows the user to use the method
-        // setNumbering to use custom numbering for the nodes and
-        // edges
-
-        void setAsBiconnected() {
-            isBiconnected=true;
+    void set_mg_to_bc_maps(std::unordered_map<Node,BiconnectedComponent*> m1, //setter for mgN_to_bc,
+                           std::unordered_map<Edge,BiconnectedComponent*> m2) //and mgE_to_bc.
+    {
+        if (!isBiconnected) { //if graph is biconnected, there is no need for the maps to exist!
+            mgN_to_bc=m1;
+            mgE_to_bc=m2;
         }
-        bool getIsBiconnected() const {  //get
-            return isBiconnected;
-        }
+    }
+
+    BiconnectedComponent* getBCOf(Node n) {
+        if (isBiconnected) return 0;
+        return mgN_to_bc.at(n);
+    }
+    BiconnectedComponent* getBCOf(Edge e) {
+        if (isBiconnected) return 0;
+        return mgE_to_bc.at(e);
+    }
 
 
-        void setNumbering(std::unordered_map<Edge,int> e_to_num,
-                          std::unordered_map<Node,int> n_to_num,
-                          std::unordered_map<int, Node > num_to_n,
-                          std::unordered_map<int, Edge > num_to_e);
 
-        void setDefaultNumbering();
-
-        int getNumberOf(Node n) {
-            return n_to_int.at(n);
-        }
-
-        int getNumberOf(Edge e) {
-            return e_to_int.at(e);
-        }
+    void setAsBiconnected() { //setter.
+        isBiconnected=true;
+    }
+    bool getIsBiconnected() const {  //getter for isBicconected.
+        return isBiconnected;
+    }
 
 
-        int getNumberOfConst(Node n) const{
-            return n_to_int.at(n);
-        }
+    void setNumbering(std::unordered_map<Edge,int> e_to_num,
+                      std::unordered_map<Node,int> n_to_num,
+                      std::unordered_map<int, Node > num_to_n,
+                      std::unordered_map<int, Edge > num_to_e);
 
-        int getNumberOfConst(Edge e) const{
-            return e_to_int.at(e);
-        }
+    void setDefaultNumbering();
 
-        Node& getNode(int num) {
-            Node& n =int_to_n.at(num);//latest change
+    int getNumberOf(Node n) {
+        return n_to_int.at(n);
+    }
 
-            return n;
-        }
-
-        const Node& getNodeConst(int num) const{
-            const Node& n =int_to_n.at(num);//latest change
-
-            return n;
-        }
+    int getNumberOf(Edge e) {
+        return e_to_int.at(e);
+    }
 
 
-        Edge& getEdge(int num) {
-            Edge& e = int_to_e.at(num);
-            return e;
-        }
+    int getNumberOfConst(Node n) const{
+        return n_to_int.at(n);
+    }
 
-        const Edge& getEdgeConst(int num) const {
-            const Edge& e = int_to_e.at(num);
-            return e;
-        }
+    int getNumberOfConst(Edge e) const{
+        return e_to_int.at(e);
+    }
 
-        ogdf::Graph toOGDFval() const {
-            ogdf::Graph& g = g2 ;
+    Node& getNode(int num) {
+        Node& n =int_to_n.at(num);//latest change
+        return n;
+    }
 
+    const Node& getNodeConst(int num) const{
+        const Node& n =int_to_n.at(num);//latest change
 
-            return g;
-        }
-
-         ogdf::Graph& toOGDF() {
-            ogdf::Graph& g = (use_g2) ? g2:g1;
-
-            ogdf::Graph& graf= g;
-            return graf;
-        }
+        return n;
+    }
 
 
-        virtual bool readGML(std::string& fileName){
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+    Edge& getEdge(int num) {
+        Edge& e = int_to_e.at(num);
+        return e;
+    }
+
+    const Edge& getEdgeConst(int num) const {
+        const Edge& e = int_to_e.at(num);
+        return e;
+    }
+
+    ogdf::Graph toOGDFval() const {
+        ogdf::Graph& g = g2 ;
 
 
-            return ogdf::GraphIO::readGML(attr,g,fileName);
-        }
-        virtual bool writeGML(std::string& fileName){
-            return ogdf::GraphIO::writeGML(attr,fileName);
-        }
-        bool empty() {
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+        return g;
+    }
 
-            return g.empty();
-        }
-        int numberOfNodes() const {
-            const ogdf::Graph& g = (use_g2) ? g2:g1;
+    ogdf::Graph& toOGDF() {
+        ogdf::Graph& g = (use_g2) ? g2:g1;
+
+        ogdf::Graph& graf= g;
+        return graf;
+    }
 
 
-            return g.numberOfNodes();
-        }
-        int numberOfEdges() const {
-            const ogdf::Graph& g = (use_g2) ? g2:g1;
+    virtual bool readGML(std::string& fileName){
+        ogdf::Graph& g = (use_g2) ? g2:g1;
 
-            return g.numberOfEdges();
-        }
 
-        Node addNode();
+        return ogdf::GraphIO::readGML(attr,g,fileName);
+    }
+    virtual bool writeGML(std::string& fileName){
+        return ogdf::GraphIO::writeGML(attr,fileName);
+    }
+    bool empty() {
+        ogdf::Graph& g = (use_g2) ? g2:g1;
 
-        virtual Edge addEdge(Node& from, Node& to){
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+        return g.empty();
+    }
+    int numberOfNodes() const {
+        const ogdf::Graph& g = (use_g2) ? g2:g1;
 
-            return g.newEdge(from, to);
-        }
 
-        virtual Node firstNode() {
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+        return g.numberOfNodes();
+    }
+    int numberOfEdges() const {
+        const ogdf::Graph& g = (use_g2) ? g2:g1;
 
-            return g.firstNode();
-        }
+        return g.numberOfEdges();
+    }
 
-        virtual Edge firstEdge()  {
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+    Node addNode();
 
-            return g.firstEdge();
-        }
+    virtual Edge addEdge(Node& from, Node& to){
+        ogdf::Graph& g = (use_g2) ? g2:g1;
 
-        ogdf::GraphAttributes getGraphAttributes() {
+        return g.newEdge(from, to);
+    }
 
-            return attr;
-        }
+    virtual Node firstNode() {
+        ogdf::Graph& g = (use_g2) ? g2:g1;
 
-        ogdf::Graph getGraph() {
-            ogdf::Graph& g = (use_g2) ? g2:g1;
+        return g.firstNode();
+    }
 
-            return g;
-        }
+    virtual Edge firstEdge()  {
+        ogdf::Graph& g = (use_g2) ? g2:g1;
 
-        bool hasLayout() const;
-        void buildLayout(const double xmin, const double ymin, const double xmax, const double ymax);
-        double getXcoord(const Node &v) const;
-        double getYcoord(const Node &v) const;
-        void setXcoord(Node &v, double x);
-        void setYcoord(Node &v, double y);
-        double getBoxWidth(const Node &v) const;
-        double getBoxHeight(const Node &v) const;
+        return g.firstEdge();
+    }
 
-        bool graphIsPlanar() const;
+    ogdf::GraphAttributes getGraphAttributes() {
 
-        //TODO:
-        //orismos methodon epanasxediasmou (px gia dinatotita allagis akmwn / switching koryfwn)
+        return attr;
+    }
 
-        BookEmbeddedGraph* bookEmbed(const int npages,const std::vector<int>& vertexPermutation);
-        BookEmbeddedGraph* bookEmbedOptimalPermutation(const int npages);
-        BookEmbeddedGraph* bookEmbedWithLeastPages();
-        //the above 3 functions will do the most serious job 
-        //bookEmbed will try and find the best book embedding for a 
-        //given number of available pages and a given sequence of vertices
-        //bookEmbedOptimalPermutation will try and find the best book embedding with **any** permutation
-        //bookEmbedWithLeastPages will try and find the least number of pages required to book-embed
-        //this Graph with zero crossings.
+    ogdf::Graph getGraph() {
+        ogdf::Graph& g = (use_g2) ? g2:g1;
 
-        //TODO:
-        //prosthiki synartisewn pou kanoun bookembedding gia dedomeno permutation alla agnosti selidopoisi
-        //kai to antistrofo
+        return g;
+    }
 
-        virtual ~Graph();
+    bool hasLayout() const;
+    void buildLayout(const double xmin, const double ymin, const double xmax, const double ymax);
+    double getXcoord(const Node &v) const;
+    double getYcoord(const Node &v) const;
+    void setXcoord(Node &v, double x);
+    void setYcoord(Node &v, double y);
+    double getBoxWidth(const Node &v) const;
+    double getBoxHeight(const Node &v) const;
+
+    bool graphIsPlanar() const;
+
+    //TODO:
+    //orismos methodon epanasxediasmou (px gia dinatotita allagis akmwn / switching koryfwn)
+
+    BookEmbeddedGraph* bookEmbed(const int npages,const std::vector<int>& vertexPermutation);
+    BookEmbeddedGraph* bookEmbedOptimalPermutation(const int npages);
+    BookEmbeddedGraph* bookEmbedWithLeastPages();
+    //the above 3 functions will do the most serious job
+    //bookEmbed will try and find the best book embedding for a
+    //given number of available pages and a given sequence of vertices
+    //bookEmbedOptimalPermutation will try and find the best book embedding with **any** permutation
+    //bookEmbedWithLeastPages will try and find the least number of pages required to book-embed
+    //this Graph with zero crossings.
+
+    //TODO:
+    //prosthiki synartisewn pou kanoun bookembedding gia dedomeno permutation alla agnosti selidopoisi
+    //kai to antistrofo
+
+    virtual ~Graph();
 };
 
 class BookEmbeddedGraph : public Graph {
 
-    public:
-        BookEmbeddedGraph(Graph* g);
+public:
+    BookEmbeddedGraph(Graph* g);
 
-        BookEmbeddedGraph(ogdf::Graph&,bool weareusingreferences);
+    BookEmbeddedGraph(ogdf::Graph&,bool weareusingreferences);
 
-        BookEmbeddedGraph();
-        BookEmbeddedGraph(ogdf::Graph );
+    BookEmbeddedGraph();
+    BookEmbeddedGraph(ogdf::Graph );
 
-        Edge addEdge(Node& from, Node& to, int pageNo);
+    Edge addEdge(Node& from, Node& to, int pageNo);
 
-        Edge addEdge(Node& from, Node& to) override{
-            return addEdge(from,to,0);
-        }
-        Edge firstEdge() ;
+    Edge addEdge(Node& from, Node& to) override{
+        return addEdge(from,to,0);
+    }
+    Edge firstEdge() ;
 
-        Node addNode();
+    Node addNode();
 
-        void addPage(int pageNo);
-        void addPage(){addPage(getNpages());}
-        void removePage(int pageNo);
+    void addPage(int pageNo);
+    void addPage(){addPage(getNpages());}
+    void removePage(int pageNo);
 
-        /*
+    /*
          * Does not recalculate crossings
         */
-        void moveToPage(Edge& e, const int newPage);
+    void moveToPage(Edge& e, const int newPage);
 
-        int getPageNo(const Edge& e) const;
-        int getPosition(const Node& v) const;
-        Node nodeAt(int position) const;
-        void swap(Node& v1, Node& v2);
-        void moveTo(Node& v, const int position);
+    int getPageNo(const Edge& e) const;
+    int getPosition(const Node& v) const;
+    Node nodeAt(int position) const;
+    void swap(Node& v1, Node& v2);
+    void moveTo(Node& v, const int position);
 
-        Page edgesIn(int page) const {
-            return pages.at(page);
+    Page edgesIn(int page) const {
+        return pages.at(page);
+    }
+    int getNpages() const {
+        return pages.size();
+    }
+    int getNcrossings() const {
+        return ncrossings;
+    }
+    int getNcrossings(const int page) const{
+        int result = 0;
+        for(Edge e : pages.at(page)){
+            result += getNcrossings(e);
         }
-        int getNpages() const {
-            return pages.size();
-        }
-        int getNcrossings() const {
-            return ncrossings;
-        }
-        int getNcrossings(const int page) const{
-            int result = 0;
-            for(Edge e : pages.at(page)){
-                result += getNcrossings(e);
-            }
-            return result/2; //we have counted each crossing twice
-        }
-        int getNcrossings(const Edge& e) const{
-            return 0;//crossings.at(e).size();
-        }
-        std::unordered_set<Edge> getcrossings(const Edge& e) const{
-            return crossings.at(e);
-        }
-        int pageSize(int p) const{
-            return pages.at(p).size();
-        }
-        /*
+        return result/2; //we have counted each crossing twice
+    }
+    int getNcrossings(const Edge& e) const{
+        return 0;//crossings.at(e).size();
+    }
+    std::unordered_set<Edge> getcrossings(const Edge& e) const{
+        return crossings.at(e);
+    }
+    int pageSize(int p) const{
+        return pages.at(p).size();
+    }
+    /*
         void setVertexOrder(int *order){
             free(vertexOrder);
             vertexOrder = order;
         }*/
 
-        bool readGML(std::string& fileName) override;
-        virtual ~BookEmbeddedGraph() = default;
+    bool readGML(std::string& fileName) override;
+    virtual ~BookEmbeddedGraph() = default;
 
-        void updatePermutation(int, int);
+    void updatePermutation(int, int);
 
-    private:
-        //std::vector<int> nodeOrderOnSpine;
-        std::vector<Page> pages;
-        std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
-        /*
+private:
+    std::vector<Page> pages;
+    std::unordered_map<Edge,std::unordered_set<Edge> > crossings;
+    /*
          * permutation is the inverse mapping of attr.label(Node).
          * Both are used to store information about the sequence of nodes on pages.
          * Do not confuse with node index, which is just a "name" for the node.
         */
-        std::vector<Node> permutation;
+    std::vector<Node> permutation;
 
-        int ncrossings;
+    int ncrossings;
 
-        bool bucketsNeedToBeGenerated;
-        std::vector<Buckets> startBuckets;
-        std::vector<Buckets> endBuckets;
+    bool bucketsNeedToBeGenerated;
+    std::vector<Buckets> startBuckets;
+    std::vector<Buckets> endBuckets;
 
-        void addEdgeToPage(Edge& e, int pageNo);
-        void generateBuckets();
+    void addEdgeToPage(Edge& e, int pageNo);
+    void generateBuckets();
 
-        /**
+    /**
          * @param pagesChanged The pages that need to be recalculated. If the vector is empty, all pages need calculation.
          */
-        void calculateCrossings(const std::vector<int> pagesChanged = std::vector<int>());
+    void calculateCrossings(const std::vector<int> pagesChanged = std::vector<int>());
 
 };
 
@@ -363,7 +391,7 @@ bool edgeCmp (const Edge&, const Edge&);
 #define forall_edges_bc(e,T,b) for ((e) = (T).firstEdge(b); (e); (e) = (e)->succ())
 
 enum onode_type {
-    ONODETYPE_NORMAL, 
+    ONODETYPE_NORMAL,
     ONODETYPE_CUT
 };
 
@@ -373,47 +401,47 @@ enum bnode_type {
 };
 
 class BCTree {
-    private:
-        //NOTE : originalGraph should not even be here, but we can't call
-        //BCTree's constructor with a temp argument, so we need to use
-        //that (see constructor definition)
-        
-        ogdf::Graph& originalGraph;
-        ogdf::BCTree ogBCT;
-        const ogdf::Graph& auxiliaryGraph;  //auxiliary graph: this is the graph that contains all biconnected components
-                                            //without any edges between them
-                                            //we chose const reference, because ogdf::BCTree::auxiliaryGraph()
-                                           //returns const
+private:
+    //NOTE : originalGraph should not even be here, but we can't call
+    //BCTree's constructor with a temp argument, so we need to use
+    //that (see constructor definition)
 
-        std::unordered_map<Node,Node> agN_to_mgN; //a(uxiliary)g(raph)N(ode)_to_m(ain)g(raph)N(ode)
-        std::unordered_map<Edge,Edge> agE_to_mgE; //similarly with edges
+    ogdf::Graph& originalGraph;
+    ogdf::BCTree ogBCT;
+    const ogdf::Graph& auxiliaryGraph;  //auxiliary graph: this is the graph that contains all biconnected components
+    //without any edges between them
+    //we chose const reference, because ogdf::BCTree::auxiliaryGraph()
+    //returns const
 
-
+    std::unordered_map<Node,Node> agN_to_mgN; //a(uxiliary)g(raph)N(ode)_to_m(ain)g(raph)N(ode)
+    std::unordered_map<Edge,Edge> agE_to_mgE; //similarly with edges
 
 
-    public:
-        BCTree(Graph& g);
 
-        const ogdf::Graph& getAuxiliaryGraph() {
-            //ogdf::Graph &ax = ogBCT.auxiliaryGraph();
-            return auxiliaryGraph;
-        }
 
-        ogdf::Graph getBCTree2() const {
-            return ogBCT.auxiliaryGraph();
-        }
+public:
+    BCTree(Graph& g);
 
-        const std::unordered_map<Node,Node> generateNodeMapping();
-        const std::unordered_map<Edge,Edge> generateEdgeMapping();
+    const ogdf::Graph& getAuxiliaryGraph() {
+        //ogdf::Graph &ax = ogBCT.auxiliaryGraph();
+        return auxiliaryGraph;
+    }
 
-        Node firstNode(bool);
-        Node lastNode(bool);
+    ogdf::Graph getBCTree2() const {
+        return ogBCT.auxiliaryGraph();
+    }
 
-        int numberOfNodes(bool);
-        int numberOfBComps ();
-        int numberOfCComps ();
-        onode_type typeOfVertexInOriginalGraph(Node);
-        bnode_type typeOfVertexInBCTree(Node);
+    const std::unordered_map<Node,Node> generateNodeMapping();
+    const std::unordered_map<Edge,Edge> generateEdgeMapping();
+
+    Node firstNode(bool);
+    Node lastNode(bool);
+
+    int numberOfNodes(bool);
+    int numberOfBComps ();
+    int numberOfCComps ();
+    onode_type typeOfVertexInOriginalGraph(Node);
+    bnode_type typeOfVertexInBCTree(Node);
 };
 
 #endif
