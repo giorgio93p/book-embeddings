@@ -25,3 +25,11 @@ baur-braudez heuristic
 he-sykora heuristic
 find edge-seperator
 
+===========11/09/2015===========
+TODO:
+* Implement switching between Biconnected Components.
+* Select/move many edges. Drag to select edges. Move edges using the keyboard.
+* Option to reset zoom of pages.
+* Uniform size of pages (at least on graph opening). Manual page resizing.
+* Select page to be shown in a view. Show more than one pages in one view.
+* Read from files with no labels (i.e. no information about book embedding).
